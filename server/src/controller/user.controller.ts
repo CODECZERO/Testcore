@@ -1,29 +1,24 @@
+class User {
 
-const tokenGen=async ()=>{
+    cookiOptions = {
 
-}
-const cookiOptions={
+    }
 
-}
+    login = async (email: string, password: string) => {
 
-const login=async (email:string,password:string)=>{
+    }
 
-}
+    singup = async (fullname: string, password: string, email: string) => {
 
-const singup=async (fullname:string,password:string,email:string)=>{
-
-}
+    }
 
 
 
-const updatePassword=()=>{
-    
+    updatePassword = () => {
+
+    }
 }
 
 export {
-    login,
-    singup,
-    updateTest,
-    postTest,
-
+    User
 }
