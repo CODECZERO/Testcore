@@ -4,14 +4,13 @@ import { ApiError } from "../util/apiError";
 const genAccToken = async (user: {//create access token so user don't have to login in again wihtin specfied time limit
     id: string;
     email: string;
-    username: string;
-    fullname?: string;
+    name?: string;
     role: string;
     phoneNumber?: string;
     address?: string;
 }) => {
     try {
-        const {id,email,username,fullname,role,phoneNumber,address}=user;
+        const {id,email,name,role,phoneNumber,address}=user;
         const secreat:any=process.env.ATS;
         if(!(secreat||user)){
             throw new ApiError(500,"secreat is missing or user info")
@@ -19,8 +18,7 @@ const genAccToken = async (user: {//create access token so user don't have to lo
         return jwt.sign({
             id,
             email,
-            username,
-            fullname,
+            name,
             role,
             phoneNumber,
             address
