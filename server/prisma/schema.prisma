@@ -14,13 +14,91 @@ datasource db {
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
+model College {
+  collegeID      String     @id @default(uuid())
+  name           String     @unique
+  refreshToken   String
+  phoneNumber    String
+  email          String     @unique
+  address        String
+  collegeVerify  Boolean
+  students       Student[]
+  examiner       Examiner[]
+}
 
-model User{
-  id          Int    @id @default(autoincrement())
-  username    String @unique
-  email       String @unique
-  fullname    String
-  phoneNumber String @unique
-  address     String
+model Examiner {
+  examinerID      String    @id @default(uuid())
+  name            String
+  email           String
+  phoneNumber     String
+  address String
+  examinerVerify  Boolean
+  refreshToken    String
+  college         College[]
+  exams           Exam[]
+}
 
+model Student {
+  studentId      String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  phoneNumber    String
+  address String
+  studentVerify  Boolean
+  refreshToken   String
+  collegeID      String
+  college        College         @relation(fields: [collegeID], references: [collegeID])
+  exams          Exam[]
+  results        Result[]
+  questionPapers QuestionPaper[]
+}
+
+model Exam {
+  examID         String          @id @default(uuid())
+  subjectID      String
+  examName       String
+  date           DateTime
+  examStart      DateTime
+  examEnd        DateTime
+  examDuration   Int
+  examinerID     String
+  examiner       Examiner        @relation(fields: [examinerID], references: [examinerID])
+  students       Student[]
+  results        Result[]
+  questionPapers QuestionPaper[]
+  Subject        Subject?        @relation(fields: [subjectID], references: [subjectID])
+}
+
+model Subject {
+  subjectID     String  @id @default(uuid())
+  subjectCode   String
+  subjectName   String
+  subjectVerify Boolean
+  exams         Exam[]
+}
+
+model QuestionPaper {
+  questionPaperID String  @id @default(uuid())
+  examID          String
+  studentID       String
+  SubjectID       String
+  exam            Exam    @relation(fields: [examID], references: [examID])
+  student         Student @relation(fields: [studentID], references: [studentId])
+
+  Result Result[]
+}
+
+model Result {
+  resultID        String        @id @default(uuid())
+  marks           Float
+  resultVerify    Boolean
+  passingMark     Float
+  obtainedMarks   Float
+  totalMarks      Float
+  questionPaperID String
+  StudentId       String
+  questionPaper   QuestionPaper @relation(fields: [questionPaperID], references: [questionPaperID])
+  Student         Student?      @relation(fields: [StudentId], references: [studentId])
+  Exam            Exam?         @relation(fields: [examExamID], references: [examID])
+  examExamID      String?
 }
