@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import primsa from "../db/database.Postgres.js";
+import prisma from "../db/database.Postgres.js";
 import { ApiError } from "../util/apiError.js";
 import { ApiResponse } from "../util/apiResponse.js";
 import bcrypt from "bcrypt";
 import { genAccToken, genReffToken } from '../middelware/jwtOp.middelware.js';
+import { createOp, findOp, updateOp } from './userQuery.controller.js';
 
 const options = {
     httpOnly: true,
@@ -14,8 +15,7 @@ const options = {
 const tokenGen = async (user: {
     id: string;
     email: string;
-    username: string;
-    fullname?: string;
+    name?: string;
     role: string;
     phoneNumber?: string;
     address?: string;
@@ -30,36 +30,19 @@ const login = async (req:Request,res:Response) => {
     const { email, password } = req.body;
     if (!(email || password)) throw new ApiError(400, "Invaild email id or password");
 
-    const findUser = await primsa.studnet.findUnique({
-        where: {
-            email,
-        },
-        select: {
-            id: true,
-            username: true,
-            email: true,
-            password:true,
-            fullname: true,
-            phoneNumber: true,
-            address: true,
-            role: true,
-        }
-    });
+    const findUser = await findOp({...email});//finding user using email
 
-    if (!(findUser||await bcrypt.compare(findUser?.password,password))) throw new ApiError(400, "Invaild password");
+    if (!(findUser||await bcrypt.compare(findUser?.password,password))) throw new ApiError(400, "Invaild password");//checking if user passwrod is valid or not
 
-    const { refreshToken, accesToken } = await tokenGen(findUser);
+    const { refreshToken, accesToken } = await tokenGen(findUser);//genereating token for the user
+    const data={//passing refersh token to the database
+        ...findUser,
+        refreshToken
+    }
+    await updateOp(data);
     
-    await primsa.studnet.upsert({
-        where: {
-            email
-        },
-        update: {
-            refreshToken
-        }
-    });
 
-    const {password:_,...userWithOutPassword}=findUser;
+    const {password:_,...userWithOutPassword}=findUser;//removing user password form find user
 
     return res.status(200).cookie("refreshToken",refreshToken,options).cookie("accesToken",accesToken,options).json(
         new ApiResponse(200,{user:userWithOutPassword},"Login in successfully")
@@ -68,54 +51,18 @@ const login = async (req:Request,res:Response) => {
 };
 
 //registering user on the site and store data on sql/postgresSql
-const singup = async (req: Request, res: Response) => {
-    const { username, fullname, email, password, phoneNumber, address, role } = req.body;
+const signup = async (req: Request, res: Response) => {
+    const { name, email, password, phoneNumber, address, role } = req.body;
     //checking if values are provide or not if not provide throw error 
-    if (!(username || email || password || phoneNumber || address || fullname || role)) throw new ApiError(400, "All fields are required");
+    if (!(email || password || phoneNumber || address || name || role)) throw new ApiError(400, "All fields are required");
 
 
-    const findUser = await primsa.findUnique({//if data is provide then checking if user exist or not in db
-        where: {
-            username: username,
-        },
-    });
+    const findUser =await findOp(req.body);//passing req.body value to query function
+    if (findUser) return res.status(409).json("user Exist");//if it exist throw error
 
-
-    if (!findUser) throw new ApiError(406, "User exists");//if it exist throw error
-
-    const hashedPassword = await bcrypt.hash(password, password);
-
-    const userCreate = await primsa.studnet.create({//if it doesn't then create account of user and save data on db
-        data: {
-            username,
-            email,
-            password:hashedPassword,
-            fullname,
-            phoneNumber,
-            address,
-            role,
-            refreshToken: null,
-
-        }
-    });
-
-    console.log(userCreate);//loging data remove it 
-    
-    const userData = await primsa.studnet.findUnique({
-        where: {
-            id: userCreate.id,
-        },
-        select: {
-            id: true,
-            username: true,
-            email: true,
-            fullname: true,
-            phoneNumber: true,
-            address: true,
-            role: true,
-        },
-    });
-
+    const hashedPassword = await bcrypt.hash(password, 10);//hashing the password
+    const userCreate=await createOp(req.body,hashedPassword);//passing req.body value to query function with hashed password
+    const userData={...userCreate,password:""};//replacing the password with empty string
 
 
     if (!userData) throw new ApiError(500, "Something went wrong while registering the user");//if user isn't create then throw error
@@ -132,5 +79,6 @@ const updatePassword = () => {
 
 
 export {
-    singup
+    signup,
+    login
 }

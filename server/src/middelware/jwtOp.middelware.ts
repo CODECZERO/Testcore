@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { ApiError } from "../util/apiError";
+import { ApiError } from "../util/apiError.js";
 
 const genAccToken = async (user: {//create access token so user don't have to login in again wihtin specfied time limit
     id: string;
