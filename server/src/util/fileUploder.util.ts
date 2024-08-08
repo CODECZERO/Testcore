@@ -14,7 +14,7 @@ const uploadFile=async(localFilePath:any)=>{
             resource_type:"auto"
         });
         fs.unlinkSync(localFilePath);//removing it from local file
-        return upload;//reutnring it's link
+        return upload.url;//reutnring it's link
     } catch (error) {
         fs.unlinkSync(localFilePath);
         return null;
