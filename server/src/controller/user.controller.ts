@@ -4,6 +4,10 @@ import { ApiResponse } from "../util/apiResponse.js";
 import bcrypt from "bcrypt";
 import { genAccToken, genReffToken } from '../middelware/jwtOp.middelware.js';
 import { createOp, findOp, updateOp,updatePasswordInDB } from './userQuery.controller.js';
+import mongoose from 'mongoose';
+import { uploadFile } from '../util/fileUploder.util.js';
+import { User } from '../models/user.model.sql.js';
+
 
   //all error retunr/out format
     // {
@@ -51,7 +55,6 @@ const login = async (req:Request,res:Response) => {
         ...findUser,
         refreshToken
     }
-    console.log(data)
     await updateOp(data);//pass the role to user it's necessary
     
 
@@ -105,11 +108,36 @@ const updatePassword = async(req:Request,res:Response) => {
     return res.status(200).json(new ApiResponse(200,"password update successfuly"));
 }
 
-const updateUserProfile=async(req:Request,res:Response)=>{
 
+const updateProfileImage=async(req:Request,res:Response)=>{
+    const fileURI=req.file?.path;
+    const {role,refreshToken}=req.body;
+    const findUser = await findOp({
+        email:"",
+        refreshToken, 
+        role,
+        name: '',
+        phoneNumber: '',
+        address: '',
+    });//finding user using email
+    if(!fileURI)return res.status(400).json(new ApiError(400,"please provide images"));
+    const upload=await uploadFile(fileURI);
+    if(!upload?.url)return res.status(500).json(new ApiError(500,"error while uploading file on server"));
+    const user=await User.findOneAndUpdate(//finding user on mongodb if it'exists with that email id then chage photo
+            findUser.email,{
+                $set:{
+                    sqlId:findUser?._id,
+                    profile:upload.url,
+                }
+            }
+    )
+    if(!user)return res.status(409).json(new ApiError(409,"user not found and unable to update profile image"))
+    return res.status(200).json(new ApiResponse(200,"user profile image updated successfuly"));
+    
 }
 export {
     signup,
     login,
-    updatePassword
+    updatePassword,
+    updateProfileImage
 }
