@@ -7,14 +7,14 @@ class ApiError extends Error{
 
     constructor(
         statusCode:number=500,
-        message:string="something went wrong",
+        message:any="something went wrong",
         errors:unknown[]=[],
         stack:string=""
     ){
         super(message);
         this.statusCode=statusCode;
-        this.data=null;
-        this.message=message;
+        this.data=message;
+        this.message=message?message:null;
         this.success=false;
         this.errors=errors;
         stack?this.stack=stack:Error.captureStackTrace(this,this.constructor);

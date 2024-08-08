@@ -1,4 +1,3 @@
-// roleMapping.js
 import prisma from "../db/database.Postgres.js";
 
 // Define the mapping between user roles and Prisma models
@@ -9,5 +8,4 @@ const roleToModel = {
     // Add other roles as needed
 };
 
-// Export the lookup table
 export default roleToModel;
