@@ -1,4 +1,4 @@
-import prisma from "../db/database.Postgres.js";
+import prisma from "./database.Postgres.js";
 
 // Define the mapping between user roles and Prisma models
 const roleToModel = {

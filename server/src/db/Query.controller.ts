@@ -1,6 +1,7 @@
 //here the query code is divide into sub-parts as there are may roles and stupidly writing the code is bad idea
-import roleToModel from "./role.controller.js";
+import roleToModel from "./role.db.js";
 import { ApiError } from "../util/apiError.js";
+import prisma from "./database.Postgres.js";
 //perfrome sql create option base on the role of user
 type UserRole = 'Student' | 'College' | 'Examiner'; // Define a type for user roles
 
@@ -60,6 +61,7 @@ const findOp = async (user: User) => {//find user based on the role of user
                 email: user.email
             },
             select: {
+                Id:true,
                 email: true,
                 password: true,
                 name: true,
@@ -116,13 +118,21 @@ const deletMOp = async (user: User, keyword: String) => {
     }
 }
 
-const updatePasswordInDB = async (user: User, password: string) => {
+const updatePasswordInDB = async (user: User, password: string) => {//update password in database
     return await roleToModel[user.role].update({
         where: {
             email: user.email
         },
         data: {
             password
+        }
+    });
+}
+
+const findCollege=async()=>{//findig college name from college table 
+    return await prisma.College.findMany({//it's only checking retrieving college name
+        select:{
+            name:true
         }
     });
 }
@@ -133,5 +143,6 @@ export {
     deleteOp,
     deletMOp,
     updatePasswordInDB,
+    findCollege
 
 }
