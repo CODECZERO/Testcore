@@ -1,7 +1,7 @@
 //here the query code is divide into sub-parts as there are may roles and stupidly writing the code is bad idea
-import roleToModel from "./role.controller.js";
+import roleToModel from "./role.db.js";
 import { ApiError } from "../util/apiError.js";
-import prisma from "../db/database.Postgres.js";
+import prisma from "./database.Postgres.js";
 //perfrome sql create option base on the role of user
 type UserRole = 'Student' | 'College' | 'Examiner'; // Define a type for user roles
 
