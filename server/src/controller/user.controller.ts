@@ -3,8 +3,7 @@ import { ApiError } from "../util/apiError.js";
 import { ApiResponse } from "../util/apiResponse.js";
 import bcrypt from "bcrypt";
 import { genAccToken, genReffToken } from '../middelware/jwtOp.middelware.js';
-import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from './userQuery.controller.js';
-import mongoose from 'mongoose';
+import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from '../db/Query.db.js';
 import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
 
