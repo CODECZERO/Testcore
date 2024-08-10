@@ -49,7 +49,7 @@ const createOp = async (user: User, password: string) => {
             },
         });
     } catch (error) {
-        return new ApiError(500, "error while creating user");
+        return error
 
     }
 }
@@ -61,7 +61,7 @@ const findOp = async (user: User) => {//find user based on the role of user
                 email: user.email
             },
             select: {
-                Id:true,
+                Id: true,
                 email: true,
                 password: true,
                 name: true,
@@ -70,7 +70,7 @@ const findOp = async (user: User) => {//find user based on the role of user
             }
         });
     } catch (error) {
-        return new ApiError(500, "error while finding user");
+        return error
     }
 }
 //update value of user based on the 
@@ -87,7 +87,7 @@ const updateOp = async (user: User) => {//user is previous values , current user
             }
         });
     } catch (error) {
-        return new ApiError(500, "error while updating ");
+        return error
     }
 }
 //it's removes single value/user from that table based on role and email
@@ -99,7 +99,7 @@ const deleteOp = async (user: User) => {
             }
         });
     } catch (error) {
-        return new ApiError(500, "error While deleting ");
+        return error
     }
 }
 
@@ -114,27 +114,35 @@ const deletMOp = async (user: User, keyword: String) => {
             }
         });
     } catch (error) {
-        return new ApiError(500, "error while deleting many");
+        return error
     }
 }
 
 const updatePasswordInDB = async (user: User, password: string) => {//update password in database
-    return await roleToModel[user.role].update({
-        where: {
-            email: user.email
-        },
-        data: {
-            password
-        }
-    });
+    try {
+        return await roleToModel[user.role].update({
+            where: {
+                email: user.email
+            },
+            data: {
+                password
+            }
+        });
+    } catch (error) {
+        return error;
+    }
 }
 
-const findCollege=async()=>{//findig college name from college table 
-    return await prisma.College.findMany({//it's only checking retrieving college name
-        select:{
-            name:true
-        }
-    });
+const findCollege = async () => {//findig college name from college table 
+    try {
+        return await prisma.College.findMany({//it's only checking retrieving college name
+            select: {
+                name: true
+            }
+        });
+    } catch (error) {
+        return error;
+    }
 }
 export {
     createOp,
@@ -143,6 +151,6 @@ export {
     deleteOp,
     deletMOp,
     updatePasswordInDB,
-    findCollege
+    findCollege,
 
 }
