@@ -114,35 +114,35 @@ const deletMOp = async (user: User, keyword: String) => {
             }
         });
     } catch (error) {
-       return error
+        return error
     }
 }
 
 const updatePasswordInDB = async (user: User, password: string) => {//update password in database
-  try {
-      return await roleToModel[user.role].update({
-          where: {
-              email: user.email
-          },
-          data: {
-              password
-          }
-      });
-  } catch (error) {
+    try {
+        return await roleToModel[user.role].update({
+            where: {
+                email: user.email
+            },
+            data: {
+                password
+            }
+        });
+    } catch (error) {
         return error;
-  }
+    }
 }
 
 const findCollege = async () => {//findig college name from college table 
- try {
-       return await prisma.College.findMany({//it's only checking retrieving college name
-           select: {
-               name: true
-           }
-       });
- } catch (error) {
+    try {
+        return await prisma.College.findMany({//it's only checking retrieving college name
+            select: {
+                name: true
+            }
+        });
+    } catch (error) {
         return error;
- }
+    }
 }
 export {
     createOp,
