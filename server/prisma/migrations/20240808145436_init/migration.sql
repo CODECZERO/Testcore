@@ -1,55 +1,49 @@
-/*
-  Warnings:
-
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
--- DropTable
-DROP TABLE "User";
-
 -- CreateTable
 CREATE TABLE "College" (
-    "collegeID" TEXT NOT NULL,
+    "Id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "refreshToken" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "collegeVerify" BOOLEAN NOT NULL,
 
-    CONSTRAINT "College_pkey" PRIMARY KEY ("collegeID")
+    CONSTRAINT "College_pkey" PRIMARY KEY ("Id")
 );
 
 -- CreateTable
 CREATE TABLE "Examiner" (
-    "examinerID" TEXT NOT NULL,
+    "Id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "examinerVerify" BOOLEAN NOT NULL,
     "refreshToken" TEXT NOT NULL,
 
-    CONSTRAINT "Examiner_pkey" PRIMARY KEY ("examinerID")
+    CONSTRAINT "Examiner_pkey" PRIMARY KEY ("Id")
 );
 
 -- CreateTable
 CREATE TABLE "Student" (
-    "studentId" TEXT NOT NULL,
+    "Id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phoneNumber" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "studentVerify" BOOLEAN NOT NULL,
     "refreshToken" TEXT NOT NULL,
     "collegeID" TEXT NOT NULL,
 
-    CONSTRAINT "Student_pkey" PRIMARY KEY ("studentId")
+    CONSTRAINT "Student_pkey" PRIMARY KEY ("Id")
 );
 
 -- CreateTable
 CREATE TABLE "Exam" (
-    "examID" TEXT NOT NULL,
+    "Id" TEXT NOT NULL,
     "subjectID" TEXT NOT NULL,
     "examName" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
@@ -58,32 +52,32 @@ CREATE TABLE "Exam" (
     "examDuration" INTEGER NOT NULL,
     "examinerID" TEXT NOT NULL,
 
-    CONSTRAINT "Exam_pkey" PRIMARY KEY ("examID")
+    CONSTRAINT "Exam_pkey" PRIMARY KEY ("Id")
 );
 
 -- CreateTable
 CREATE TABLE "Subject" (
-    "subjectID" TEXT NOT NULL,
+    "Id" TEXT NOT NULL,
     "subjectCode" TEXT NOT NULL,
     "subjectName" TEXT NOT NULL,
     "subjectVerify" BOOLEAN NOT NULL,
 
-    CONSTRAINT "Subject_pkey" PRIMARY KEY ("subjectID")
+    CONSTRAINT "Subject_pkey" PRIMARY KEY ("Id")
 );
 
 -- CreateTable
 CREATE TABLE "QuestionPaper" (
-    "questionPaperID" TEXT NOT NULL,
+    "Id" TEXT NOT NULL,
     "examID" TEXT NOT NULL,
     "studentID" TEXT NOT NULL,
     "SubjectID" TEXT NOT NULL,
 
-    CONSTRAINT "QuestionPaper_pkey" PRIMARY KEY ("questionPaperID")
+    CONSTRAINT "QuestionPaper_pkey" PRIMARY KEY ("Id")
 );
 
 -- CreateTable
 CREATE TABLE "Result" (
-    "resultID" TEXT NOT NULL,
+    "Id" TEXT NOT NULL,
     "marks" DOUBLE PRECISION NOT NULL,
     "resultVerify" BOOLEAN NOT NULL,
     "passingMark" DOUBLE PRECISION NOT NULL,
@@ -93,7 +87,7 @@ CREATE TABLE "Result" (
     "StudentId" TEXT NOT NULL,
     "examExamID" TEXT,
 
-    CONSTRAINT "Result_pkey" PRIMARY KEY ("resultID")
+    CONSTRAINT "Result_pkey" PRIMARY KEY ("Id")
 );
 
 -- CreateTable
@@ -133,37 +127,37 @@ CREATE UNIQUE INDEX "_ExamToStudent_AB_unique" ON "_ExamToStudent"("A", "B");
 CREATE INDEX "_ExamToStudent_B_index" ON "_ExamToStudent"("B");
 
 -- AddForeignKey
-ALTER TABLE "Student" ADD CONSTRAINT "Student_collegeID_fkey" FOREIGN KEY ("collegeID") REFERENCES "College"("collegeID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Student" ADD CONSTRAINT "Student_collegeID_fkey" FOREIGN KEY ("collegeID") REFERENCES "College"("Id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Exam" ADD CONSTRAINT "Exam_examinerID_fkey" FOREIGN KEY ("examinerID") REFERENCES "Examiner"("examinerID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Exam" ADD CONSTRAINT "Exam_examinerID_fkey" FOREIGN KEY ("examinerID") REFERENCES "Examiner"("Id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Exam" ADD CONSTRAINT "Exam_subjectID_fkey" FOREIGN KEY ("subjectID") REFERENCES "Subject"("subjectID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Exam" ADD CONSTRAINT "Exam_subjectID_fkey" FOREIGN KEY ("subjectID") REFERENCES "Subject"("Id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QuestionPaper" ADD CONSTRAINT "QuestionPaper_examID_fkey" FOREIGN KEY ("examID") REFERENCES "Exam"("examID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "QuestionPaper" ADD CONSTRAINT "QuestionPaper_examID_fkey" FOREIGN KEY ("examID") REFERENCES "Exam"("Id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QuestionPaper" ADD CONSTRAINT "QuestionPaper_studentID_fkey" FOREIGN KEY ("studentID") REFERENCES "Student"("studentId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "QuestionPaper" ADD CONSTRAINT "QuestionPaper_studentID_fkey" FOREIGN KEY ("studentID") REFERENCES "Student"("Id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Result" ADD CONSTRAINT "Result_questionPaperID_fkey" FOREIGN KEY ("questionPaperID") REFERENCES "QuestionPaper"("questionPaperID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Result" ADD CONSTRAINT "Result_questionPaperID_fkey" FOREIGN KEY ("questionPaperID") REFERENCES "QuestionPaper"("Id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Result" ADD CONSTRAINT "Result_StudentId_fkey" FOREIGN KEY ("StudentId") REFERENCES "Student"("studentId") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Result" ADD CONSTRAINT "Result_StudentId_fkey" FOREIGN KEY ("StudentId") REFERENCES "Student"("Id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Result" ADD CONSTRAINT "Result_examExamID_fkey" FOREIGN KEY ("examExamID") REFERENCES "Exam"("examID") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Result" ADD CONSTRAINT "Result_examExamID_fkey" FOREIGN KEY ("examExamID") REFERENCES "Exam"("Id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_CollegeToExaminer" ADD CONSTRAINT "_CollegeToExaminer_A_fkey" FOREIGN KEY ("A") REFERENCES "College"("collegeID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_CollegeToExaminer" ADD CONSTRAINT "_CollegeToExaminer_A_fkey" FOREIGN KEY ("A") REFERENCES "College"("Id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_CollegeToExaminer" ADD CONSTRAINT "_CollegeToExaminer_B_fkey" FOREIGN KEY ("B") REFERENCES "Examiner"("examinerID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_CollegeToExaminer" ADD CONSTRAINT "_CollegeToExaminer_B_fkey" FOREIGN KEY ("B") REFERENCES "Examiner"("Id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_ExamToStudent" ADD CONSTRAINT "_ExamToStudent_A_fkey" FOREIGN KEY ("A") REFERENCES "Exam"("examID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_ExamToStudent" ADD CONSTRAINT "_ExamToStudent_A_fkey" FOREIGN KEY ("A") REFERENCES "Exam"("Id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_ExamToStudent" ADD CONSTRAINT "_ExamToStudent_B_fkey" FOREIGN KEY ("B") REFERENCES "Student"("studentId") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_ExamToStudent" ADD CONSTRAINT "_ExamToStudent_B_fkey" FOREIGN KEY ("B") REFERENCES "Student"("Id") ON DELETE CASCADE ON UPDATE CASCADE;

@@ -50,7 +50,8 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
     if (!findUser) throw new ApiError(400, "Invaild User");//checking if user passwrod is valid or not
     const passwordCheck=await bcrypt.compare(password,findUser?.password);
     if(!passwordCheck)throw new ApiError(400,"Invalid password")
-    const { refreshToken, accesToken } = await tokenGen(findUser);//genereating token for the user
+    const findAndRole={...findUser,role}
+    const { refreshToken, accesToken } = await tokenGen(findAndRole);//genereating token for the user
     const data = {//passing refersh token to the database
         ...findUser,
         refreshToken
@@ -104,15 +105,16 @@ const updatePassword = AsyncHandler(async (req: Request, res: Response) => {
     //updates password of user based on the roles
 
     const requ=req as Requestany
-    const { email, role, password} = requ.user;//taking email,role,passwrod from user
+    const { email, role} = requ.user;//taking email,role,passwrod from user
+    const {password}=req.body;
     if (!(password || role || email)) return res.status(400).json("password is not provided");//if not found then return error
     const hashedPassword = await bcrypt.hash(password, 10);//hash password
-    const update = await updatePasswordInDB(req.body, hashedPassword);//chage hash password in db
+    const update = await updatePasswordInDB(requ.user, hashedPassword);//chage hash password in db
     if (!update) {
         throw new ApiError(500, "error while updating password");
     };//if update is fail then error
     //else return output
-    return res.status(200).json(new ApiResponse(200, update,"password update successfuly"));
+    return res.status(200).json(new ApiResponse(200,"password update successfuly"));
 })
 
 //@ts-ignore

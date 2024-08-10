@@ -36,7 +36,6 @@ const verifyData = async (req: Request, res: Response, next: NextFunction) => {
         const secert: any = process.env.ATS;
         const decoded = await jwt.verify(token, secert) as decodedUser;
         const {email,role} = decoded;
-        console.log(email,role,decoded);
         const findUser = await findOp({
             email,
             role,
