@@ -2,10 +2,11 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from "../util/apiError.js";
 import { ApiResponse } from "../util/apiResponse.js";
 import bcrypt from "bcrypt";
-import { genAccToken, genReffToken } from '../middelware/jwtOp.middelware.js';
+import { genAccToken, genReffToken } from '../util/jwtOp.util.js';
 import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from '../db/Query.db.js';
 import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
+import AsyncHandler from '../util/ayscHandler.js';
 
 
 //all error retunr/out format
@@ -23,20 +24,19 @@ const options = {//options for cookies to secure theme
 
 
 const tokenGen = async (user: {
-    id: string;
+    Id: string;
     email: string;
     name?: string;
     role: string;
     phoneNumber?: string;
     address?: string;
 }) => {//creating token
-    const accesToken = genAccToken(user);//calling genAccToken function to genrate access token for user
-    const refreshToken = genReffToken(user);//calling genReffToken function to genrate refersh token for server
-
+    const accesToken =await genAccToken(user);//calling genAccToken function to genrate access token for user
+    const refreshToken = await genReffToken(user);//calling genReffToken function to genrate refersh token for server
     return { accesToken, refreshToken };//returing both of theme
 }
-
-const login = async (req: Request, res: Response) => {
+//@ts-ignore
+const login = AsyncHandler(async (req: Request, res: Response) => {
     const { email, password, role } = req.body;
     if (!(email || password || role)) throw new ApiError(400, "Invaild email id or password");
 
@@ -47,9 +47,11 @@ const login = async (req: Request, res: Response) => {
         address: '',
         refreshToken: ''
     });//finding user using email
-
-    if (!(findUser || await bcrypt.compare(findUser?.password, password))) throw new ApiError(400, "Invaild password");//checking if user passwrod is valid or not
-    const { refreshToken, accesToken } = await tokenGen(findUser);//genereating token for the user
+    if (!findUser) throw new ApiError(400, "Invaild User");//checking if user passwrod is valid or not
+    const passwordCheck=await bcrypt.compare(password,findUser?.password);
+    if(!passwordCheck)throw new ApiError(400,"Invalid password")
+    const findAndRole={...findUser,role}
+    const { refreshToken, accesToken } = await tokenGen(findAndRole);//genereating token for the user
     const data = {//passing refersh token to the database
         ...findUser,
         refreshToken
@@ -60,13 +62,14 @@ const login = async (req: Request, res: Response) => {
     const { password: _, ...userWithOutPassword } = findUser;//removing user password form find user
 
     return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(
-        new ApiResponse(200, { user: userWithOutPassword }, "Login in successfully")
+        new ApiResponse(200, { user: userWithOutPassword,accesToken,refreshToken}, "Login in successfully")
     )
 
-};
+});
 
 //registering user on the site and store data on sql/postgresSql
-const signup = async (req: Request, res: Response) => {
+//@ts-ignore
+const signup = AsyncHandler(async (req: Request, res: Response) => {
     const { name, email, password, phoneNumber, address, role } = req.body;
     //checking if values are provide or not if not provide throw error 
     if (!(email || password || phoneNumber || address || name || role)) throw new ApiError(400, "All fields are required");
@@ -91,24 +94,31 @@ const signup = async (req: Request, res: Response) => {
         new ApiResponse(200, userData, "User create successfuly")
     )
 }
+)
 
+//@ts-ignore
+interface Requestany extends Request{
+    user?:any
+}
+//@ts-ignore
+const updatePassword = AsyncHandler(async (req: Request, res: Response) => {
+    //updates password of user based on the roles
 
-
-const updatePassword = async (req: Request, res: Response) => {//updates password of user based on the roles
-    const { email, role, password } = req.body;//taking email,role,passwrod from user
+    const requ=req as Requestany
+    const { email, role} = requ.user;//taking email,role,passwrod from user
+    const {password}=req.body;
     if (!(password || role || email)) return res.status(400).json("password is not provided");//if not found then return error
     const hashedPassword = await bcrypt.hash(password, 10);//hash password
-    const update = await updatePasswordInDB(req.body, hashedPassword);//chage hash password in db
-
+    const update = await updatePasswordInDB(requ.user, hashedPassword);//chage hash password in db
     if (!update) {
-        res.status(500).json(new ApiError(500, "error while updating password"));
+        throw new ApiError(500, "error while updating password");
     };//if update is fail then error
     //else return output
-    return res.status(200).json(new ApiResponse(200, "password update successfuly"));
-}
+    return res.status(200).json(new ApiResponse(200,"password update successfuly"));
+})
 
-
-const updateProfileImage = async (req: Request, res: Response) => {//update profile image of user based on the role
+//@ts-ignore
+const updateProfileImage = AsyncHandler(async (req: Request, res: Response) => {//update profile image of user based on the role
     const fileURI = req.file?.path;
     const { role, refreshToken } = req.body;
     const findUser = await findOp({
@@ -134,14 +144,14 @@ const updateProfileImage = async (req: Request, res: Response) => {//update prof
     //then return error
     return res.status(200).json(new ApiResponse(200, "user profile image updated successfuly"));//else return success messsage
 
-}
-
-const getCollege = async (req: Request, res: Response) => {//findings college for student 
+})
+//@ts-ignore
+const getCollege = AsyncHandler(async (req: Request, res: Response) => {//findings college for student 
     const findCollegeName = await findCollege();//find college name 
     if (!findCollegeName) return res.status(400).json(new ApiError(400, "No college is register"));//throws error if it doesn't exists
     return res.status(200).json(new ApiResponse(200, findCollegeName));//returns college name
 }
-
+)
 
 export {
     signup,
