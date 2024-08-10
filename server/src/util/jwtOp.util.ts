@@ -1,22 +1,22 @@
 import jwt from "jsonwebtoken";
-import { ApiError } from "../util/apiError.js";
+import { ApiError } from "./apiError.js";
 
 const genAccToken = async (user: {//create access token so user don't have to login in again wihtin specfied time limit
-    id: string;
-    email: string;
+    Id?: string;
+    email?: string;
     name?: string;
-    role: string;
+    role?: string;
     phoneNumber?: string;
     address?: string;
 }) => {
     try {
-        const {id,email,name,role,phoneNumber,address}=user;
+        const {Id,email,name,role,phoneNumber,address}=user;
         const secreat:any=process.env.ATS;
         if(!(secreat||user)){
             throw new ApiError(500,"secreat is missing or user info")
         }
-        return jwt.sign({
-            id,
+        return await jwt.sign({
+            Id,
             email,
             name,
             role,
@@ -35,14 +35,14 @@ const genAccToken = async (user: {//create access token so user don't have to lo
 
 const genReffToken=async(//creates refersh token
     user:{
-        id:string//takes user id as argument
+        Id:string//takes user id as argument
     }
 )=>{
     try {
-        const {id}=user;
+        const {Id}=user;
         const secreat:any=process.env.RTS;
-        return jwt.sign({
-            id
+        return await jwt.sign({
+            Id
         },secreat,{
             expiresIn:process.env.RTE
         });
