@@ -10,12 +10,20 @@ import { TimeTable } from "../models/timetable.model.nosql.js";
 interface Requestany extends Request {
     user?: any
 }
-//@ts-ignore
+type subject={
+    subjectCode:string
+    subjectName:string
 
+}
+type timetable={
+    timetableId:string,
+    approve:boolean
+}
+//@ts-ignore
 const getSubjects = AsyncHandler(async (req: Request, res: Response) => {//get subject for college
-    const { subjectCode, subjectName } = req.body;//taking subject name and code 
+    const subject:subject = req.body;//taking subject name and code 
     let subjects;
-    if (!(subjectCode || subjectName)) {//if it doesn't exist then return whole table or subject name or code is not provide then return all
+    if (!subject) {//if it doesn't exist then return whole table or subject name or code is not provide then return all
         subjects = await prisma.Subject.findMany({//try puting pagenation here and function like it because , it can increase load on database
             select: {
                 Id: true,
@@ -26,7 +34,7 @@ const getSubjects = AsyncHandler(async (req: Request, res: Response) => {//get s
     }
     if (subjects) return res.status(200).json(new ApiResponse(200, subjects, "subject found"));
 
-    const subjectGeter = await getSubject(subjectCode, subjectName);//if subject name and code is provide then search for theme
+    const subjectGeter = await getSubject(subject.subjectCode, subject.subjectName);//if subject name and code is provide then search for theme
     if (!subjectGeter) res.status(204).json(new ApiResponse(204, "no subject is there currently of this name"))
     return res.status(200).json(new ApiResponse(200, subjectGeter, "Subjects found"));
 });
@@ -35,16 +43,16 @@ const getSubjects = AsyncHandler(async (req: Request, res: Response) => {//get s
 //@ts-ignore
 
 const CreateSubject = AsyncHandler(async (req: Request, res: Response) => {
-    const { subjectCode, subjectName } = req.body;//takes subject from college to create
-    if (!(subjectCode & subjectName)) throw new ApiError(400, "subjectcode or subjectName is not provided");//check if value is provided or not
+    const subject:subject = req.body;//takes subject from college to create
+    if (!subject) throw new ApiError(400, "subjectcode or subjectName is not provided");//check if value is provided or not
     //checking if subject exists or not if yes return subject exists if not then create it 
-    const subjectFind = await getSubject(subjectCode, subjectName);//checking database if subject exists
+    const subjectFind = await getSubject(subject.subjectCode, subject.subjectName);//checking database if subject exists
     if (subjectFind) return res.status(200).json(new ApiResponse(200, subjectFind, "Subject Exists"));//if exists then return it
 
     const createSubject = await prisma.Subject.create({//else create subject 
         data: {
-            subjectCode,
-            subjectName
+            subjectCode:subject.subjectCode,
+            subjectName:subject.subjectName
         }
     });
     if (!createSubject) throw new ApiError(500, "Something went wrrong while creating subject");//check if the subject is create and throw error if doesn't
@@ -128,9 +136,8 @@ const TimeTableSearch = AsyncHandler(async (req: Requestany, res: Response) => {
 })
 //@ts-ignore
 const AprroveTimeTable = AsyncHandler(async (req: Request, res: Response) => {//approve time table function
-    const { approve, timetableId } = req.body;//takes data like time table id and aprrove , approve is true or false
-    if (!(approve)) return res.status(200).json(new ApiResponse(200, "aprrove is false"));//if aprrove is false then there is no database operation
-    else if (!(timetableId)) throw new ApiError(400, "timetableId is not provied");//if id is not given throw error that id is not given
+    const timetable:timetable = req.body;//takes data like time table id and aprrove , approve is true or false
+    if (!timetable) return res.status(200).json(new ApiResponse(200, "aprrove is false or timetableId is not provided"));//if aprrove or id is false then there is no database operation
 
     const updateAprrove = await TimeTable.findByIdAndUpdate({//if both of the things are given then find theme and update theme
 

@@ -52,4 +52,8 @@ const verifyData = async (req: Request, res: Response, next: NextFunction) => {
     }
 };
 
+const examData=async(req:Request,res:Response)=>{
+    
+}
+
 export { verifyData };

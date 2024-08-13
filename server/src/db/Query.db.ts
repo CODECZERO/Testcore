@@ -188,6 +188,48 @@ const findStudnet = async (studnetData: {Id: string}) => {
 
 
 }
+
+const getQuestionPaper=async(examId:String)=>{
+    try {
+        return await prisma.QuestionPaper.findMany({
+            where:{
+                examID:examId
+            },
+            select:{
+                Id:true,
+                examID:true,
+                studnetID:true,
+                SubjectID:true,
+                question:true,
+                answer:true,
+            }
+        });
+    } catch (error) {
+        return error;
+    }
+}
+
+
+const getQuestionPaperForEaxaminer=async(examID:String,QuestionPaperId:String)=>{
+    try {
+        return await prisma.QuestionPaper.findMany({
+            where: {
+                examID:examID,
+                Id: QuestionPaperId
+            },
+            select: {
+                Id: true,
+                examID: true,
+                studnetID: true,
+                SubjectID: true,
+                question: true,
+                answer: true,
+            }
+        })
+    } catch (error) {
+        return error;
+    }
+}
 export {
     createOp,
     findOp,
@@ -197,6 +239,8 @@ export {
     updatePasswordInDB,
     findCollege,
     getSubject,
-    findStudnet
+    findStudnet,
+    getQuestionPaper,
+    getQuestionPaperForEaxaminer
 
 }
