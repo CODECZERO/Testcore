@@ -144,6 +144,50 @@ const findCollege = async () => {//findig college name from college table
         return error;
     }
 }
+
+//find single subject for college,examiner and student
+const getSubject = async (subjectCode: string, subjectName: string) => {
+    try {
+        return await prisma.Subject.findUnique({
+            where: {
+                subjectCode,
+                subjectName //try to put conditional rendering here
+            },
+            select: {
+                Id: true,
+                subjectCode: true,
+                subjectName: true,
+            }
+        });
+    } catch (error) {
+        return error
+    }
+
+}
+const findStudnet = async (studnetData: {Id: string}) => {
+    try {
+        await prisma.Student.findMany({
+            where: {
+                college: studnetData?.Id
+            }
+            ,
+            select: {
+                Id: true,
+                name: true,
+                phoneNumber: true,
+                email: true,
+                studentVerify: true,
+                collegeID: true,
+                address: true
+            }
+        });
+
+    } catch (error) {
+        return error
+    }
+
+
+}
 export {
     createOp,
     findOp,
@@ -152,5 +196,7 @@ export {
     deletMOp,
     updatePasswordInDB,
     findCollege,
+    getSubject,
+    findStudnet
 
 }
