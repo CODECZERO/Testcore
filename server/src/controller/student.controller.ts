@@ -20,5 +20,9 @@ const getResult=AsyncHandler(async(req:Request,res:Response)=>{
 })
 
 const getSubject=AsyncHandler(async(req:Request,res:Response)=>{
-    
+    return await prisma.Subject.findMany({
+        where:{
+            
+        }
+    })
 })
