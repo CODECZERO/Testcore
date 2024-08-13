@@ -98,12 +98,13 @@ model QuestionPaper {
 model Result {
   Id              String        @id @default(uuid())
   marks           Float
-  resultVerify    Boolean
-  passingMark     Float
-  obtainedMarks   Float
-  totalMarks      Float
+  resultVerify    Boolean       @default(false)
+  passingMark     Float         @default(35)
+  obtainedMarks   Float         @default(0)
+  totalMarks      Float         @default(100)
   questionPaperID String
   StudentId       String
+  
   questionPaper   QuestionPaper @relation(fields: [questionPaperID], references: [Id])
   Student         Student?      @relation(fields: [StudentId], references: [Id])
   Exam            Exam?         @relation(fields: [examExamID], references: [Id])
