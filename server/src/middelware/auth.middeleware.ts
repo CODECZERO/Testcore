@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { findOp } from "../db/Query.db.js";
 import { ApiError } from "../util/apiError.js";
 import { Request, Response, NextFunction } from "express";
+import AsyncHandler from "../util/ayscHandler.js";
 
 type UserRole = 'Student' | 'College' | 'Examiner'; // Define a type for user roles
 
@@ -18,16 +19,16 @@ interface decodedUser {
     name: string,
     phoneNumber: string,
     address: string,
-    role:UserRole
-    
+    role: UserRole
+
 }
 
 
-const verifyData = async (req: Request, res: Response, next: NextFunction) => {
+const verifyData = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     try {
         const request = req as RequestWithCookies;
         const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
-        const token =request.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
+        const token = request.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
         if (!token) {
             throw new ApiError(401, "Unauthorized");
         }
@@ -35,7 +36,7 @@ const verifyData = async (req: Request, res: Response, next: NextFunction) => {
         // Verify the token here
         const secert: any = process.env.ATS;
         const decoded = await jwt.verify(token, secert) as decodedUser;
-        const {email,role} = decoded;
+        const { email, role } = decoded;
         const findUser = await findOp({
             email,
             role,
@@ -50,10 +51,11 @@ const verifyData = async (req: Request, res: Response, next: NextFunction) => {
     } catch (error) {
         next(new ApiError(401, "Unauthorized: Invalid token or role is missing"));
     }
-};
-
-const examData=async(req:Request,res:Response)=>{
-    
 }
+)
+
+const examData = AsyncHandler(async (req: Request, res: Response) => {
+
+})
 
 export { verifyData };
