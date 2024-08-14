@@ -210,7 +210,7 @@ const getQuestionPaper=async(examId:String)=>{
 }
 
 
-const getQuestionPaperForEaxaminer=async(examID:String,QuestionPaperId:String)=>{
+const getQuestionPaperForExaminer=async(examID:String,QuestionPaperId:String)=>{
     try {
         return await prisma.QuestionPaper.findMany({
             where: {
@@ -241,6 +241,6 @@ export {
     getSubject,
     findStudnet,
     getQuestionPaper,
-    getQuestionPaperForEaxaminer
+    getQuestionPaperForExaminer
 
 }
