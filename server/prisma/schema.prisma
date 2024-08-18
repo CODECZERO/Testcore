@@ -60,12 +60,13 @@ model Student {
 model Exam {
   Id             String          @id @default(uuid())
   subjectID      String
-  examName       String
+  examName       String          
   date           DateTime
   examStart      DateTime
   examEnd        DateTime
   examDuration   DateTime
   examinerID     String
+  
   examiner       Examiner        @relation(fields: [examinerID], references: [Id])
   students       Student[]
   results        Result[]
@@ -76,7 +77,7 @@ model Exam {
 model Subject {
   Id            String      @id @default(uuid())
   subjectCode   String      @unique
-  subjectName   String
+  subjectName   String      @unique
   subjectVerify Boolean
   exams         Exam[]
   student       Student[]
