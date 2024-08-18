@@ -144,6 +144,94 @@ const findCollege = async () => {//findig college name from college table
         return error;
     }
 }
+
+//find single subject for college,examiner and student
+const getSubject = async (subjectCode: string, subjectName: string) => {
+    try {
+        return await prisma.Subject.findUnique({
+            where: {
+                OR: [
+                    { subjectCode: subjectCode },
+                    { subjectName: subjectName }
+                ]
+            },
+            select: {
+                Id: true,
+                subjectCode: true,
+                subjectName: true,
+            }
+        });
+    } catch (error) {
+        return error;
+    }
+}
+
+const findStudnet = async (studnetData: {Id: string}) => {
+    try {
+        await prisma.Student.findMany({
+            where: {
+                college: studnetData?.Id
+            }
+            ,
+            select: {
+                Id: true,
+                name: true,
+                phoneNumber: true,
+                email: true,
+                studentVerify: true,
+                collegeID: true,
+                address: true
+            }
+        });
+
+    } catch (error) {
+        return error
+    }
+
+
+}
+
+const getQuestionPaper=async(examId:String)=>{
+    try {
+        return await prisma.QuestionPaper.findMany({
+            where:{
+                examID:examId
+            },
+            select:{
+                Id:true,
+                examID:true,
+                studnetID:true,
+                SubjectID:true,
+                question:true,
+                answer:true,
+            }
+        });
+    } catch (error) {
+        return error;
+    }
+}
+
+
+const getQuestionPaperForExaminer=async(examID:String)=>{
+    try {
+        return await prisma.QuestionPaper.findMany({
+            where: {
+                examID:examID,
+            },
+            select: {
+                Id: true,
+                examID: true,
+                studnetID: true,
+                SubjectID: true,
+                question: true,
+                answer: true,
+            }
+        })
+    } catch (error) {
+        return error;
+    }
+}
+
 export {
     createOp,
     findOp,
@@ -152,5 +240,9 @@ export {
     deletMOp,
     updatePasswordInDB,
     findCollege,
+    getSubject,
+    findStudnet,
+    getQuestionPaper,
+    getQuestionPaperForExaminer
 
 }
