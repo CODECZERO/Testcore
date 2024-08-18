@@ -150,8 +150,10 @@ const getSubject = async (subjectCode: string, subjectName: string) => {
     try {
         return await prisma.Subject.findUnique({
             where: {
-                subjectCode,
-                subjectName //try to put conditional rendering here
+                OR: [
+                    { subjectCode: subjectCode },
+                    { subjectName: subjectName }
+                ]
             },
             select: {
                 Id: true,
@@ -160,10 +162,10 @@ const getSubject = async (subjectCode: string, subjectName: string) => {
             }
         });
     } catch (error) {
-        return error
+        return error;
     }
-
 }
+
 const findStudnet = async (studnetData: {Id: string}) => {
     try {
         await prisma.Student.findMany({
@@ -210,12 +212,11 @@ const getQuestionPaper=async(examId:String)=>{
 }
 
 
-const getQuestionPaperForExaminer=async(examID:String,QuestionPaperId:String)=>{
+const getQuestionPaperForExaminer=async(examID:String)=>{
     try {
         return await prisma.QuestionPaper.findMany({
             where: {
                 examID:examID,
-                Id: QuestionPaperId
             },
             select: {
                 Id: true,
@@ -230,6 +231,7 @@ const getQuestionPaperForExaminer=async(examID:String,QuestionPaperId:String)=>{
         return error;
     }
 }
+
 export {
     createOp,
     findOp,

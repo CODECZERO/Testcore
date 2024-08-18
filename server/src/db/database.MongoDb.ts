@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { examDataStore } from '../models/examDatamanage.model.nosql.js';
 const connectDb=async()=>{
     try {
         const connectionInstance=await mongoose.connect(`${process.env.MONGODB_URL}`);
@@ -9,4 +10,16 @@ const connectDb=async()=>{
     }
 }
 
-export {connectDb};
+const searchMongodb=async(tokenID:string)=>{
+        try {
+            const findExam=await examDataStore.findOne({
+                tokenID
+            });
+            if(!findExam)return null;
+            return findExam;
+        } catch (error) {
+            return error
+        }
+
+}
+export {connectDb,searchMongodb};

@@ -1,7 +1,9 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import userRouter from "./router/user.router.js"
+import userRouter from "./router/user.router.js";
+import logingRouter from "./router/loging.router.js"
+import { MiddlewareCount } from "./services/logging and monitoring/Grafana/grafana.service.js";
 
 const app=express();
 
@@ -10,6 +12,10 @@ const app=express();
 //     origin:process.env.CROS_ORGIN,
 //     credentials: true
 // }))
+
+//confing the loging service
+app.use("/api/v1/superuser",logingRouter);
+app.use(MiddlewareCount);
 
 
 //config the app to use/send/recive json,url,cookie data 

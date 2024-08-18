@@ -12,9 +12,10 @@ const timetableSchema = new mongoose.Schema({
         type:Boolean,
         require:true
     },
-    ColelgeName:{
+    CollegeName:{
         type:String,
         require:true
+
     }
 }, { timestamps: true });
 
