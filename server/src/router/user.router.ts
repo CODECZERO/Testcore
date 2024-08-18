@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { signup, login, getCollege,updatePassword } from "../controller/user.controller.js";
+import { MiddlewareCount } from "../services/logging and monitoring/Grafana/grafana.service.js";
 import { verifyData } from "../middelware/auth.middeleware.js";
 
 const router = Router();

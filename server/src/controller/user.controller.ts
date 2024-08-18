@@ -1,9 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response} from 'express';
 import { ApiError } from "../util/apiError.js";
 import { ApiResponse } from "../util/apiResponse.js";
 import bcrypt from "bcrypt";
 import { genAccToken, genReffToken } from '../util/jwtOp.util.js';
-import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from '../db/Query.db.js';
+import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from '../db/Query.sql.db.js';
 import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
@@ -38,7 +38,7 @@ const tokenGen = async (user: {
 //@ts-ignore
 const login = AsyncHandler(async (req: Request, res: Response) => {
     const { email, password, role } = req.body;
-    if (!(email || password || role)) throw new ApiError(400, "Invaild email id or password");
+    if (!(email || password || role)) throw new ApiError(400, "Invaild email id,role or password");
 
     const findUser = await findOp({
         email, role,
@@ -62,7 +62,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
     const { password: _, ...userWithOutPassword } = findUser;//removing user password form find user
 
     return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(
-        new ApiResponse(200, { user: userWithOutPassword,accesToken,refreshToken}, "Login in successfully")
+        new ApiResponse(200, userWithOutPassword, "Login in successfully")
     )
 
 });
@@ -90,8 +90,8 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
 
 
     if (!userData) throw new ApiError(500, "Something went wrong while registering the user");//if user isn't create then throw error
-    return res.status(200).json(//if create then return user data
-        new ApiResponse(200, userData, "User create successfuly")
+    return res.status(201).json(//if create then return user data
+        new ApiResponse(201, userData, "User create successfuly")
     )
 }
 )
@@ -101,15 +101,14 @@ interface Requestany extends Request{
     user?:any
 }
 //@ts-ignore
-const updatePassword = AsyncHandler(async (req: Request, res: Response) => {
+const updatePassword = AsyncHandler(async (req: Requestany, res: Response) => {
     //updates password of user based on the roles
 
-    const requ=req as Requestany
-    const { email, role} = requ.user;//taking email,role,passwrod from user
+    const { email, role} = req.user;//taking email,role,passwrod from user
     const {password}=req.body;
     if (!(password || role || email)) return res.status(400).json("password is not provided");//if not found then return error
     const hashedPassword = await bcrypt.hash(password, 10);//hash password
-    const update = await updatePasswordInDB(requ.user, hashedPassword);//chage hash password in db
+    const update = await updatePasswordInDB(req.user, hashedPassword);//chage hash password in db
     if (!update) {
         throw new ApiError(500, "error while updating password");
     };//if update is fail then error
@@ -140,9 +139,15 @@ const updateProfileImage = AsyncHandler(async (req: Request, res: Response) => {
         }
     }
     )
-    if (!user) return res.status(409).json(new ApiError(409, "user not found and unable to update profile image"))//if there is any issues while updating data on monogodb
+    let updateProfile=null;
+    if (!user){//if user does not exist then create it
+            updateProfile=await User.create({
+                sqlId:findUser?.Id,
+                profile:upload
+            })
+    }//if there is any issues while updating data on monogodb
     //then return error
-    return res.status(200).json(new ApiResponse(200, "user profile image updated successfuly"));//else return success messsage
+    return res.status(200).json(new ApiResponse(200, updateProfile||user,"user profile image updated successfuly"));//else return success messsage
 
 })
 //@ts-ignore
@@ -158,5 +163,6 @@ export {
     login,
     updatePassword,
     updateProfileImage,
-    getCollege
+    getCollege,
+    tokenGen
 }
