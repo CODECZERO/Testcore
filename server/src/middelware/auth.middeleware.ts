@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { findOp } from "../db/Query.db.js";
+import { findOp } from "../db/Query.sql.db.js";
 import { ApiError } from "../util/apiError.js";
 import { Request, Response, NextFunction } from "express";
 import AsyncHandler from "../util/ayscHandler.js";

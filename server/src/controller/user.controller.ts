@@ -3,7 +3,7 @@ import { ApiError } from "../util/apiError.js";
 import { ApiResponse } from "../util/apiResponse.js";
 import bcrypt from "bcrypt";
 import { genAccToken, genReffToken } from '../util/jwtOp.util.js';
-import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from '../db/Query.db.js';
+import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from '../db/Query.sql.db.js';
 import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
@@ -62,7 +62,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
     const { password: _, ...userWithOutPassword } = findUser;//removing user password form find user
 
     return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(
-        new ApiResponse(200, { user: userWithOutPassword,accesToken,refreshToken}, "Login in successfully")
+        new ApiResponse(200, userWithOutPassword, "Login in successfully")
     )
 
 });
@@ -90,8 +90,8 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
 
 
     if (!userData) throw new ApiError(500, "Something went wrong while registering the user");//if user isn't create then throw error
-    return res.status(200).json(//if create then return user data
-        new ApiResponse(200, userData, "User create successfuly")
+    return res.status(201).json(//if create then return user data
+        new ApiResponse(201, userData, "User create successfuly")
     )
 }
 )
@@ -163,5 +163,6 @@ export {
     login,
     updatePassword,
     updateProfileImage,
-    getCollege
+    getCollege,
+    tokenGen
 }

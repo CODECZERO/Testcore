@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import AsyncHandler from "../util/ayscHandler.js"
 import prisma from "../db/database.Postgres.js"
-import { findStudnet, getSubject } from "../db/Query.db.js"
+import { findStudnet, getSubject } from "../db/Query.sql.db.js"
 import { ApiError } from "../util/apiError.js";
 import { ApiResponse } from "../util/apiResponse.js";
 import { TimeTable } from "../models/timetable.model.nosql.js";
@@ -153,5 +153,6 @@ export {
     TimeTableSearch,
     CreateSubject,
     StudentVeryify,
-    getExaminer
+    getExaminer,
+    findStudnet
 }
