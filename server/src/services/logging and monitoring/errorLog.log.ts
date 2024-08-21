@@ -25,7 +25,11 @@ const errorDataLoger = async (level: string, error: any) => {
       // Add other relevant error details
     };
 
-    const savedError = await errorLoger.create(errorData);
+ 
+
+    const savedError = await errorLoger.create({
+      error:errorData.stack
+    });
     logger.info(`Error logged to database: ${savedError._id}`);
   } catch (error) {
     logger.error('Error logging error to database:', error);

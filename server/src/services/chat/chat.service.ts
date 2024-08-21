@@ -47,8 +47,7 @@ const closeSocket=async(ws:WebSocket,roomName:string)=>{
 
 
 
-const runWebSocket=AsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
-    roomName=req.url.valueOf();
+const runWebSocket=async(roomName:string)=>{
     console.log(roomName);
 
     try {
@@ -67,6 +66,6 @@ const runWebSocket=AsyncHandler(async(req:Request,res:Response,next:NextFunction
     } catch (error) {
         throw new ApiError(500,"Error while runing websocket");
     }
-})
+}
 
 export default runWebSocket;
