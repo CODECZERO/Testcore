@@ -35,11 +35,10 @@ const tokenGen = async (user: {
     const refreshToken = await genReffToken(user);//calling genReffToken function to genrate refersh token for server
     return { accesToken, refreshToken };//returing both of theme
 }
-//@ts-ignore
+//
 const login = AsyncHandler(async (req: Request, res: Response) => {
     const { email, password, role } = req.body;
     if (!(email || password || role)) throw new ApiError(400, "Invaild email id,role or password");
-
     const findUser = await findOp({
         email, role,
         name: '',
@@ -68,7 +67,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
 });
 
 //registering user on the site and store data on sql/postgresSql
-//@ts-ignore
+//
 const signup = AsyncHandler(async (req: Request, res: Response) => {
     const { name, email, password, phoneNumber, address, role } = req.body;
     //checking if values are provide or not if not provide throw error 
@@ -86,7 +85,7 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     // } 
     const hashedPassword = await bcrypt.hash(password, 10);//hashing the password
     const userCreate = await createOp(req.body, hashedPassword);//passing req.body value to query function with hashed password
-    const userData = { ...userCreate, password: "" };//replacing the password with empty string
+    const userData = { userCreate, password: "" };//replacing the password with empty string
 
 
     if (!userData) throw new ApiError(500, "Something went wrong while registering the user");//if user isn't create then throw error
@@ -96,11 +95,11 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
 }
 )
 
-//@ts-ignore
+//
 interface Requestany extends Request{
     user?:any
 }
-//@ts-ignore
+//
 const updatePassword = AsyncHandler(async (req: Requestany, res: Response) => {
     //updates password of user based on the roles
 
@@ -116,7 +115,7 @@ const updatePassword = AsyncHandler(async (req: Requestany, res: Response) => {
     return res.status(200).json(new ApiResponse(200,"password update successfuly"));
 })
 
-//@ts-ignore
+//
 const updateProfileImage = AsyncHandler(async (req: Request, res: Response) => {//update profile image of user based on the role
     const fileURI = req.file?.path;
     const { role, refreshToken } = req.body;
@@ -150,7 +149,7 @@ const updateProfileImage = AsyncHandler(async (req: Request, res: Response) => {
     return res.status(200).json(new ApiResponse(200, updateProfile||user,"user profile image updated successfuly"));//else return success messsage
 
 })
-//@ts-ignore
+//
 const getCollege = AsyncHandler(async (req: Request, res: Response) => {//findings college for student 
     const findCollegeName = await findCollege();//find college name 
     if (!findCollegeName) return res.status(400).json(new ApiError(400, "No college is register"));//throws error if it doesn't exists

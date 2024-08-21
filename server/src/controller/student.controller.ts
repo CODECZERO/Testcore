@@ -11,7 +11,7 @@ type examdata = {
     QuestionPaperId: string
     SubjectID: string
     Answer: string
-    StudentId:String
+    StudentId:string
 }
 
 interface Requestany extends Request {
@@ -25,7 +25,7 @@ type classData = {
 //@ts-ignore
 const giveExam = AsyncHandler(async (req: Requestany, res: Response) => {
     const examdata: examdata = req.examData;
-    const answerQuestion = await prisma.QuestionPaper.update({
+    const answerQuestion = await prisma.questionPaper.update({
         where: {
             Id: examdata.examID
         },
@@ -43,7 +43,8 @@ const giveExam = AsyncHandler(async (req: Requestany, res: Response) => {
 const getExam = AsyncHandler(async (req: Requestany, res: Response) => {
     const examdata: examdata = req.examData;
     if (!examdata) throw new ApiError(401, "exam data is not provied");
-    const findexam = prisma.Exam.findFirst({
+    //@ts-ignore
+    const findexam = prisma.exam.findFirst({
         where: {
             Id: examdata.examID
         },
@@ -85,7 +86,7 @@ const getTimeTable = AsyncHandler(async (req: Request, res: Response) => {
 const getResult = AsyncHandler(async (req: Requestany, res: Response) => {
     const resultdata:examdata=req.examData;
     if(!resultdata)throw new ApiError(401,"no data is provied");
-    const findresult=await prisma.Result.findMany({
+    const findresult=await prisma.result.findMany({
         where:{
             OR:[
                 {questionPaperID:resultdata.QuestionPaperId},
