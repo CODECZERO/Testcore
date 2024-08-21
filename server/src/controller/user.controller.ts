@@ -48,7 +48,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
     });//finding user using email
     if (!findUser) throw new ApiError(400, "Invaild User");//checking if user passwrod is valid or not
     const passwordCheck=await bcrypt.compare(password,findUser?.password);
-    if(!passwordCheck)throw new ApiError(400,"Invalid password")
+    if(passwordCheck)throw new ApiError(400,"Invalid password")
     const findAndRole={...findUser,role}
     const { refreshToken, accesToken } = await tokenGen(findAndRole);//genereating token for the user
     const data = {//passing refersh token to the database
