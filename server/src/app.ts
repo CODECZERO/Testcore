@@ -29,4 +29,4 @@ app.use("/api/v1/user", userRouter);
 
 //routes in
 //exporting app
-export {app};
+export default app;

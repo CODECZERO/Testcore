@@ -1,17 +1,17 @@
 //here the query code is divide into sub-parts as there are may roles and stupidly writing the code is bad idea
 import roleToModel from "./role.db.js";
-import { ApiError } from "../util/apiError.js";
 import prisma from "./database.Postgres.js";
 //perfrome sql create option base on the role of user
 type UserRole = 'Student' | 'College' | 'Examiner'; // Define a type for user roles
 
 interface User {
-    email: string;
-    name: string;
-    phoneNumber: string;
-    address: string;
-    role: UserRole; // Enforce role type
-    refreshToken: string;
+    email?: string;
+    name?: string;
+    phoneNumber?: string;
+    address?: string;
+    role?: UserRole; // Enforce role type
+    refreshToken?: string;
+    collegeID?: string;
 }
 
 
@@ -23,31 +23,47 @@ interface User {
 
 const createOp = async (user: User, password: string) => {
     try {
-        if (!(user.role === 'Student')) {
-            return await roleToModel[user.role].create({
-                data: {
-                    email: user.email,
-                    password, // password is hashed before storing
-                    name: user.name,
-                    phoneNumber: user.phoneNumber,
-                    address: user.address,
-                    refreshToken: " ",
-                    collegeVerify: true
-                },
-            });
+        switch (user.role) {
+            case "College":
+                return await roleToModel[user.role].create({
+                    data: {
+                        email: user.email??"",
+                        password, // password is hashed before storing
+                        name: user.name??"",
+                        phoneNumber: user.phoneNumber??"",
+                        address: user.address??"",
+                        refreshToken: " ",
+                        collegeVerify: true
+                    },
+                });
+            case "Student":
+                return await roleToModel[user.role].create({
+                    data: {
+                        email: user.email??"",
+                        password, // password is hashed before storing
+                        name: user.name??"",
+                        phoneNumber: user.phoneNumber??"",
+                        address: user.address??"",
+                        collegeID: user.collegeID??"",
+                        refreshToken: "",
+                        studentVerify: true
+                    },
+                });
+            case "Examiner":
+                return await roleToModel[user.role].create({
+                    data: {
+                        email: user.email,
+                        password, // password is hashed before storing
+                        name: user.name,
+                        phoneNumber: user.phoneNumber,
+                        address: user.address,
+                        refreshToken: "",
+                        examinerVerify:true,
+                    },
+                });
         }
-        //puting value in studnet table if role is student because it has one to one reffernces to college
-        return await roleToModel[user.role].create({
-            data: {
-                email: user.email,
-                password, // password is hashed before storing
-                name: user.name,
-                phoneNumber: user.phoneNumber,
-                address: user.address,
-                collegeID: String,
-                refreshToken: null,
-            },
-        });
+        //puting value in student table if role is student because it has one to one reffernces to college
+
     } catch (error) {
         return error
 
@@ -56,7 +72,8 @@ const createOp = async (user: User, password: string) => {
 //might have security issues 
 const findOp = async (user: User) => {//find user based on the role of user
     try {
-        return await roleToModel[user.role].findUnique({
+
+        return await roleToModel[user.role].findFirst({
             where: {
                 email: user.email
             },
@@ -76,7 +93,8 @@ const findOp = async (user: User) => {//find user based on the role of user
 //update value of user based on the 
 //pssing of role is necessary, so the function can select on whic table it should perform operations
 const updateOp = async (user: User) => {//user is previous values , current user is new value
-    try {
+    try {            //
+
         return await roleToModel[user.role].update({
 
             where: {
@@ -93,6 +111,8 @@ const updateOp = async (user: User) => {//user is previous values , current user
 //it's removes single value/user from that table based on role and email
 const deleteOp = async (user: User) => {
     try {
+        //
+
         await roleToModel[user.role].delete({
             where: {
                 email: user.email
@@ -106,6 +126,8 @@ const deleteOp = async (user: User) => {
 //it remove all data/user which contians , user selected text aka keyword
 const deletMOp = async (user: User, keyword: String) => {
     try {
+        //
+
         return await roleToModel[user.role].deleteMany({
             where: {
                 email: {
@@ -120,6 +142,7 @@ const deletMOp = async (user: User, keyword: String) => {
 
 const updatePasswordInDB = async (user: User, password: string) => {//update password in database
     try {
+        //
         return await roleToModel[user.role].update({
             where: {
                 email: user.email
@@ -135,7 +158,7 @@ const updatePasswordInDB = async (user: User, password: string) => {//update pas
 
 const findCollege = async () => {//findig college name from college table 
     try {
-        return await prisma.College.findMany({//it's only checking retrieving college name
+        return await prisma.college.findMany({//it's only checking retrieving college name
             select: {
                 name: true
             }
@@ -146,9 +169,12 @@ const findCollege = async () => {//findig college name from college table
 }
 
 //find single subject for college,examiner and student
+
+
 const getSubject = async (subjectCode: string, subjectName: string) => {
     try {
-        return await prisma.Subject.findUnique({
+        return await prisma.subject.findUnique({//
+
             where: {
                 OR: [
                     { subjectCode: subjectCode },
@@ -166,11 +192,11 @@ const getSubject = async (subjectCode: string, subjectName: string) => {
     }
 }
 
-const findStudnet = async (studnetData: {Id: string}) => {
+const findStudnet = async (studnetData: { Id: string }) => {
     try {
-        await prisma.Student.findMany({
+        await prisma.student.findMany({
             where: {
-                college: studnetData?.Id
+                collegeID: studnetData?.Id
             }
             ,
             select: {
@@ -191,19 +217,19 @@ const findStudnet = async (studnetData: {Id: string}) => {
 
 }
 
-const getQuestionPaper=async(examId:String)=>{
+const getQuestionPaper = async (examId: string) => {
     try {
-        return await prisma.QuestionPaper.findMany({
-            where:{
-                examID:examId
+        return await prisma.questionPaper.findMany({
+            where: {
+                examID: examId
             },
-            select:{
-                Id:true,
-                examID:true,
-                studnetID:true,
-                SubjectID:true,
-                question:true,
-                answer:true,
+            select: {
+                Id: true,
+                examID: true,
+                studentID: true,
+                SubjectID: true,
+                question: true,
+                answer: true,
             }
         });
     } catch (error) {
@@ -212,16 +238,16 @@ const getQuestionPaper=async(examId:String)=>{
 }
 
 
-const getQuestionPaperForExaminer=async(examID:String)=>{
+const getQuestionPaperForExaminer = async (examID: string) => {
     try {
-        return await prisma.QuestionPaper.findMany({
+        return await prisma.questionPaper.findMany({
             where: {
-                examID:examID,
+                examID,
             },
             select: {
                 Id: true,
                 examID: true,
-                studnetID: true,
+                studentID: true,
                 SubjectID: true,
                 question: true,
                 answer: true,

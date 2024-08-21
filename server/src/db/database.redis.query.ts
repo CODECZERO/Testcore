@@ -22,7 +22,7 @@ const connectReids = async () => {
 
 const cacheUpdate = async (tokenID: string, examID: string) => {
     try {
-        const data = await client.set(tokenID, examID);
+        const data = await client.setEx(tokenID,86400,examID);
         if (!data) return null;
         return data
     } catch (error) {
