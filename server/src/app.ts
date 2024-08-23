@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import userRouter from "./router/user.router.js";
 import logingRouter from "./router/loging.router.js"
 import { MiddlewareCount } from "./services/logging and monitoring/Grafana/grafana.service.js";
+import runWebSocket from "./services/chat/chat.service.js";
 
 const app=express();
 
