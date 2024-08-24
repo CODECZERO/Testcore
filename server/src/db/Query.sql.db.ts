@@ -9,7 +9,7 @@ interface User {
     name?: string;
     phoneNumber?: string;
     address?: string;
-    role?: UserRole; // Enforce role type
+    role: UserRole; // Enforce role type
     refreshToken?: string;
     collegeID?: string;
 }
@@ -52,11 +52,11 @@ const createOp = async (user: User, password: string) => {
             case "Examiner":
                 return await roleToModel[user.role].create({
                     data: {
-                        email: user.email,
+                        email: user.email??"",
                         password, // password is hashed before storing
-                        name: user.name,
-                        phoneNumber: user.phoneNumber,
-                        address: user.address,
+                        name: user.name??"",
+                        phoneNumber: user.phoneNumber??"",
+                        address: user.address??"",
                         refreshToken: "",
                         examinerVerify:true,
                     },
@@ -72,8 +72,8 @@ const createOp = async (user: User, password: string) => {
 //might have security issues 
 const findOp = async (user: User) => {//find user based on the role of user
     try {
-
-        return await roleToModel[user.role].findFirst({
+        //@ts-ignore // the ingore is put here becase there is type error for findunique,but it works 
+        return await roleToModel[user.role]?.findUnique({
             where: {
                 email: user.email
             },
@@ -94,7 +94,7 @@ const findOp = async (user: User) => {//find user based on the role of user
 //pssing of role is necessary, so the function can select on whic table it should perform operations
 const updateOp = async (user: User) => {//user is previous values , current user is new value
     try {            //
-
+        //@ts-ignore
         return await roleToModel[user.role].update({
 
             where: {
@@ -111,7 +111,7 @@ const updateOp = async (user: User) => {//user is previous values , current user
 //it's removes single value/user from that table based on role and email
 const deleteOp = async (user: User) => {
     try {
-        //
+        //@ts-ignore
 
         await roleToModel[user.role].delete({
             where: {
@@ -126,7 +126,7 @@ const deleteOp = async (user: User) => {
 //it remove all data/user which contians , user selected text aka keyword
 const deletMOp = async (user: User, keyword: String) => {
     try {
-        //
+        //@ts-ignore
 
         return await roleToModel[user.role].deleteMany({
             where: {
@@ -142,7 +142,7 @@ const deletMOp = async (user: User, keyword: String) => {
 
 const updatePasswordInDB = async (user: User, password: string) => {//update password in database
     try {
-        //
+        //@ts-ignore
         return await roleToModel[user.role].update({
             where: {
                 email: user.email
@@ -173,7 +173,7 @@ const findCollege = async () => {//findig college name from college table
 
 const getSubject = async (subjectCode: string, subjectName: string) => {
     try {
-        return await prisma.subject.findUnique({//
+        return await prisma.subject.findFirst({//
 
             where: {
                 OR: [
@@ -185,7 +185,7 @@ const getSubject = async (subjectCode: string, subjectName: string) => {
                 Id: true,
                 subjectCode: true,
                 subjectName: true,
-            }
+            },
         });
     } catch (error) {
         return error;

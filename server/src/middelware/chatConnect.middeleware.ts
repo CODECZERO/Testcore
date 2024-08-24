@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import AsyncHandler from "../util/ayscHandler.js";
 import { ApiError } from "../util/apiError.js";
 import { WebSocket } from "ws";
+import cacheCheck from "./cache.middleware.js";
 
 const connectChat = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const roomNameUrl = req.url.valueOf();
