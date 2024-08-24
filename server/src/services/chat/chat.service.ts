@@ -24,7 +24,7 @@ const sendMessage = async (messageBuffer: Buffer, roomName: string, ws: WebSocke
   try {
     rooms[roomName].forEach((client: WebSocket) => {
       if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(messageBuffer);
+        client.send(JSON.stringify(messageBuffer));
       }
     });
   } catch (error) {
@@ -49,26 +49,26 @@ const runWebSocket = async () => {
 
   try {
     wss.on('connection', (ws) => {
-      console.log("on");
-      ws.on('message', (messageData) => {
-        const { roomName, message } = JSON.parse(messageData.toString());
+    console.log("on");
+    ws.on('message', (messageData) => {
+      const { roomName, message } = JSON.parse(messageData.toString());
 
-        if (!roomName || !message) {
-          throw new ApiError(400, "Invalid message format");
-        }
-        joinRoom(ws, roomName);
-        console.log(roomName);
-        sendMessage(message, roomName, ws);
-      })
-      ws.on('close', () => {
-        if (rooms[roomName].has(ws)) {
-          closeSocket(ws, roomName);
-        }
-      })
+      if (!roomName || !message) {
+        throw new ApiError(400, "Invalid message format");
+      }
+      joinRoom(ws, roomName);
+      console.log(roomName);
+      sendMessage(message, roomName, ws);
     })
-  } catch (error) {
-    throw new ApiError(500, "Error while runing websocket");
-  }
+    ws.on('close', () => {
+      if (rooms[roomName].has(ws)) {
+        closeSocket(ws, roomName);
+      }
+    })
+  })
+} catch (error) {
+  throw new ApiError(500, "Error while runing websocket");
+}
 }
 
 export default runWebSocket;

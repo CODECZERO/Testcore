@@ -5,11 +5,9 @@ import { ApiResponse } from "../util/apiResponse.js";
 import { TimeTable } from "../models/timetable.model.nosql.js";
 import { getQuestionPaperForExaminer, getSubject } from "../db/Query.sql.db.js";
 import prisma from "../db/database.Postgres.js";
-import { tokenGen } from "./user.controller.js";
 import { examDataStore } from "../models/examDatamanage.model.nosql.js";
 import { nanoid } from "nanoid";
 import { cacheUpdate } from "../db/database.redis.query.js";
-import { json } from "body-parser";
 
 interface Requestany extends Request {
     examData?: any
@@ -52,6 +50,9 @@ interface examSubject extends subject {
     examinerID: string;
 
 }
+
+
+
 const scheuldeExam = AsyncHandler(async (req: Requestany, res: Response) => {
     const { Id, email } = req.user;
     const createExamdata: examSubject = req.body;
@@ -67,12 +68,11 @@ const scheuldeExam = AsyncHandler(async (req: Requestany, res: Response) => {
     if (!(findUser)) throw new ApiError(401, "user is not allowed to scheulde exam");
     const getsubject = await getSubject(createExamdata.subjectCode, createExamdata.subjectName);
     if (!getsubject) throw new ApiError(404, "subject not found");
-
     const createExam = await prisma.exam.create({
-       
+
         data: {
-             //
-            subjectID: getsubject?.Id,
+            //
+            subjectID: getsubject.Id,
             examName: createExamdata.examName,
             date: createExamdata.date,
             examStart: createExamdata.examStart,
@@ -85,15 +85,15 @@ const scheuldeExam = AsyncHandler(async (req: Requestany, res: Response) => {
         }
     });
     if (!createExam) throw new ApiError(406, "unbale to scheduled exam")
-    const tokenID=nanoid(8);
+    const tokenID = nanoid(8);
     const saveExamToken = await examDataStore.create({
         tokenID,
         examID: createExam?.Id
     });
-    if(!saveExamToken)throw new ApiError(504,"unable to save tokenID");
-    const updatecache=await cacheUpdate(tokenID,createExam.Id);
-    if(!updatecache) res.send(new ApiError(504,"unable to put it in cache"));
-    return res.status(201).json(new ApiResponse(201,{exam:createExam,tokenID}, "Exam scheduled successfully"));
+    if (!saveExamToken) throw new ApiError(504, "unable to save tokenID");
+    const updatecache = await cacheUpdate(tokenID, createExam.Id);
+    if (!updatecache) res.send(new ApiError(504, "unable to put it in cache"));
+    return res.status(201).json(new ApiResponse(201, { exam: createExam, tokenID }, "Exam scheduled successfully"));
 })
 
 const makeTimetable = AsyncHandler(async (req: Requestany, res: Response) => {//create time 
@@ -112,6 +112,7 @@ const makeTimetable = AsyncHandler(async (req: Requestany, res: Response) => {//
 
 }
 );
+
 const getQuestionPaperForExaminers = AsyncHandler(async (req: Requestany, res: Response) => {
     const examdata: examdata = req.examData;
     if (!examdata) throw new ApiError(400, "examID and QuestionPaperID");
@@ -145,6 +146,7 @@ const updateQuestionPaperMarks = AsyncHandler(async (req: Requestany, res: Respo
 
 
 })
+
 const makeQuestionPaper = AsyncHandler(async (req: Requestany, res: Response) => {
     const extraData: examdata = req.examData;
     const { QuestionPapaerData } = req.body;
@@ -153,10 +155,12 @@ const makeQuestionPaper = AsyncHandler(async (req: Requestany, res: Response) =>
         data: {
             SubjectID: extraData.SubjectID,
             examID: extraData.examID,
+            studentID: " ",
+            answer: "",
             question: JSON.stringify(QuestionPapaerData), // Serialize the object/array to a string
         }
     });
-    
+
     if (!questionPaperInsert) throw new ApiError(406, "error while making questionpaper");
     return res.status(201).json(new ApiResponse(201, questionPaperInsert));
 })
@@ -176,6 +180,7 @@ const getParticipant = AsyncHandler(async (req: Requestany, res: Response) => {
     return res.status(200).json(new ApiResponse(200, getExamParticipation));
 
 })
+
 const UpdateQuestionPaper = AsyncHandler(async (req: Requestany, res: Response) => {
     const examData: examdata = req.examData;
     const { QuestionPapaerData } = req.body;
@@ -191,15 +196,22 @@ const UpdateQuestionPaper = AsyncHandler(async (req: Requestany, res: Response) 
     if (!updatePaper) throw new ApiError(400, "exam paper can't be update as exam is not selected");
     return res.status(200).json(new ApiResponse(200, updatePaper, "Question update succesfuly"));
 })
+
 const getExam = AsyncHandler(async (req: Requestany, res: Response) => {
     const { Id } = req.user;
     if (!Id) throw new ApiError(400, "user data not provided");
-    const findUser = await prisma.exam.findMany({
+    const findExams = await prisma.exam.findMany({
         where: {
             examinerID: Id
         },
-        include: {
-            Subject: {
+        select: {
+            Id: true,
+            date: true,
+            examStart: true,
+            examEnd: true,
+            examDuration: true,
+            examinerID: true,
+            Subject: { // Including related subject data
                 select: {
                     Id: true,
                     subjectCode: true,
@@ -208,15 +220,14 @@ const getExam = AsyncHandler(async (req: Requestany, res: Response) => {
             }
         }
     });
-    
-    
-    if (!findUser) throw new ApiError(404, "Exam not found");
-    const { refreshToken, accesToken } = await tokenGen(findUser);//genereating token for the user
-    return res.status(200).json(new ApiResponse(200, { examdata: findUser, refreshToken, accesToken }, "Exam Found"));
+
+
+    if (!findExams) throw new ApiError(404, "Exam not found");
+    return res.status(200).json(new ApiResponse(200, { examdata: findExams}, "Exam Found"));
 
 })
 
-export{
+export {
     makeQuestionPaper,
     makeTimetable,
     getExam,

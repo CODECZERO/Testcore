@@ -9,6 +9,6 @@ const router = Router();
 router.route("/signup").post(signup).get(getCollege);
 router.route("/login").post(login);
 router.route("/userData").put(verifyData,updatePassword);
-router.route("/chat/:college/:branch").put(connectChat);
+router.route("/chat/:college/:branch").get(connectChat);
 
 export default router;
