@@ -21,15 +21,14 @@ const connectDb = () => __awaiter(void 0, void 0, void 0, function* () {
 });
 const searchMongodb = (tokenID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const findExam = yield examDataStore.findOne({
-            tokenID
-        });
+        const findExam = yield examDataStore.findOne({ tokenID });
         if (!findExam)
             return null;
         return findExam;
     }
     catch (error) {
-        return error;
+        console.error("MongoDB search error:", error);
+        throw new Error("Error while searching in MongoDB");
     }
 });
 export { connectDb, searchMongodb };

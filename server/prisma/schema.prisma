@@ -34,7 +34,7 @@ model Examiner {
   phoneNumber    String
   password       String
   address        String
-  examinerVerify Boolean    @default(true)
+  examinerVerify Boolean  
   refreshToken   String
   college        College[]
   exams          Exam[]
@@ -47,7 +47,7 @@ model Student {
   phoneNumber    String
   password       String
   address        String
-  studentVerify  Boolean
+  studentVerify  Boolean       
   refreshToken   String
   collegeID      String
   college        College         @relation(fields: [collegeID], references: [Id])
@@ -88,7 +88,7 @@ model QuestionPaper {
   examID    String
   studentID String
   SubjectID String
-  question  String
+  question  Json
   answer    String
 
   exam    Exam     @relation(fields: [examID], references: [Id])

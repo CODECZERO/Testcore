@@ -13,11 +13,9 @@ import { ApiResponse } from "../util/apiResponse.js";
 import { TimeTable } from "../models/timetable.model.nosql.js";
 import { getQuestionPaperForExaminer, getSubject } from "../db/Query.sql.db.js";
 import prisma from "../db/database.Postgres.js";
-import { tokenGen } from "./user.controller.js";
 import { examDataStore } from "../models/examDatamanage.model.nosql.js";
 import { nanoid } from "nanoid";
 import { cacheUpdate } from "../db/database.redis.query.js";
-//@ts-ignore
 const scheuldeExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { Id, email } = req.user;
     const createExamdata = req.body;
@@ -25,7 +23,7 @@ const scheuldeExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
         throw new ApiError(401, "user is not login");
     else if (!createExamdata)
         throw new ApiError(401, "exam data is not provide");
-    const findUser = yield prisma.Examiner.findUnique({
+    const findUser = yield prisma.examiner.findUnique({
         where: {
             Id,
             email
@@ -36,9 +34,10 @@ const scheuldeExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
     const getsubject = yield getSubject(createExamdata.subjectCode, createExamdata.subjectName);
     if (!getsubject)
         throw new ApiError(404, "subject not found");
-    const createExam = yield prisma.Exam.create({
+    const createExam = yield prisma.exam.create({
         data: {
-            subjectID: getsubject === null || getsubject === void 0 ? void 0 : getsubject.Id,
+            //
+            subjectID: getsubject.Id,
             examName: createExamdata.examName,
             date: createExamdata.date,
             examStart: createExamdata.examStart,
@@ -64,7 +63,6 @@ const scheuldeExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
         res.send(new ApiError(504, "unable to put it in cache"));
     return res.status(201).json(new ApiResponse(201, { exam: createExam, tokenID }, "Exam scheduled successfully"));
 }));
-//@ts-ignore
 const makeTimetable = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const timetable = req.body; //takes data from user subjects 
     if (!timetable)
@@ -79,7 +77,6 @@ const makeTimetable = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 
         throw new ApiError(500, "Something went wrong while inserting timetable in database"); //if for some reasone data is not update throw error
     return res.status(201).json(new ApiResponse(201, dataInsert, "Time table created successfully")); //return data after inserting
 }));
-//@ts-ignore
 const getQuestionPaperForExaminers = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examdata = req.examData;
     if (!examdata)
@@ -89,7 +86,6 @@ const getQuestionPaperForExaminers = AsyncHandler((req, res) => __awaiter(void 0
         throw new ApiError(406, "didn't found questionpaper");
     return res.status(200).json(new ApiResponse(200, examPaper));
 }));
-//@ts-ignore
 const updateQuestionPaperMarks = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examdata = req.examData;
     const examdataupdata = req.body;
@@ -98,7 +94,7 @@ const updateQuestionPaperMarks = AsyncHandler((req, res) => __awaiter(void 0, vo
     const findQuestionpaper = yield getQuestionPaperForExaminer(examdata.examID);
     if (!findQuestionpaper)
         throw new ApiError(406, "no able to find question paper");
-    const updatemarks = yield prisma.Result.update({
+    const updatemarks = yield prisma.result.updateMany({
         where: {
             questionPaperID: examdata.QuestionPaperId
         },
@@ -114,34 +110,32 @@ const updateQuestionPaperMarks = AsyncHandler((req, res) => __awaiter(void 0, vo
         throw new ApiError(406, "unable to update reult");
     return res.status(200).json(new ApiResponse(200, updatemarks));
 }));
-//@ts-ignore
 const makeQuestionPaper = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const extraData = req.examData;
     const { QuestionPapaerData } = req.body;
     if (!QuestionPapaerData)
         throw new ApiError(400, "Question paper is not provided");
-    const questionPaperInsert = yield prisma.QuestionPaper.create({
+    const questionPaperInsert = yield prisma.questionPaper.create({
         data: {
             SubjectID: extraData.SubjectID,
             examID: extraData.examID,
-            question: {
-                create: QuestionPapaerData
-            }
+            studentID: " ",
+            answer: "",
+            question: JSON.stringify(QuestionPapaerData), // Serialize the object/array to a string
         }
     });
     if (!questionPaperInsert)
         throw new ApiError(406, "error while making questionpaper");
     return res.status(201).json(new ApiResponse(201, questionPaperInsert));
 }));
-//@ts-ignore
 const getParticipant = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examdata = req.examData;
     if (!examdata)
         throw new ApiError(400, "exam id is not provided");
-    const getExamParticipation = yield prisma.QuestionPaper.count({
+    const getExamParticipation = yield prisma.questionPaper.count({
         where: {
             answer: {
-                not: null
+                not: undefined
             }
         }
     });
@@ -149,13 +143,12 @@ const getParticipant = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
         throw new ApiError(406, "unable to find any participant");
     return res.status(200).json(new ApiResponse(200, getExamParticipation));
 }));
-//@ts-ignore
 const UpdateQuestionPaper = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examData = req.examData;
     const { QuestionPapaerData } = req.body;
     if (!examData)
         throw new ApiError(400, "exam data is not provied");
-    const updatePaper = yield prisma.QuestionPaper.update({
+    const updatePaper = yield prisma.questionPaper.updateMany({
         where: {
             examID: examData.examID
         },
@@ -167,21 +160,21 @@ const UpdateQuestionPaper = AsyncHandler((req, res) => __awaiter(void 0, void 0,
         throw new ApiError(400, "exam paper can't be update as exam is not selected");
     return res.status(200).json(new ApiResponse(200, updatePaper, "Question update succesfuly"));
 }));
-//@ts-ignore
 const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { Id } = req.user;
     if (!Id)
         throw new ApiError(400, "user data not provided");
-    const findUser = yield prisma.Exam.findMany({
+    const findExams = yield prisma.exam.findMany({
         where: {
             examinerID: Id
         },
         select: {
             Id: true,
-            examName: true,
             date: true,
-        },
-        include: {
+            examStart: true,
+            examEnd: true,
+            examDuration: true,
+            examinerID: true,
             Subject: {
                 select: {
                     Id: true,
@@ -191,9 +184,8 @@ const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, fun
             }
         }
     });
-    if (!findUser)
+    if (!findExams)
         throw new ApiError(404, "Exam not found");
-    const { refreshToken, accesToken } = yield tokenGen(findUser); //genereating token for the user
-    return res.status(200).json(new ApiResponse(200, { examdata: findUser, refreshToken, accesToken }, "Exam Found"));
+    return res.status(200).json(new ApiResponse(200, { examdata: findExams }, "Exam Found"));
 }));
 export { makeQuestionPaper, makeTimetable, getExam, getParticipant, getQuestionPaperForExaminers, updateQuestionPaperMarks, UpdateQuestionPaper, scheuldeExam };

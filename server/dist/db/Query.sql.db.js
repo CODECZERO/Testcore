@@ -10,47 +10,66 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 //here the query code is divide into sub-parts as there are may roles and stupidly writing the code is bad idea
 import roleToModel from "./role.db.js";
 import prisma from "./database.Postgres.js";
+import { ApiError } from "../util/apiError.js";
 // const roleToModel: { [key in UserRole]: any } = {
 //     Student: prisma.Student, // Assuming Prisma model types exist
 //     College: prisma.College,
 //     Examiner: prisma.Examiner,
 // };
 const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
     try {
-        if (!(user.role === 'Student')) {
-            return yield roleToModel[user.role].create({
-                data: {
-                    email: user.email,
-                    password,
-                    name: user.name,
-                    phoneNumber: user.phoneNumber,
-                    address: user.address,
-                    refreshToken: " ",
-                    collegeVerify: true
-                },
-            });
+        switch (user.role) {
+            case "College":
+                return yield roleToModel[user.role].create({
+                    data: {
+                        email: (_a = user.email) !== null && _a !== void 0 ? _a : "",
+                        password,
+                        name: (_b = user.name) !== null && _b !== void 0 ? _b : "",
+                        phoneNumber: (_c = user.phoneNumber) !== null && _c !== void 0 ? _c : "",
+                        address: (_d = user.address) !== null && _d !== void 0 ? _d : "",
+                        refreshToken: " ",
+                        collegeVerify: true
+                    },
+                });
+            case "Student":
+                return yield roleToModel[user.role].create({
+                    data: {
+                        email: (_e = user.email) !== null && _e !== void 0 ? _e : "",
+                        password,
+                        name: (_f = user.name) !== null && _f !== void 0 ? _f : "",
+                        phoneNumber: (_g = user.phoneNumber) !== null && _g !== void 0 ? _g : "",
+                        address: (_h = user.address) !== null && _h !== void 0 ? _h : "",
+                        collegeID: (_j = user.collegeID) !== null && _j !== void 0 ? _j : "",
+                        refreshToken: "",
+                        studentVerify: true
+                    },
+                });
+            case "Examiner":
+                return yield roleToModel[user.role].create({
+                    data: {
+                        email: (_k = user.email) !== null && _k !== void 0 ? _k : "",
+                        password,
+                        name: (_l = user.name) !== null && _l !== void 0 ? _l : "",
+                        phoneNumber: (_m = user.phoneNumber) !== null && _m !== void 0 ? _m : "",
+                        address: (_o = user.address) !== null && _o !== void 0 ? _o : "",
+                        refreshToken: "",
+                        examinerVerify: true,
+                    },
+                });
         }
-        //puting value in studnet table if role is student because it has one to one reffernces to college
-        return yield roleToModel[user.role].create({
-            data: {
-                email: user.email,
-                password,
-                name: user.name,
-                phoneNumber: user.phoneNumber,
-                address: user.address,
-                collegeID: String,
-                refreshToken: null,
-            },
-        });
+        //puting value in student table if role is student because it has one to one reffernces to college
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 //might have security issues 
 const findOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    var _p;
     try {
-        return yield roleToModel[user.role].findUnique({
+        //@ts-ignore // the ingore is put here becase there is type error for findunique,but it works 
+        return yield ((_p = roleToModel[user.role]) === null || _p === void 0 ? void 0 : _p.findUnique({
             where: {
                 email: user.email
             },
@@ -62,16 +81,17 @@ const findOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
                 phoneNumber: true,
                 address: true,
             }
-        });
+        }));
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 //update value of user based on the 
 //pssing of role is necessary, so the function can select on whic table it should perform operations
 const updateOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
+    try { //
+        //@ts-ignore
         return yield roleToModel[user.role].update({
             where: {
                 email: user.email
@@ -81,12 +101,13 @@ const updateOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 //it's removes single value/user from that table based on role and email
 const deleteOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        //@ts-ignore
         yield roleToModel[user.role].delete({
             where: {
                 email: user.email
@@ -94,12 +115,13 @@ const deleteOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 //it remove all data/user which contians , user selected text aka keyword
 const deletMOp = (user, keyword) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        //@ts-ignore
         return yield roleToModel[user.role].deleteMany({
             where: {
                 email: {
@@ -109,11 +131,12 @@ const deletMOp = (user, keyword) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 const updatePasswordInDB = (user, password) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        //@ts-ignore
         return yield roleToModel[user.role].update({
             where: {
                 email: user.email
@@ -124,25 +147,25 @@ const updatePasswordInDB = (user, password) => __awaiter(void 0, void 0, void 0,
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 const findCollege = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield prisma.College.findMany({
+        return yield prisma.college.findMany({
             select: {
                 name: true
             }
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 //find single subject for college,examiner and student
 const getSubject = (subjectCode, subjectName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield prisma.Subject.findUnique({
+        return yield prisma.subject.findFirst({
             where: {
                 OR: [
                     { subjectCode: subjectCode },
@@ -153,18 +176,18 @@ const getSubject = (subjectCode, subjectName) => __awaiter(void 0, void 0, void 
                 Id: true,
                 subjectCode: true,
                 subjectName: true,
-            }
+            },
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 const findStudnet = (studnetData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield prisma.Student.findMany({
+        yield prisma.student.findMany({
             where: {
-                college: studnetData === null || studnetData === void 0 ? void 0 : studnetData.Id
+                collegeID: studnetData === null || studnetData === void 0 ? void 0 : studnetData.Id
             },
             select: {
                 Id: true,
@@ -178,19 +201,19 @@ const findStudnet = (studnetData) => __awaiter(void 0, void 0, void 0, function*
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 const getQuestionPaper = (examId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield prisma.QuestionPaper.findMany({
+        return yield prisma.questionPaper.findMany({
             where: {
                 examID: examId
             },
             select: {
                 Id: true,
                 examID: true,
-                studnetID: true,
+                studentID: true,
                 SubjectID: true,
                 question: true,
                 answer: true,
@@ -198,19 +221,19 @@ const getQuestionPaper = (examId) => __awaiter(void 0, void 0, void 0, function*
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 const getQuestionPaperForExaminer = (examID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield prisma.QuestionPaper.findMany({
+        return yield prisma.questionPaper.findMany({
             where: {
-                examID: examID,
+                examID,
             },
             select: {
                 Id: true,
                 examID: true,
-                studnetID: true,
+                studentID: true,
                 SubjectID: true,
                 question: true,
                 answer: true,
@@ -218,7 +241,7 @@ const getQuestionPaperForExaminer = (examID) => __awaiter(void 0, void 0, void 0
         });
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer };
