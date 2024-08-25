@@ -1,5 +1,4 @@
 import { errorLoger } from "../../models/errorLog.model.nosql.js";
-import { ApiError } from "../../util/apiError.js";
 import winston from "winston";
 
 
