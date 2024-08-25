@@ -1,7 +1,7 @@
 global:
   scrape_interval: 60s
 remote_write:
-  - url: 
+  - url:
     basic_auth:
       username: 
       password: 

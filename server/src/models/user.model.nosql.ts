@@ -1,17 +1,22 @@
-import { Prisma } from "@prisma/client";
 import mongoose from "mongoose";
 
-const UserSchema=new mongoose.Schema({
-    sqlId:{
-        type:String,
-        require:true
+const UserSchema = new mongoose.Schema({
+    sqlId: {
+        type: String,
+        require: true
     },
-    profile:{
-        type:String,
-        require:true
-    }
-},{timestamps:true})
+    profile: {
+        type: String,
+        require: true
+    },
+    chatRoomIDs: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Chatmodel"
+        }
+    ]
+}, { timestamps: true })
 
-const User=mongoose.model("User",UserSchema)
+const User = mongoose.model("User", UserSchema)
 
-export {User};
+export { User };
