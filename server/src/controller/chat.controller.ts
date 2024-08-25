@@ -101,6 +101,7 @@ const modifiChat = AsyncHandler(async () => {
 const SendMessage = AsyncHandler(async (req:Requestany,res:Response) => {
     const roomData:roomData=req.chatRoomData;
     const secretData:encryption=req.chatEncryption;
+    if(!(roomData||secretData)) throw new ApiError(401,"")
     const encryptChatData=await encryptDataFunc(req.body,secretData.secretKey,secretData.iv as Buffer);//figure out how will you handle issue with 
    
     //kafka producer here
