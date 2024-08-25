@@ -24,7 +24,7 @@ const getSubjects = AsyncHandler(async (req: Request, res: Response) => {//get s
     const subject:subject = req.body;//taking subject name and code 
     let subjects;
     if (!subject) {//if it doesn't exist then return whole table or subject name or code is not provide then return all
-        subjects = await prisma.Subject.findMany({//try puting pagenation here and function like it because , it can increase load on database
+        subjects = await prisma.subject.findMany({//try puting pagenation here and function like it because , it can increase load on database
             select: {
                 Id: true,
                 subjectCode: true,
@@ -49,7 +49,8 @@ const CreateSubject = AsyncHandler(async (req: Request, res: Response) => {
     const subjectFind = await getSubject(subject.subjectCode, subject.subjectName);//checking database if subject exists
     if (subjectFind) return res.status(200).json(new ApiResponse(200, subjectFind, "Subject Exists"));//if exists then return it
 
-    const createSubject = await prisma.Subject.create({//else create subject 
+    const createSubject = await prisma.subject.create({//else create subject 
+        //@ts-ignore
         data: {
             subjectCode:subject.subjectCode,
             subjectName:subject.subjectName
@@ -78,7 +79,7 @@ const StudentVeryify = AsyncHandler(async (req: Requestany, res: Response) => {
     if (!Id) throw new ApiError(400, "id is not provied");
     const studentdata = await findStudnet(req.user);
     if (!studentdata) throw new ApiError(502, "error while finding student");
-    const veryifyStudent = await prisma.Student.updateMany(
+    const veryifyStudent = await prisma.student.updateMany(
         {
             where: {
                 collegeID: req.user?.Id
@@ -97,7 +98,7 @@ const StudentVeryify = AsyncHandler(async (req: Requestany, res: Response) => {
 
 const getExaminer = AsyncHandler(async (req: Requestany, res: Response) => {
     const { Id } = req.user;
-    const findExaminer = await prisma.Examiner.findMany({
+    const findExaminer = await prisma.examiner.findMany({
         where: {
             college: Id
         },
