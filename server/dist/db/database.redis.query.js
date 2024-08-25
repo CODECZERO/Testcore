@@ -8,6 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { createClient } from "redis";
+import { ApiError } from "../util/apiError";
 const REDIS_HOST = process.env.REDIS_HOST || 'redis';
 const REDIS_PORT = process.env.REDIS_PORT || 6379;
 let client;
@@ -20,18 +21,18 @@ const connectReids = () => __awaiter(void 0, void 0, void 0, function* () {
         // You can now use the Redis client
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 const cacheUpdate = (tokenID, examID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield client.set(tokenID, examID);
+        const data = yield client.setEx(tokenID, 86400, examID);
         if (!data)
             return null;
         return data;
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
 const cacheSearch = (tokenID) => __awaiter(void 0, void 0, void 0, function* () {
@@ -42,7 +43,37 @@ const cacheSearch = (tokenID) => __awaiter(void 0, void 0, void 0, function* () 
         return dataSearch;
     }
     catch (error) {
-        return error;
+        throw new ApiError(500, error);
     }
 });
-export { cacheSearch, cacheUpdate, connectReids };
+const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const CollegeName = roomName.match(/^\w+/);
+        const ClassRoomName = roomName.match(/(?<=\/)\w+$/);
+        if (!CollegeName || !ClassRoomName)
+            throw new Error("Invalid room name format");
+        const roomSearch = yield client.hGet(CollegeName[0], ClassRoomName[0]);
+        if (!roomSearch)
+            return null;
+        return roomName;
+    }
+    catch (error) {
+        throw new ApiError(500, error);
+    }
+});
+const cacheUpdateForChatRoom = (roomName, roomID) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const CollegeName = roomName.match(/^\w+/);
+        const ClassRoomName = roomName.match(/(?<=\/)\w+$/);
+        if (!CollegeName || !ClassRoomName)
+            throw new Error("Invalid room name format");
+        const roomSearch = yield client.hSet(CollegeName[0], ClassRoomName[0], roomID);
+        if (!roomSearch)
+            return null;
+        return roomName;
+    }
+    catch (error) {
+        throw new ApiError(500, error);
+    }
+});
+export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom };

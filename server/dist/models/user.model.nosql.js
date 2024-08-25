@@ -7,7 +7,13 @@ const UserSchema = new mongoose.Schema({
     profile: {
         type: String,
         require: true
-    }
+    },
+    chatRoomIDs: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Chatmodel"
+        }
+    ]
 }, { timestamps: true });
 const User = mongoose.model("User", UserSchema);
 export { User };

@@ -16,7 +16,7 @@ import { getQuestionPaper } from "../db/Query.sql.db.js";
 //@ts-ignore
 const giveExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examdata = req.examData;
-    const answerQuestion = yield prisma.QuestionPaper.update({
+    const answerQuestion = yield prisma.questionPaper.update({
         where: {
             Id: examdata.examID
         },
@@ -33,7 +33,8 @@ const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, fun
     const examdata = req.examData;
     if (!examdata)
         throw new ApiError(401, "exam data is not provied");
-    const findexam = prisma.Exam.findFirst({
+    //@ts-ignore
+    const findexam = prisma.exam.findFirst({
         where: {
             Id: examdata.examID
         },
@@ -78,7 +79,7 @@ const getResult = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, f
     const resultdata = req.examData;
     if (!resultdata)
         throw new ApiError(401, "no data is provied");
-    const findresult = yield prisma.Result.findMany({
+    const findresult = yield prisma.result.findMany({
         where: {
             OR: [
                 { questionPaperID: resultdata.QuestionPaperId },
