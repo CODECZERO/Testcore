@@ -6,12 +6,15 @@ import { Response, Request } from "express";
 import { chatModel } from "../models/chatRoomData.model.nosql";
 import { User } from "../models/user.model.nosql";
 import { findUsers } from "../db/Query.nosql.db";
+import { nanoid } from "nanoid";
+import { randomBytes } from "crypto";
 import mongoose from "mongoose";
+import { encryptDataFunc } from "../util/cryptographi.util";
 
 
 type roomData = {
     roomName: string,
-    roomID:string
+    roomID: string
 }
 
 type chatData = {
@@ -22,9 +25,16 @@ type user = {
     Id: string
 }
 
+type encryption={
+    secretKey:string,
+    iv:string
+
+}
+
 interface Requestany extends Request {
     chatRoomData?: any,
-    user?: any
+    user?: any,
+    chatEncryption?:any
 }
 
 
@@ -52,9 +62,12 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
     const { Id } = req.user;
     const encryptCode = "fsf";
     if (!Id || !roomData || !encryptCode) throw new ApiError(400, "group name or Admin id is not provided");
+    const secretKey=nanoid(32);
+    const iv = randomBytes(16);
+    if(!(secretKey||iv)) throw new ApiError(500,"error while making keys");
     const createRoom = await chatModel.create({
         romeName: roomData.roomName,
-        encryptCode,
+        encryptCode:secretKey,
         AdminId: Id
     });
     if (!createRoom) throw new ApiError(500, "unable to create chat group");
@@ -85,11 +98,17 @@ const modifiChat = AsyncHandler(async () => {
 
 });
 
-const EncryptChat = AsyncHandler(async () => {
+const SendMessage = AsyncHandler(async (req:Requestany,res:Response) => {
+    const roomData:roomData=req.chatRoomData;
+    const secretData:encryption=req.chatEncryption;
+    const encryptChatData=await encryptDataFunc(req.body,secretData.secretKey,secretData.iv as Buffer);//figure out how will you handle issue with 
+   
+    //kafka producer here
+    return res.status(200).json(new ApiResponse(200,encryptChatData,"encrypt message data"));
 
 });
 
-const DecryptChat = AsyncHandler(async () => {// this function should be taken care on user/client side 
+const ReciveMessage = AsyncHandler(async (req:Requestany,res:Response) => {// this function should be taken care on user/client side 
 
 });
 
@@ -106,7 +125,7 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
 });
 
 
-const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//aggreation query
+const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//checks wheater user is part of that chat room
     const roomData: roomData = req.chatRoomData;
     const user: user = req.user;
     if (!roomData) throw new ApiError(400, "invalid request");
@@ -126,17 +145,17 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//ag
             }
         },
         {
-            $project:{
-                _id:1,
-                ChatUsers:1,
+            $project: {
+                _id: 1,
+                ChatUsers: 1,
             }
         }
 
     ])
-    if(!checkUserAccess||checkUserAccess.length===0) throw new ApiError(409,"user don't have access to chat ");
+    if (!checkUserAccess || checkUserAccess.length === 0) throw new ApiError(409, "user don't have access to chat ");
 
 
-    return res.status(200).json(new ApiResponse(200,checkUserAccess[0],"user have access to chat"));
+    return res.status(200).json(new ApiResponse(200, checkUserAccess[0], "user have access to chat"));
 
 });
 
@@ -147,7 +166,7 @@ export {
     LeaveRoom,
     deleteChat,
     modifiChat,
-    DecryptChat,
-    EncryptChat,
+    SendMessage,
+    ReciveMessage,
     getUserInChat
 }
