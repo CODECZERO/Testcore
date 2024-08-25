@@ -12,6 +12,12 @@ const chatSchema=new mongoose.Schema({
         require:true,
         unique:true
     },
+    iv:{
+        type:String,
+        require:true,
+        unique:true
+    }
+    ,
     AdminId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:"User"

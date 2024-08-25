@@ -42,7 +42,7 @@ const tokenGen = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = yield genReffToken(user); //calling genReffToken function to genrate refersh token for server
     return { accesToken, refreshToken }; //returing both of theme
 });
-//@ts-ignore
+//
 const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, role } = req.body;
     if (!(email || password || role))
@@ -67,7 +67,7 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, userWithOutPassword, "Login in successfully"));
 }));
 //registering user on the site and store data on sql/postgresSql
-//@ts-ignore
+//
 const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password, phoneNumber, address, role } = req.body;
     //checking if values are provide or not if not provide throw error 
@@ -85,13 +85,13 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
     // } 
     const hashedPassword = yield bcrypt.hash(password, 10); //hashing the password
     const userCreate = yield createOp(req.body, hashedPassword); //passing req.body value to query function with hashed password
-    const userData = Object.assign(Object.assign({}, userCreate), { password: "" }); //replacing the password with empty string
+    const userData = { userCreate, password: "" }; //replacing the password with empty string
     if (!userData)
         throw new ApiError(500, "Something went wrong while registering the user"); //if user isn't create then throw error
     return res.status(201).json(//if create then return user data
     new ApiResponse(201, userData, "User create successfuly"));
 }));
-//@ts-ignore
+//
 const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //updates password of user based on the roles
     const { email, role } = req.user; //taking email,role,passwrod from user
@@ -107,7 +107,7 @@ const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
     //else return output
     return res.status(200).json(new ApiResponse(200, "password update successfuly"));
 }));
-//@ts-ignore
+//
 const updateProfileImage = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const fileURI = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
@@ -142,7 +142,7 @@ const updateProfileImage = AsyncHandler((req, res) => __awaiter(void 0, void 0, 
     //then return error
     return res.status(200).json(new ApiResponse(200, updateProfile || user, "user profile image updated successfuly")); //else return success messsage
 }));
-//@ts-ignore
+//
 const getCollege = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const findCollegeName = yield findCollege(); //find college name 
     if (!findCollegeName)

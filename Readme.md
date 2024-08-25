@@ -1,4 +1,5 @@
 # imp
+
     # rate limit the user/examiner
     # proct from dos/ddos
     # limit user from accessing other's data like chat,file,exam etc
@@ -13,6 +14,7 @@
     # the user/student exam token will contian object id of exam paper and it will search that exam paper answer in the database
 
 # fetaures
+
     # chat/group chat of particulre crouse and normal/gernal too
     # live test giving stream
     # can chat to admin or examiner in case of douts via chat 
@@ -33,8 +35,6 @@
     # if the unique id is not map then map ,it when user enterd it 
     # cache data/exam paper so it doesn't make any load on database  
 
-
-
 # if posible
 
     # we need someone who has knowldge about ai 
@@ -45,5 +45,24 @@
 
     # include block option too in every like block from exam/block from group etc
 
+# Backend
 
- 
+    # limit the database search return or search by using take and skip in primsa and monogodb
+    # rewrite the status code arrcoding to the correct usage
+    # debug and and test code 
+    # do indexing of database table 
+    # use Caching
+    # put antivirus check for file upload
+    #comprase file
+    #write auth middelware for examdata verfiy
+    # add message to response 
+    # make loger and mointer activty of the user for data purose or handling servers
+    # put return message
+    #should set cookie or seesion token option
+    #implement token base verifaction methode
+
+# imp
+
+# rember to rewrite and check code working
+kafka is need in backend as there are many live action to be handle
+and radit mq

@@ -33,6 +33,27 @@ const SearchChatRoom = AsyncHandler(async (req: Requestany, res: Response, next:
 
 });
 
+const encryptDecryptData=AsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{
+    try {
+        const request = req;
+        const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
+        const token = request.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
+        if (!token) {
+            throw new ApiError(401, "Unauthorized");
+        }
+
+        // Verify the token here
+        const secert: any = process.env.ATS;
+        const decoded = await jwt.verify(token, secert) as decodedUser;
+        const { email, role } = decoded;
+        request.user = decoded; // Assuming `req.user` is where you store the decoded token
+
+        next();
+    } catch (error) {
+        next(new ApiError(401, "Unauthorized: Invalid secret key"));
+    }
+})
+
 export {
     SearchChatRoom
 };

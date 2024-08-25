@@ -18,7 +18,7 @@ const getSubjects = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0,
     const subject = req.body; //taking subject name and code 
     let subjects;
     if (!subject) { //if it doesn't exist then return whole table or subject name or code is not provide then return all
-        subjects = yield prisma.Subject.findMany({
+        subjects = yield prisma.subject.findMany({
             select: {
                 Id: true,
                 subjectCode: true,
@@ -43,7 +43,8 @@ const CreateSubject = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 
     const subjectFind = yield getSubject(subject.subjectCode, subject.subjectName); //checking database if subject exists
     if (subjectFind)
         return res.status(200).json(new ApiResponse(200, subjectFind, "Subject Exists")); //if exists then return it
-    const createSubject = yield prisma.Subject.create({
+    const createSubject = yield prisma.subject.create({
+        //@ts-ignore
         data: {
             subjectCode: subject.subjectCode,
             subjectName: subject.subjectName
@@ -73,7 +74,7 @@ const StudentVeryify = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
     const studentdata = yield findStudnet(req.user);
     if (!studentdata)
         throw new ApiError(502, "error while finding student");
-    const veryifyStudent = yield prisma.Student.updateMany({
+    const veryifyStudent = yield prisma.student.updateMany({
         where: {
             collegeID: (_a = req.user) === null || _a === void 0 ? void 0 : _a.Id
         },
@@ -88,7 +89,7 @@ const StudentVeryify = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
 //@ts-ignore
 const getExaminer = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { Id } = req.user;
-    const findExaminer = yield prisma.Examiner.findMany({
+    const findExaminer = yield prisma.examiner.findMany({
         where: {
             college: Id
         },
