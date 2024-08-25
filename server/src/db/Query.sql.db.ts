@@ -1,6 +1,7 @@
 //here the query code is divide into sub-parts as there are may roles and stupidly writing the code is bad idea
 import roleToModel from "./role.db.js";
 import prisma from "./database.Postgres.js";
+import { ApiError } from "../util/apiError.js";
 //perfrome sql create option base on the role of user
 type UserRole = 'Student' | 'College' | 'Examiner'; // Define a type for user roles
 
@@ -27,11 +28,11 @@ const createOp = async (user: User, password: string) => {
             case "College":
                 return await roleToModel[user.role].create({
                     data: {
-                        email: user.email??"",
+                        email: user.email ?? "",
                         password, // password is hashed before storing
-                        name: user.name??"",
-                        phoneNumber: user.phoneNumber??"",
-                        address: user.address??"",
+                        name: user.name ?? "",
+                        phoneNumber: user.phoneNumber ?? "",
+                        address: user.address ?? "",
                         refreshToken: " ",
                         collegeVerify: true
                     },
@@ -39,12 +40,12 @@ const createOp = async (user: User, password: string) => {
             case "Student":
                 return await roleToModel[user.role].create({
                     data: {
-                        email: user.email??"",
+                        email: user.email ?? "",
                         password, // password is hashed before storing
-                        name: user.name??"",
-                        phoneNumber: user.phoneNumber??"",
-                        address: user.address??"",
-                        collegeID: user.collegeID??"",
+                        name: user.name ?? "",
+                        phoneNumber: user.phoneNumber ?? "",
+                        address: user.address ?? "",
+                        collegeID: user.collegeID ?? "",
                         refreshToken: "",
                         studentVerify: true
                     },
@@ -52,20 +53,20 @@ const createOp = async (user: User, password: string) => {
             case "Examiner":
                 return await roleToModel[user.role].create({
                     data: {
-                        email: user.email??"",
+                        email: user.email ?? "",
                         password, // password is hashed before storing
-                        name: user.name??"",
-                        phoneNumber: user.phoneNumber??"",
-                        address: user.address??"",
+                        name: user.name ?? "",
+                        phoneNumber: user.phoneNumber ?? "",
+                        address: user.address ?? "",
                         refreshToken: "",
-                        examinerVerify:true,
+                        examinerVerify: true,
                     },
                 });
         }
         //puting value in student table if role is student because it has one to one reffernces to college
 
     } catch (error) {
-        return error
+        throw new ApiError(500,error)
 
     }
 }
@@ -87,7 +88,7 @@ const findOp = async (user: User) => {//find user based on the role of user
             }
         });
     } catch (error) {
-        return error
+        throw new ApiError(500,error)
     }
 }
 //update value of user based on the 
@@ -105,7 +106,7 @@ const updateOp = async (user: User) => {//user is previous values , current user
             }
         });
     } catch (error) {
-        return error
+        throw new ApiError(500,error)
     }
 }
 //it's removes single value/user from that table based on role and email
@@ -119,7 +120,7 @@ const deleteOp = async (user: User) => {
             }
         });
     } catch (error) {
-        return error
+        throw new ApiError(500,error)
     }
 }
 
@@ -136,7 +137,7 @@ const deletMOp = async (user: User, keyword: String) => {
             }
         });
     } catch (error) {
-        return error
+        throw new ApiError(500,error)
     }
 }
 
@@ -152,7 +153,7 @@ const updatePasswordInDB = async (user: User, password: string) => {//update pas
             }
         });
     } catch (error) {
-        return error;
+        throw new ApiError(500,error)
     }
 }
 
@@ -164,7 +165,7 @@ const findCollege = async () => {//findig college name from college table
             }
         });
     } catch (error) {
-        return error;
+        throw new ApiError(500,error)
     }
 }
 
@@ -188,7 +189,7 @@ const getSubject = async (subjectCode: string, subjectName: string) => {
             },
         });
     } catch (error) {
-        return error;
+        throw new ApiError(500,error)
     }
 }
 
@@ -211,7 +212,7 @@ const findStudnet = async (studnetData: { Id: string }) => {
         });
 
     } catch (error) {
-        return error
+        throw new ApiError(500,error)
     }
 
 
@@ -233,7 +234,7 @@ const getQuestionPaper = async (examId: string) => {
             }
         });
     } catch (error) {
-        return error;
+        throw new ApiError(500,error)
     }
 }
 
@@ -254,7 +255,7 @@ const getQuestionPaperForExaminer = async (examID: string) => {
             }
         })
     } catch (error) {
-        return error;
+        throw new ApiError(500,error)
     }
 }
 
