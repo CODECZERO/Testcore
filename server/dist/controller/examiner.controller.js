@@ -69,8 +69,8 @@ const makeTimetable = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 
         throw new ApiError(400, "timetable is not provided"); //checks if subject or class is provide or not if not throw error
     const dataInsert = yield TimeTable.create({
         Class: timetable.Class,
-        Subjects: timetable.Subject, // imp, subject is a nested object
-        Aprrove: false, //waiting for approveable from college
+        Subjects: timetable.Subject,
+        Aprrove: false,
         CollegeName: timetable.CollegeName
     });
     if (!dataInsert)
