@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "run": "node ./dist/index.js",
+    "build": "npm install && node ./dist/index.js",
     "dev": "nodemon ./dist/index.js"
   },
   "keywords": [],
