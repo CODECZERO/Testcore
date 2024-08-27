@@ -1,6 +1,33 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { ApiError } from "../../util/apiError.js";
 
+
+/*
+  ***Message pattern***
+      Message={
+        "MessageID":"Message id genreated using nanoid",
+        "content":"Here put user message",
+        "typeOfMessage":"SEND_MESSAGE or LEAVE_ROOM",
+        "userId":"Id of user",
+        "roomName":"Name of the room which is get by using connectChat for the user"
+      }
+*/
+
+type typeOfMessage="SEND_MESSAGE"|"LEAVE_ROOM";
+
+type MessageData={
+  MessageId:string,
+  typeOfMessage:string,
+  roomName:string,
+  userId:string,
+  content:string  
+}
+
+interface CustomWebSocket extends WebSocket {
+  roomName?: string;  // Optional property's
+  sub?: string;
+}
+
 const rooms: any = {};
 const port: number = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000;
 const wss = new WebSocketServer({ port });
@@ -9,30 +36,20 @@ let parameters;
 let roomName: string;
 let a = 0;
 
-const joinRoom = async (ws: WebSocket, roomName: string) => {
-  try {
-    if (!rooms[roomName]) {
-      rooms[roomName] = new Set();
-    }
-    rooms[roomName].add(ws);
-  } catch (error) {
-    throw new ApiError(500, "error while find and storing room");
-  }
-}
 
-const sendMessage = async (messageBuffer: Buffer, roomName: string, ws: WebSocket) => {
+
+const sendMessage = async (MessageData:MessageData, ws: CustomWebSocket) => {
   try {
-    rooms[roomName].forEach((client: WebSocket) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(messageBuffer));
-      }
-    });
+      const messageInfo=JSON.stringify(MessageData);
+
   } catch (error) {
     throw new ApiError(500, "error while sending message");
   }
 }
 
-const closeSocket = async (ws: WebSocket, roomName: string) => {
+
+
+const closeSocket = async (ws: CustomWebSocket, roomName: string) => {
   try {
     rooms[roomName].delete(ws);
     if (rooms[roomName].size === 0) {
@@ -44,28 +61,43 @@ const closeSocket = async (ws: WebSocket, roomName: string) => {
 }
 
 
+const actions={
+
+  'SEND_MESSAGE':()=>{},
+  'LEAVE_ROOM':()=>{},
+
+}
+
 
 const runWebSocket = async () => {
 
   try {
-    wss.on('connection', (ws) => {
-    console.log("on");
-    ws.on('message', (messageData) => {
-      const { roomName, message } = JSON.parse(messageData.toString());
+    wss.on('connection', (ws:CustomWebSocket) => {
+      ws.on('message',async (message:string)=>{
+          const MessageData:MessageData=JSON.parse(message);
+          if(!MessageData){
+            ws.close(4000,"Message data is not provided");
+            return;
+          }
+          ws.roomName=MessageData.roomName;
 
-      if (!roomName || !message) {
-        throw new ApiError(400, "Invalid message format");
-      }
-      joinRoom(ws, roomName);
-      console.log(roomName);
-      sendMessage(message, roomName, ws);
-    })
-    ws.on('close', () => {
-      if (rooms[roomName].has(ws)) {
-        closeSocket(ws, roomName);
-      }
-    })
-  })
+          if(!roomName){
+            ws.close(4000,"Message data is not provided");
+            return;
+          }
+
+          const typeAction=MessageData.typeOfMessage;
+          const actiondata=actions[typeAction];
+
+          if(!actiondata){
+            ws.close(4000,"message type wasn't define");
+            return;
+          }
+      })
+  });
+
+  sub.on()
+
 } catch (error) {
   throw new ApiError(500, "Error while runing websocket");
 }

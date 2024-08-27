@@ -1,7 +1,7 @@
 import AsyncHandler from "../util/ayscHandler";
 import { ApiError } from "../util/apiError";
 import { ApiResponse } from "../util/apiResponse";
-import { cacheUpdateForChatRoom } from "../db/database.redis.query";
+import { cacheSearchForChatRoom, cacheUpdateForChatRoom } from "../db/database.redis.query";
 import { Response, Request } from "express";
 import { chatModel } from "../models/chatRoomData.model.nosql";
 import { User } from "../models/user.model.nosql";
@@ -85,7 +85,7 @@ const getUserInChat = AsyncHandler(async (req: Requestany, res: Response) => {
 
 });
 
-const deleteChat = AsyncHandler(async (req: Requestany, res: Response) => {
+const deleteChat = AsyncHandler(async (req: Requestany, res: Response) => {//cruently working on this feature
     const chatdata: chatData = req.chatRoomData;
     if (!chatdata) throw new ApiError(400, "invalid data");
     // const modifi = await ;
@@ -98,10 +98,9 @@ const modifiChat = AsyncHandler(async () => {
 
 });
 
-const SendMessage = AsyncHandler(async (req:Requestany,res:Response) => {
-    const roomData:roomData=req.chatRoomData;
-    const secretData:encryption=req.chatEncryption;
-    if(!(roomData||secretData)) throw new ApiError(401,"")
+const SendMessageEncryption = AsyncHandler(async (req:Requestany,res:Response) => {
+     const roomData:roomData=cacheSearchForChatRoom();
+     if(!(roomData||secretData)) throw new ApiError(401,"secretData or roomData is not found")
     const encryptChatData=await encryptDataFunc(req.body,secretData.secretKey,secretData.iv as Buffer);//figure out how will you handle issue with 
    
     //kafka producer here
@@ -109,11 +108,11 @@ const SendMessage = AsyncHandler(async (req:Requestany,res:Response) => {
 
 });
 
-const ReciveMessage = AsyncHandler(async (req:Requestany,res:Response) => {// this function should be taken care on user/client side 
+const ReciveMessageDecryption = AsyncHandler(async (req:Requestany,res:Response) => {// this function should be taken care on user/client side 
 
 });
 
-const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
+const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {//it removes the users from that particure chat permantly
     const roomData: roomData = req.chatRoomData;
     const user: user = req.user;
     if (!(roomData || user)) throw new ApiError(400, "invalid data");
@@ -156,7 +155,7 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//ch
     if (!checkUserAccess || checkUserAccess.length === 0) throw new ApiError(409, "user don't have access to chat ");
 
 
-    return res.status(200).json(new ApiResponse(200, checkUserAccess[0], "user have access to chat"));
+    return res.status(200).json(new ApiResponse(200, checkUserAccess[0], "user have access to chat")); 
 
 });
 
@@ -167,7 +166,7 @@ export {
     LeaveRoom,
     deleteChat,
     modifiChat,
-    SendMessage,
-    ReciveMessage,
+    SendMessageEncryption,
+    ReciveMessageDecryption,
     getUserInChat
 }
