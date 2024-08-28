@@ -66,10 +66,9 @@ const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function*
 });
 //might have security issues 
 const findOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    var _p;
     try {
         //@ts-ignore // the ingore is put here becase there is type error for findunique,but it works 
-        return yield ((_p = roleToModel[user.role]) === null || _p === void 0 ? void 0 : _p.findUnique({
+        return yield roleToModel[user.role].findUnique({
             where: {
                 email: user.email
             },
@@ -81,7 +80,7 @@ const findOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
                 phoneNumber: true,
                 address: true,
             }
-        }));
+        });
     }
     catch (error) {
         throw new ApiError(500, error);

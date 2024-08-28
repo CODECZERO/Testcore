@@ -9,10 +9,7 @@ lerna-debug.log*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
-#test folders
-dist/
-/dist
-dist
+
 # Runtime data
 pids
 *.pid
@@ -132,5 +129,3 @@ out
 .pnp.*
 
 
-#folders
-dist/
