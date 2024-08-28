@@ -74,7 +74,7 @@ const createOp = async (user: User, password: string) => {
 const findOp = async (user: User) => {//find user based on the role of user
     try {
         //@ts-ignore // the ingore is put here becase there is type error for findunique,but it works 
-        return await roleToModel[user.role]?.findUnique({
+        return await roleToModel[user.role].findUnique({
             where: {
                 email: user.email
             },
