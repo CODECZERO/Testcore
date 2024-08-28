@@ -1,7 +1,7 @@
 import { createClient } from "redis";
-import { ApiError } from "../util/apiError";
+import { ApiError } from "../util/apiError.js";
 import { RedisClientType } from "@redis/client";
-import { ApiResponse } from "../util/apiResponse";
+import { ApiResponse } from "../util/apiResponse.js";
 
 //redis is use for caching to store data realte to exam and chat room's
 //usign env to load value of redis server
@@ -11,7 +11,7 @@ const REDIS_PORT = process.env.REDIS_PORT || 6379;
 let client: RedisClientType;
 const connectReids = async () => {//connecting redis
     try {
-        client = createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` });
+        client = createClient({ url: process.env.REDISURL });
         client.on('error', (err) => console.log('Redis Client Error', err));
         await client.connect();
         console.log('Redis connected successfully');
