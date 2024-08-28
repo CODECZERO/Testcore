@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { createClient } from "redis";
-import { ApiError } from "../util/apiError";
+import { ApiError } from "../util/apiError.js";
 //redis is use for caching to store data realte to exam and chat room's
 //usign env to load value of redis server
 const REDIS_HOST = process.env.REDIS_HOST || 'redis';
@@ -16,7 +16,7 @@ const REDIS_PORT = process.env.REDIS_PORT || 6379;
 let client;
 const connectReids = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        client = createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` });
+        client = createClient({ url: process.env.REDISURL });
         client.on('error', (err) => console.log('Redis Client Error', err));
         yield client.connect();
         console.log('Redis connected successfully');
