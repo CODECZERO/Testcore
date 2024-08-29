@@ -9,16 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { WebSocketServer } from "ws";
 import { ApiError } from "../../util/apiError.js";
-import rabbitMqFunction from "../rabbitmq/rabbitmq.services.js";
+import rabbitmq from "../rabbitmq/rabbitmq.services.js";
 const rooms = {};
 const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000;
 const wss = new WebSocketServer({ port });
-const rabbitmq = new rabbitMqFunction;
 const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const messageInfo = JSON.stringify(MessageData);
         // const messageEnc=await SendMessageEncryption();
-        rabbitmq.publishData(MessageData.roomName, messageInfo);
+        rabbitmq.publishData(JSON.stringify(MessageData), MessageData.roomName);
     }
     catch (error) {
         throw new ApiError(500, "error while sending message");
@@ -29,7 +28,7 @@ const reciveMEssage = (roomName, ws) => __awaiter(void 0, void 0, void 0, functi
         const messageEnc = yield rabbitmq.subData(roomName);
         rabbitmq.channel.consume(rabbitmq.queue.queue, (message) => {
             if (message) {
-                ws.send(message.toString());
+                ws.send(JSON.stringify(message.content));
             }
         });
     }
@@ -57,7 +56,6 @@ const runWebSocket = () => __awaiter(void 0, void 0, void 0, function* () {
         wss.on('connection', (ws) => {
             ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
                 const MessageData = JSON.parse(message);
-                console.log(MessageData);
                 ws.send(JSON.stringify(MessageData));
                 if (!MessageData) {
                     ws.close(4000, "Message data is not provided");

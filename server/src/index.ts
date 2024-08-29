@@ -7,6 +7,7 @@ import runWebSocket from "./services/chat/chatServer.service.js";
 connectDb().then(() => {
     app.listen(process.env.PORT || 8080, () => { console.log(`App running on port:${process.env.PORT}`) });
     runWebSocket();
+    console.log("Websokcet server runing")
 }).catch((error) => {
     console.log(`Database connection fail ${error}`);
 })
