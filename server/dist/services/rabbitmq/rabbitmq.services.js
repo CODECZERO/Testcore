@@ -13,22 +13,40 @@ class rabbitMqFunction {
         this.exchangeName = 'chat_exchagne';
         this.messageTTL = '';
         // private queueName = "MessageStore"
-        this.connectRabbitMq = (MessageEnc, roomName) => __awaiter(this, void 0, void 0, function* () {
-            const connection = yield amqplib.connect(process.env.RABBITMQURL);
-            const channel = yield connection.createChannel();
-            yield channel.assertExchange(this.exchangeName, roomName, {
-                durable: true,
-            });
-            this.channel = channel;
+        this.connectRabbitMq = (roomName) => __awaiter(this, void 0, void 0, function* () {
+            if (!this.connection)
+                this.connection = yield amqplib.connect(process.env.RABBITMQURL);
+            if (!this.channel) {
+                this.channel = yield this.connection.createChannel();
+                this.channel.assertExchange(this.exchangeName, 'topic', {
+                    durable: true,
+                });
+            }
         });
         this.publishData = (messageEnc, roomName) => __awaiter(this, void 0, void 0, function* () {
+            if (!this.channel) {
+                yield this.connectRabbitMq(roomName);
+            }
             yield this.channel.publish(this.exchangeName, roomName, Buffer.from(messageEnc), { persistent: true });
         });
         this.subData = (roomName) => __awaiter(this, void 0, void 0, function* () {
+            if (!this.channel) {
+                yield this.connectRabbitMq(roomName);
+            }
             this.queue = yield this.channel.assertQueue(roomName, { exclusive: false });
             const message = yield this.channel.bindQueue(this.queue.queue, this.exchangeName, roomName);
             return message;
         });
+        this.closeConnection = () => __awaiter(this, void 0, void 0, function* () {
+            yield this.channel.close();
+            yield this.connection.close();
+        });
+    }
+    initialize(roomName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.connectRabbitMq(roomName);
+        });
     }
 }
-export default rabbitMqFunction;
+const rabbitmq = new rabbitMqFunction();
+export default rabbitmq;

@@ -66,3 +66,7 @@
 # rember to rewrite and check code working
 kafka is need in backend as there are many live action to be handle
 and radit mq
+
+
+
+# know handle why message is not to user in same group in backend;

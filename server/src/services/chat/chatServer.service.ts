@@ -1,6 +1,7 @@
 import { WebSocketServer, WebSocket } from "ws";
 import { ApiError } from "../../util/apiError.js";
-import rabbitMqFunction from "../rabbitmq/rabbitmq.services.js";
+import rabbitmq from "../rabbitmq/rabbitmq.services.js";
+import { ConsumeMessage } from "amqplib";
 // import { SendMessageEncryption } from "../../controller/chat.controller.js";
 
 /*
@@ -32,14 +33,14 @@ interface CustomWebSocket extends WebSocket {
 const rooms: any = {};
 const port: number = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000;
 const wss = new WebSocketServer({ port });
-const rabbitmq = new rabbitMqFunction;
+
 
 
 const sendMessage = async (MessageData: MessageData, ws: CustomWebSocket,) => {
   try {
     const messageInfo = JSON.stringify(MessageData);
     // const messageEnc=await SendMessageEncryption();
-    rabbitmq.publishData(MessageData.roomName, messageInfo);
+    rabbitmq.publishData(JSON.stringify(MessageData), MessageData.roomName);
 
   } catch (error) {
     throw new ApiError(500, "error while sending message");
@@ -49,9 +50,9 @@ const sendMessage = async (MessageData: MessageData, ws: CustomWebSocket,) => {
 const reciveMEssage = async (roomName: string, ws: WebSocket) => {
   try {
     const messageEnc = await rabbitmq.subData(roomName);
-    rabbitmq.channel.consume(rabbitmq.queue.queue, (message: string) => {
+    rabbitmq.channel.consume(rabbitmq.queue.queue, (message:ConsumeMessage|null) => {
       if (message) {
-        ws.send(message.toString());
+        ws.send(JSON.stringify(message.content));
       }
     })
   } catch (error) {
@@ -84,8 +85,7 @@ const runWebSocket = async () => {
   try {
     wss.on('connection', (ws: CustomWebSocket) => {
       ws.on('message', async (message: string) => {
-        const MessageData: MessageData = JSON.parse(message);
-        console.log(MessageData);
+        const MessageData: MessageData = JSON.parse(message);        
         ws.send(JSON.stringify(MessageData));
         if (!MessageData) {
           ws.close(4000, "Message data is not provided");
