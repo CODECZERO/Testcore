@@ -42,11 +42,6 @@ class rabbitMqFunction {
             yield this.connection.close();
         });
     }
-    initialize(roomName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.connectRabbitMq(roomName);
-        });
-    }
 }
 const rabbitmq = new rabbitMqFunction();
 export default rabbitmq;

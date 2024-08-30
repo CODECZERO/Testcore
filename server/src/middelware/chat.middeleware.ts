@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import AsyncHandler from "../util/ayscHandler.js";
 import { ApiError } from "../util/apiError.js";
 import { cacheSearchForChatRoom } from "../db/database.redis.query.js";
+import jwt from 'jsonwebtoken';
 
 interface Requestany extends Request{
     chatRoomData?:any;

@@ -8,77 +8,52 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { WebSocketServer } from "ws";
-import { ApiError } from "../../util/apiError.js";
-import rabbitmq from "../rabbitmq/rabbitmq.services.js";
-const rooms = {};
-const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000;
-const wss = new WebSocketServer({ port });
-const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const messageInfo = JSON.stringify(MessageData);
-        // const messageEnc=await SendMessageEncryption();
-        rabbitmq.publishData(JSON.stringify(MessageData), MessageData.roomName);
-    }
-    catch (error) {
-        throw new ApiError(500, "error while sending message");
-    }
-});
-const reciveMEssage = (roomName, ws) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const messageEnc = yield rabbitmq.subData(roomName);
-        rabbitmq.channel.consume(rabbitmq.queue.queue, (message) => {
-            if (message) {
-                ws.send(JSON.stringify(message.content));
-            }
-        });
-    }
-    catch (error) {
-        throw new ApiError(500, "error while reciveing message");
-    }
-});
-const closeSocket = (MessageData, ws) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        rooms[MessageData.roomName].delete(ws);
-        if (rooms[MessageData.roomName].size === 0) {
-            delete rooms[MessageData.roomName];
-        }
-    }
-    catch (error) {
-        throw new ApiError(500, "error while closeing socket");
-    }
-});
+import { sendMessage, reciveMEssage, closeSocket } from "../../controller/chat.controller.js";
+import AsyncHandler from "../../util/ayscHandler.js";
+const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
+const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000; //running websocket on same webserver but different port,
+//i won't recommend that as the webscoket should be run on different server as it has a collection of user
+//and it's better for scablity of the application 
+const wss = new WebSocketServer({ port }); //creating websocket server on the port 9001 or 3000 or any other port diffene by the user
+const clients = new Set(); //collection of websocket
 const actions = {
+    //actions are way of simply access or using the function based on the message type,
+    //if message type is LEAVE_ROOM, the room the closeSocket function will be call
+    //if message type is SEND_MESSAGE, the sendMessage fucntion will be call 
+    // the both functin will be call in O(1) time.
     'SEND_MESSAGE': sendMessage,
     'LEAVE_ROOM': closeSocket,
 };
-const runWebSocket = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        wss.on('connection', (ws) => {
-            ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
-                const MessageData = JSON.parse(message);
-                ws.send(JSON.stringify(MessageData));
-                if (!MessageData) {
-                    ws.close(4000, "Message data is not provided");
-                    return;
-                }
-                if (!MessageData.roomName) {
-                    ws.close(4000, "Message data is not provided");
-                    return;
-                }
-                if (!rooms[MessageData.roomName])
-                    ws.roomName = MessageData.roomName;
-                const typeAction = MessageData.typeOfMessage;
-                const actiondata = actions[typeAction](MessageData, ws);
-                if (!actiondata) {
-                    ws.close(4000, "message type wasn't define");
-                    return;
-                }
-                yield reciveMEssage(MessageData.roomName, ws);
-            }));
+const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, function* () {
+    wss.on('connection', (ws) => {
+        ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
+            const MessageData = JSON.parse(message); //take data or message in message pattern from user first time as they join
+            //beter use onconnection  or connection      
+            if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId)) { //check if the whole messagedata is provided or not 
+                ws.close(4000, "Message data is not provided"); //if not close the websocket connection
+                return;
+            }
+            if (!rooms[MessageData.roomName])
+                ws.roomName = MessageData.roomName; //if the room is not in rooms collection then add theme to roomCollection 
+            //but , know i think, this conditon is stoping multiple people to connect to same room,check and find it out
+            clients.add(ws); //adding websocket to the collection of websocket
+            const typeAction = MessageData.typeOfMessage; //check the message data type
+            if (!(typeAction === 'SEND_MESSAGE' || typeAction === 'LEAVE_ROOM')) { //if the message type is not in the typeOfMessage then close the websocket and return message
+                ws.close(4000, "message type wasn't define");
+                return;
+            }
+            const actiondata = actions[typeAction](MessageData, ws); //if the messagedat type exists then use the function, pass these function parameters
+            //message data and webscoket connection
+            if (!actiondata) { //if the message type is not in the typeOfMessage then close the websocket and return message
+                ws.close(4000, "message type wasn't define");
+                return;
+            }
+            yield reciveMEssage(MessageData.roomName, ws); //call the function and wait, if user send message the send to the websocket or wait for the message to come or send
+        }));
+        ws.on('close', () => {
+            clients.delete(ws);
+            console.log(`Client disconnected. Total clients: ${clients.size}`);
         });
-    }
-    catch (error) {
-        throw new ApiError(500, "Error while runing websocket");
-    }
-});
-export default runWebSocket;
+    });
+}));
+export { runWebSocket, clients, rooms }; //exoprt the function so you can start the server at the beging

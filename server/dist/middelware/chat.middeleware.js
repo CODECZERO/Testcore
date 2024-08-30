@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import AsyncHandler from "../util/ayscHandler.js";
 import { ApiError } from "../util/apiError.js";
 import { cacheSearchForChatRoom } from "../db/database.redis.query.js";
+import jwt from 'jsonwebtoken';
 const SearchChatRoom = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const roomNameUrl = req.url.valueOf();
     if (!roomNameUrl)

@@ -4,8 +4,7 @@ import cookieParser from "cookie-parser";
 import userRouter from "./router/user.router.js";
 import logingRouter from "./router/loging.router.js"
 import { MiddlewareCount } from "./services/logging and monitoring/Grafana/grafana.service.js";
-import runWebSocket from "./services/chat/chatServer.service.js";
-import { errorDataLoger } from "./services/logging and monitoring/errorLog.log.js";
+import AsyncHandler from "./util/ayscHandler.js";
 
 const app = express();
 
@@ -18,8 +17,6 @@ const app = express();
 //confing the loging service
 app.use("/api/v1/superuser", logingRouter);
 app.use(MiddlewareCount);
-app.use(errorDataLoger);
-
 
 //config the app to use/send/recive json,url,cookie data 
 app.use(express.json({ limit: "16kb" }));

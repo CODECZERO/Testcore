@@ -7,11 +7,6 @@ class rabbitMqFunction {
     public queue: any;
     public connection!: Connection;
 
-
-
-    private async initialize(roomName: string) {
-        await this.connectRabbitMq(roomName);
-    }
     // private queueName = "MessageStore"
     public connectRabbitMq = async (roomName: string) => {
         if (!this.connection) this.connection = await amqplib.connect(process.env.RABBITMQURL as string);
@@ -48,8 +43,7 @@ class rabbitMqFunction {
         );
         return message;
     };
-
-
+    
     public closeConnection = async () => {
         await this.channel.close();
         await this.connection.close();

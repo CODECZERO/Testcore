@@ -1,4 +1,4 @@
-import { chatModel } from "../models/chatRoomData.model.nosql";
+import { chatModel } from "../models/chatRoomData.model.nosql.js";
 import mongoose from "mongoose";
 
 const findUsers = async (roomName: string, AdminId?: string, userId?: string) => {

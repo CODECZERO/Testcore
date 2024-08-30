@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { chatModel } from "../models/chatRoomData.model.nosql";
+import { chatModel } from "../models/chatRoomData.model.nosql.js";
 import mongoose from "mongoose";
 const findUsers = (roomName, AdminId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
