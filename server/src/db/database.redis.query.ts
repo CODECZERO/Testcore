@@ -48,12 +48,13 @@ const cacheSearch = async (tokenID: string) => {//this function to search tokenI
 
 const cacheSearchForChatRoom = async (roomName: string) => {//this function takes room name from user and search it on redis 
     try {
+        console.log(roomName);
         //using regex to spilt.
         //eg College/BranchName
         const CollegeName = roomName.match(/^\w+/);//College
         const ClassRoomName = roomName.match(/(?<=\/)\w+$/);//BrachName
         //this function spilt the college name and branch name
-
+        console.log(CollegeName,ClassRoomName);
         if (!CollegeName || !ClassRoomName) throw new ApiError(500,"Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
         const roomSearch = await client.hGet(CollegeName[0], ClassRoomName[0]);//if the college and branch name is provied then search theme in redis 
@@ -98,6 +99,7 @@ const cacheUpdateForChatRoom = async (roomName: string, roomID: string) => {//th
         throw new ApiError(500, error);
     }
 }
+
 export {
     cacheSearch,
     cacheUpdate,

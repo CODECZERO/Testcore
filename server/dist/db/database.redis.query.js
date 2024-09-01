@@ -54,11 +54,13 @@ const cacheSearch = (tokenID) => __awaiter(void 0, void 0, void 0, function* () 
 });
 const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log(roomName);
         //using regex to spilt.
         //eg College/BranchName
         const CollegeName = roomName.match(/^\w+/); //College
         const ClassRoomName = roomName.match(/(?<=\/)\w+$/); //BrachName
         //this function spilt the college name and branch name
+        console.log(CollegeName, ClassRoomName);
         if (!CollegeName || !ClassRoomName)
             throw new ApiError(500, "Invalid room name format"); //if it wasn't able to split theme throw erro
         //value are at 0th index

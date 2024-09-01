@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { WebSocketServer } from "ws";
-import { sendMessage, reciveMEssage, closeSocket, tokenExtractr } from "../../controller/chat.controller.js";
+import { sendMessage, reciveMEssage, closeSocket, tokenExtractr } from "./chatMethodes.services.js";
 import AsyncHandler from "../../util/ayscHandler.js";
 const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
 const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000; //running websocket on same webserver but different port,
@@ -28,6 +28,10 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
     wss.on('connection', (ws, req) => {
         const token = tokenExtractr(req); //this function extract the token from req objcet in starting and verify's it
         console.log(token);
+        if (!token) {
+            ws.close(4000, "Invalid request,User not have access to this group");
+            return;
+        }
         ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
             const MessageData = JSON.parse(message); //take data or message in message pattern from user first time as they join
             //beter use onconnection  or connection      
