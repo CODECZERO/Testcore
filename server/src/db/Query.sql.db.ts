@@ -95,6 +95,7 @@ const findOp = async (user: User) => {//find user based on the role of user
 //pssing of role is necessary, so the function can select on whic table it should perform operations
 const updateOp = async (user: User,role:UserRole) => {//user is previous values , current user is new value
     try {
+        //@ts-ignore
         return await roleToModel[role].update({
             where: {
                 email: user.email

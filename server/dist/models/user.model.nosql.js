@@ -2,7 +2,8 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema({
     sqlId: {
         type: String,
-        require: true
+        require: true,
+        index: true
     },
     profile: {
         type: String,

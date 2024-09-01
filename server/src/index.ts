@@ -6,6 +6,7 @@ import { connectReids } from "./db/database.redis.query.js";
 import {runWebSocket} from "./services/chat/chatServer.service.js";
 connectDb().then(() => {
     app.listen(process.env.PORT || 8080, () => { console.log(`App running on port:${process.env.PORT}`) });
+    connectReids();
     runWebSocket();
     console.log("Websokcet server runing")
 }).catch((error) => {

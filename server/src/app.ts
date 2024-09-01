@@ -2,9 +2,9 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRouter from "./router/user.router.js";
-import logingRouter from "./router/loging.router.js"
+import logingRouter from "./router/loging.router.js";
+import ChatRouter from "./router/chat.router.js"
 import { MiddlewareCount } from "./services/logging and monitoring/Grafana/grafana.service.js";
-import AsyncHandler from "./util/ayscHandler.js";
 import rateLimit from "express-rate-limit";
 
 const app = express();
@@ -24,10 +24,6 @@ const limiter = rateLimit({
 //applying to whole server
 app.use(limiter);
 
-//confing the loging service
-app.use("/api/v1/superuser", logingRouter);
-app.use(MiddlewareCount);
-
 //config the app to use/send/recive json,url,cookie data 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
@@ -36,6 +32,10 @@ app.use(cookieParser());
 
 //routes import
 app.use("/api/v1/user", userRouter);
+app.use("/api/v1/chat",ChatRouter);
+//confing the loging service
+app.use("/api/v1/superuser", logingRouter);
+app.use(MiddlewareCount);
 
 //routes in
 //exporting app

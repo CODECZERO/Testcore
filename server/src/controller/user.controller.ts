@@ -38,14 +38,12 @@ const tokenGen = async (user: {
 //
 const login = AsyncHandler(async (req: Request, res: Response) => {
     const { email, password, role } = req.body;
-    if (!(email || password || role)) throw new ApiError(400, "Invaild email id,role or password");
+    if (!(email && password && role)) throw new ApiError(400, "Invaild email id,role or password");
     
     const findUser = await findOp({email,role});//finding user using email
-    
     if (!findUser) throw new ApiError(400, "Invaild User");//checking if user passwrod is valid or not
-    
     const passwordCheck=await bcrypt.compare(password,findUser.password);
-    
+
     if(!passwordCheck)throw new ApiError(400,"Invalid password")
     const findAndRole={...findUser,role}
     const { refreshToken, accesToken } = await tokenGen(findAndRole);//genereating token for the user
@@ -68,7 +66,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
 const signup = AsyncHandler(async (req: Request, res: Response) => {
     const { name, email, password, phoneNumber, address, role } = req.body;
     //checking if values are provide or not if not provide throw error 
-    if (!(email || password || phoneNumber || address || name || role)) throw new ApiError(400, "All fields are required");
+    if (!(email && password && phoneNumber && address && name && role)) throw new ApiError(400, "All fields are required");
 
 
     const findUser = await findOp(req.body);//passing req.body value to query function
@@ -102,7 +100,7 @@ const updatePassword = AsyncHandler(async (req: Requestany, res: Response) => {
 
     const { email, role} = req.user;//taking email,role,passwrod from user
     const {password}=req.body;
-    if (!(password || role || email)) return res.status(400).json("password is not provided");//if not found then return error
+    if (!(password && role && email)) return res.status(400).json("password is not provided");//if not found then return error
     const hashedPassword = await bcrypt.hash(password, 10);//hash password
     const update = await updatePasswordInDB(req.user, hashedPassword);//chage hash password in db
     if (!update) {
@@ -126,7 +124,7 @@ const updateProfileImage = AsyncHandler(async (req: Request, res: Response) => {
     });//finding user using email
     if (!fileURI) return res.status(400).json(new ApiError(400, "please provide images"));
     const upload = await uploadFile(fileURI);//upload file on the cloud server
-    if (!(upload || findUser.email)) return res.status(500).json(new ApiError(500, "error while uploading file on server"));
+    if (!(upload && findUser.email)) return res.status(500).json(new ApiError(500, "error while uploading file on server"));
     const user = await User.findOneAndUpdate(//finding user on mongodb if it'exists with that email id then chage photo
         findUser.email, {
         $set: {

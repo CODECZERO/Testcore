@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from "ws";
-import { sendMessage, reciveMEssage, closeSocket, tokenExtractr } from "../../controller/chat.controller.js";
+import { sendMessage, reciveMEssage, closeSocket, tokenExtractr } from "./chatMethodes.services.js";
 import AsyncHandler from "../../util/ayscHandler.js";
 import { Request } from "express";
 
@@ -55,6 +55,12 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
   wss.on('connection', (ws: CustomWebSocket, req: Request) => {//if webserver is running
     const token = tokenExtractr(req);//this function extract the token from req objcet in starting and verify's it
     console.log(token);
+    
+    if(!token){
+      ws.close(4000,"Invalid request,User not have access to this group");
+      return;
+    }
+
     ws.on('message', async (message: string) => {//if websocket is running
       const MessageData: MessageData = JSON.parse(message);//take data or message in message pattern from user first time as they join
       //beter use onconnection  or connection      

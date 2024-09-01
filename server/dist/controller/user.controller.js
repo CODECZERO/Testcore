@@ -45,7 +45,7 @@ const tokenGen = (user) => __awaiter(void 0, void 0, void 0, function* () {
 //
 const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, role } = req.body;
-    if (!(email || password || role))
+    if (!(email && password && role))
         throw new ApiError(400, "Invaild email id,role or password");
     const findUser = yield findOp({ email, role }); //finding user using email
     if (!findUser)
@@ -65,7 +65,7 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
 const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password, phoneNumber, address, role } = req.body;
     //checking if values are provide or not if not provide throw error 
-    if (!(email || password || phoneNumber || address || name || role))
+    if (!(email && password && phoneNumber && address && name && role))
         throw new ApiError(400, "All fields are required");
     const findUser = yield findOp(req.body); //passing req.body value to query function
     if (findUser)
@@ -90,7 +90,7 @@ const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
     //updates password of user based on the roles
     const { email, role } = req.user; //taking email,role,passwrod from user
     const { password } = req.body;
-    if (!(password || role || email))
+    if (!(password && role && email))
         return res.status(400).json("password is not provided"); //if not found then return error
     const hashedPassword = yield bcrypt.hash(password, 10); //hash password
     const update = yield updatePasswordInDB(req.user, hashedPassword); //chage hash password in db
@@ -117,7 +117,7 @@ const updateProfileImage = AsyncHandler((req, res) => __awaiter(void 0, void 0, 
     if (!fileURI)
         return res.status(400).json(new ApiError(400, "please provide images"));
     const upload = yield uploadFile(fileURI); //upload file on the cloud server
-    if (!(upload || findUser.email))
+    if (!(upload && findUser.email))
         return res.status(500).json(new ApiError(500, "error while uploading file on server"));
     const user = yield User.findOneAndUpdate(//finding user on mongodb if it'exists with that email id then chage photo
     findUser.email, {
