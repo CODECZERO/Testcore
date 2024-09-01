@@ -65,20 +65,18 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
   //  const secretKey = nanoid(12);
   // const iv = randomBytes(16);
   // if (!(secretKey || iv)) throw new A piError(500, 'error while making keys');
-  const saveUser=await User.create({
-    sqlId:Id
-  });
 
   const createRoom = await chatModel.create({
     romeName: roomData.roomName,
   });
 
-  if (!(createRoom&&saveUser)) throw new ApiError(500, 'unable to create chat group');
+  if (!(createRoom)) throw new ApiError(500, 'unable to create chat group');
   
-  await cacheUpdateForChatRoom(
+  const data=await cacheUpdateForChatRoom(
     roomData.roomName,
     JSON.stringify(createRoom?._id),
   );
+  console.log(data);
 
   return res.status(200).json(new ApiResponse(200, createRoom));
 });

@@ -12,12 +12,7 @@ import { ApiError } from "../util/apiError.js";
 import { cacheSearchForChatRoom } from "../db/database.redis.query.js";
 import jwt from 'jsonwebtoken';
 const SearchChatRoom = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const roomNameUrl = req.url.valueOf();
-    if (!roomNameUrl)
-        throw new ApiError(400, "room name is not provided");
-    console.log(roomNameUrl);
-    const findRoom = yield cacheSearchForChatRoom(roomNameUrl);
-    console.log(findRoom);
+    const findRoom = yield cacheSearchForChatRoom(req.params.College, req.params.Branch);
     if (!findRoom)
         throw new ApiError(404, "chat room not found, make sure it's register");
     req.chatRoomData = findRoom;

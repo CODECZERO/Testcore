@@ -52,19 +52,13 @@ const cacheSearch = (tokenID) => __awaiter(void 0, void 0, void 0, function* () 
         throw new ApiError(500, error);
     }
 });
-const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, function* () {
+const cacheSearchForChatRoom = (CollegeName, ClassRoomName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log(roomName);
-        //using regex to spilt.
-        //eg College/BranchName
-        const CollegeName = roomName.match(/^\w+/); //College
-        const ClassRoomName = roomName.match(/(?<=\/)\w+$/); //BrachName
         //this function spilt the college name and branch name
-        console.log(CollegeName, ClassRoomName);
         if (!CollegeName || !ClassRoomName)
             throw new ApiError(500, "Invalid room name format"); //if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = yield client.hGet(CollegeName[0], ClassRoomName[0]); //if the college and branch name is provied then search theme in redis 
+        const roomSearch = yield client.hGet(CollegeName, ClassRoomName); //if the college and branch name is provied then search theme in redis 
         //cache , the cache uses Hashe datatype as the one College can have many Brach
         //the output will be like this 
         /*
@@ -74,6 +68,7 @@ const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, f
                 "BranchName3":"MongodbId Of that chat room",
             }
         */
+        console.log(roomSearch);
         if (!roomSearch)
             return null; //if data is not present return null as the further error handling can be implemented
         return roomSearch; //retunr the hashset or id of the chatroom and futher operation can be performed on it.
