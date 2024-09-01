@@ -8,6 +8,6 @@ const router=Router();
 
 router.route("/createChat").post(verifyData,createChatRoom);
 router.route("/ChatQuery").post(verifyData,SearchChatRoom,joinChatRoom).put(verifyData,LeaveRoom).delete(verifyData,deleteChat);
-router.route("/User/:College/:Branch").post(verifyData,SearchChatRoom,getUserInChat);
+router.route("/:College/:Branch").post(verifyData,SearchChatRoom,getUserInChat);
 
 export default router;

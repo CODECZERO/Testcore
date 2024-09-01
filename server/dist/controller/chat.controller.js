@@ -45,15 +45,13 @@ const createChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
     //  const secretKey = nanoid(12);
     // const iv = randomBytes(16);
     // if (!(secretKey || iv)) throw new A piError(500, 'error while making keys');
-    const saveUser = yield User.create({
-        sqlId: Id
-    });
     const createRoom = yield chatModel.create({
         romeName: roomData.roomName,
     });
-    if (!(createRoom && saveUser))
+    if (!(createRoom))
         throw new ApiError(500, 'unable to create chat group');
-    yield cacheUpdateForChatRoom(roomData.roomName, JSON.stringify(createRoom === null || createRoom === void 0 ? void 0 : createRoom._id));
+    const data = yield cacheUpdateForChatRoom(roomData.roomName, JSON.stringify(createRoom === null || createRoom === void 0 ? void 0 : createRoom._id));
+    console.log(data);
     return res.status(200).json(new ApiResponse(200, createRoom));
 }));
 const getUserInChat = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
