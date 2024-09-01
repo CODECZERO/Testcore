@@ -47,13 +47,7 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     const { email, password, role } = req.body;
     if (!(email || password || role))
         throw new ApiError(400, "Invaild email id,role or password");
-    const findUser = yield findOp({
-        email, role,
-        name: '',
-        phoneNumber: '',
-        address: '',
-        refreshToken: ''
-    }); //finding user using email
+    const findUser = yield findOp({ email, role }); //finding user using email
     if (!findUser)
         throw new ApiError(400, "Invaild User"); //checking if user passwrod is valid or not
     const passwordCheck = yield bcrypt.compare(password, findUser.password);
@@ -62,7 +56,7 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     const findAndRole = Object.assign(Object.assign({}, findUser), { role });
     const { refreshToken, accesToken } = yield tokenGen(findAndRole); //genereating token for the user
     const data = Object.assign(Object.assign({}, findUser), { refreshToken });
-    yield updateOp(data); //pass the role to user it's necessary
+    yield updateOp(data, role); //pass the role to user it's necessary
     const { password: _ } = findUser, userWithOutPassword = __rest(findUser, ["password"]); //removing user password form find user
     return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, userWithOutPassword, "Login in successfully"));
 }));
@@ -149,4 +143,4 @@ const getCollege = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, 
         return res.status(400).json(new ApiError(400, "No college is register")); //throws error if it doesn't exists
     return res.status(200).json(new ApiResponse(200, findCollegeName)); //returns college name
 }));
-export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen };
+export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen, options };

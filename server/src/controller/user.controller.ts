@@ -39,15 +39,13 @@ const tokenGen = async (user: {
 const login = AsyncHandler(async (req: Request, res: Response) => {
     const { email, password, role } = req.body;
     if (!(email || password || role)) throw new ApiError(400, "Invaild email id,role or password");
-    const findUser = await findOp({
-        email, role,
-        name: '',
-        phoneNumber: '',
-        address: '',
-        refreshToken: ''
-    });//finding user using email
+    
+    const findUser = await findOp({email,role});//finding user using email
+    
     if (!findUser) throw new ApiError(400, "Invaild User");//checking if user passwrod is valid or not
+    
     const passwordCheck=await bcrypt.compare(password,findUser.password);
+    
     if(!passwordCheck)throw new ApiError(400,"Invalid password")
     const findAndRole={...findUser,role}
     const { refreshToken, accesToken } = await tokenGen(findAndRole);//genereating token for the user
@@ -55,8 +53,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
         ...findUser,
         refreshToken
     }
-    await updateOp(data);//pass the role to user it's necessary
-
+    await updateOp(data,role);//pass the role to user it's necessary
 
     const { password: _, ...userWithOutPassword } = findUser;//removing user password form find user
 
@@ -163,5 +160,6 @@ export {
     updatePassword,
     updateProfileImage,
     getCollege,
-    tokenGen
+    tokenGen,
+    options
 }

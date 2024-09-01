@@ -5,6 +5,7 @@ import userRouter from "./router/user.router.js";
 import logingRouter from "./router/loging.router.js"
 import { MiddlewareCount } from "./services/logging and monitoring/Grafana/grafana.service.js";
 import AsyncHandler from "./util/ayscHandler.js";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 
@@ -13,6 +14,15 @@ const app = express();
 //     origin:process.env.CROS_ORGIN,
 //     credentials: true
 // }))
+
+//limiting the rate of the user per node
+const limiter = rateLimit({
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: 'Too many connections from this IP, please try again later',
+});
+//applying to whole server
+app.use(limiter);
 
 //confing the loging service
 app.use("/api/v1/superuser", logingRouter);
