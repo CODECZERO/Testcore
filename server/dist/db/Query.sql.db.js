@@ -88,10 +88,9 @@ const findOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
 });
 //update value of user based on the 
 //pssing of role is necessary, so the function can select on whic table it should perform operations
-const updateOp = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    try { //
-        //@ts-ignore
-        return yield roleToModel[user.role].update({
+const updateOp = (user, role) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield roleToModel[role].update({
             where: {
                 email: user.email
             },

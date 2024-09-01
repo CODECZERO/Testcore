@@ -19,6 +19,8 @@ import mongoose from 'mongoose';
 import { clients, rooms } from '../services/chat/chatServer.service.js';
 import rabbitmq from '../services/rabbitmq/rabbitmq.services.js';
 import { ApiError } from '../util/apiError.js';
+import { parse } from "url";
+import { options } from './user.controller.js';
 //write this fnction
 const joinChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomdata = req.chatRoomData;
@@ -99,39 +101,50 @@ const LeaveRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, f
         throw new ApiError(406, 'User unable to remove');
     return res.status(200).json(new ApiResponse(200, removeUser, 'user remvoe'));
 }));
-const connectChat = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const checkUserAccess = (userId, roomID) => __awaiter(void 0, void 0, void 0, function* () {
     //checks wheater user is part of that chat room
+    try {
+        const checkUserChatAccess = yield User.aggregate([
+            {
+                $match: {
+                    sqlId: new mongoose.Types.ObjectId(userId),
+                    chatRoomIDs: { $eq: new mongoose.Types.ObjectId(roomID) },
+                },
+            },
+            {
+                $lookup: {
+                    from: 'chatmodels',
+                    localField: 'chatRoomIDs',
+                    foreignField: '_id',
+                    as: 'ChatUsers',
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    ChatUsers: 1,
+                },
+            },
+        ]);
+        if (!checkUserChatAccess || checkUserChatAccess.length === 0)
+            throw new ApiError(409, "user don't have access to chat ");
+        return checkUserChatAccess[0];
+    }
+    catch (error) {
+        return new ApiError(500, "Something went wrong while checking user access");
+    }
+});
+const connectChat = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomData = req.chatRoomData;
     const user = req.user;
     if (!roomData)
         throw new ApiError(400, 'invalid request');
-    const checkUserAccess = yield User.aggregate([
-        {
-            $match: {
-                sqlId: new mongoose.Types.ObjectId(user.Id),
-                chatRoomIDs: { $eq: new mongoose.Types.ObjectId(roomData.roomID) },
-            },
-        },
-        {
-            $lookup: {
-                from: 'chatmodels',
-                localField: 'chatRoomIDs',
-                foreignField: '_id',
-                as: 'ChatUsers',
-            },
-        },
-        {
-            $project: {
-                _id: 1,
-                ChatUsers: 1,
-            },
-        },
-    ]);
-    if (!checkUserAccess || checkUserAccess.length === 0)
-        throw new ApiError(409, "user don't have access to chat ");
-    return res
-        .status(200)
-        .json(new ApiResponse(200, checkUserAccess[0], 'user have access to chat'));
+    const Checker = yield checkUserAccess(user.Id, roomData.roomID);
+    if (Checker instanceof ApiError)
+        throw new ApiError(500, "someting went wrong while checking user access");
+    //call token generater here
+    const tokenGen = "dfd";
+    return res.status(200).cookie("UserchatsAccess", Checker, options).json(new ApiResponse(200, Checker));
 }));
 const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -193,7 +206,14 @@ const closeConnection = () => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError(500, "error while closeing connection"); //throw error if any thing went wrong, so later the dev can debug it 
     }
 });
-export { createChatRoom, joinChatRoom, connectChat, LeaveRoom, deleteChat, modifiChat, 
+const tokenGenforWebsocket = () => __awaiter(void 0, void 0, void 0, function* () {
+});
+const tokenExtractr = (req) => {
+    const parsedUrl = parse(req.url || " ", true); //it parse query as string
+    const queryParams = parsedUrl.query; //takes query from parsedUrl and  
+    const tokenFroUser = queryParams === null || queryParams === void 0 ? void 0 : queryParams.token;
+};
+export { createChatRoom, joinChatRoom, connectChat, checkUserAccess, LeaveRoom, deleteChat, modifiChat, 
 // SendMessageEncryption,
 // ReciveMessageDecryption,
-getUserInChat, sendMessage, reciveMEssage, closeSocket, closeConnection };
+getUserInChat, sendMessage, reciveMEssage, closeSocket, closeConnection, tokenExtractr };

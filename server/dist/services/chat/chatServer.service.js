@@ -8,11 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { WebSocketServer } from "ws";
-import { sendMessage, reciveMEssage, closeSocket } from "../../controller/chat.controller.js";
+import { sendMessage, reciveMEssage, closeSocket, tokenExtractr } from "../../controller/chat.controller.js";
 import AsyncHandler from "../../util/ayscHandler.js";
 const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
 const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000; //running websocket on same webserver but different port,
-//i won't recommend that as the webscoket should be run on different server as it has a collection of user
+//i won't recommend that , as websocket it should be run on different server
 //and it's better for scablity of the application 
 const wss = new WebSocketServer({ port }); //creating websocket server on the port 9001 or 3000 or any other port diffene by the user
 const clients = new Set(); //collection of websocket
@@ -25,7 +25,9 @@ const actions = {
     'LEAVE_ROOM': closeSocket,
 };
 const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, function* () {
-    wss.on('connection', (ws) => {
+    wss.on('connection', (ws, req) => {
+        const token = tokenExtractr(req); //this function extract the token from req objcet in starting and verify's it
+        console.log(token);
         ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
             const MessageData = JSON.parse(message); //take data or message in message pattern from user first time as they join
             //beter use onconnection  or connection      

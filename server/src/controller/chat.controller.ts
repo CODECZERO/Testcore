@@ -1,9 +1,6 @@
 import AsyncHandler from '../util/ayscHandler.js';
 import { ApiResponse } from '../util/apiResponse.js';
-import {
-  cacheSearchForChatRoom,
-  cacheUpdateForChatRoom,
-} from '../db/database.redis.query.js';
+import { cacheSearchForChatRoom, cacheUpdateForChatRoom, } from '../db/database.redis.query.js';
 import { Response, Request } from 'express';
 import { chatModel } from '../models/chatRoomData.model.nosql.js';
 import { User } from '../models/user.model.nosql.js';
@@ -16,6 +13,10 @@ import { ConsumeMessage } from "amqplib";
 import { MessageData, CustomWebSocket, clients, rooms } from '../services/chat/chatServer.service.js';
 import rabbitmq from '../services/rabbitmq/rabbitmq.services.js';
 import { ApiError } from '../util/apiError.js';
+import { parse } from "url";
+import { ParsedUrlQuery } from "querystring";
+import { options } from './user.controller.js';
+
 type roomData = {
   roomName: string;
   roomID: string;
@@ -127,41 +128,53 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
   return res.status(200).json(new ApiResponse(200, removeUser, 'user remvoe'));
 });
 
-const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {
+const checkUserAccess = async (userId:string,roomID:string) => {//should be called when user enter in chat app or chat window, only one time it, should be called
   //checks wheater user is part of that chat room
+
+ 
+  try {
+    const checkUserChatAccess = await User.aggregate([
+      {
+        $match: {
+          sqlId: new mongoose.Types.ObjectId(userId),
+          chatRoomIDs: { $eq: new mongoose.Types.ObjectId(roomID) },
+        },
+      },
+      {
+        $lookup: {
+          from: 'chatmodels',
+          localField: 'chatRoomIDs',
+          foreignField: '_id',
+          as: 'ChatUsers',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          ChatUsers: 1,
+        },
+      },
+    ]);
+    if (!checkUserChatAccess || checkUserChatAccess.length === 0)
+      throw new ApiError(409, "user don't have access to chat ");
+  
+    return checkUserChatAccess[0];
+  } catch (error) {
+      return new ApiError(500,"Something went wrong while checking user access");
+  }
+}
+
+const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {
   const roomData: roomData = req.chatRoomData;
   const user: user = req.user;
   if (!roomData) throw new ApiError(400, 'invalid request');
-  const checkUserAccess = await User.aggregate([
-    {
-      $match: {
-        sqlId: new mongoose.Types.ObjectId(user.Id),
-        chatRoomIDs: { $eq: new mongoose.Types.ObjectId(roomData.roomID) },
-      },
-    },
-    {
-      $lookup: {
-        from: 'chatmodels',
-        localField: 'chatRoomIDs',
-        foreignField: '_id',
-        as: 'ChatUsers',
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        ChatUsers: 1,
-      },
-    },
-  ]);
-  if (!checkUserAccess || checkUserAccess.length === 0)
-    throw new ApiError(409, "user don't have access to chat ");
+  const Checker= await checkUserAccess(user.Id,roomData.roomID);
+  if(Checker instanceof ApiError) throw new ApiError(500,"someting went wrong while checking user access");
+  //call token generater here
+  const tokenGen="dfd";
+  return res.status(200).cookie("UserchatsAccess",Checker,options).json(new ApiResponse(200,Checker));
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, checkUserAccess[0], 'user have access to chat'));
-});
-
+})
 
 const sendMessage = async (MessageData: MessageData, ws: CustomWebSocket,) => {//message send function
   try {
@@ -228,10 +241,25 @@ const closeConnection = async () => {
   }
 }
 
+const tokenGenforWebsocket = async () => {
+
+}
+
+const tokenExtractr = (req: Request) => {//takes requset object from websocket extract token from it.
+  const parsedUrl = parse(req.url || " ", true);//it parse query as string
+  const queryParams: ParsedUrlQuery = parsedUrl.query;//takes query from parsedUrl and  
+  const tokenFroUser: string = queryParams?.token as string;
+
+
+
+
+}
+
 export {
   createChatRoom,
   joinChatRoom,
   connectChat,
+  checkUserAccess,
   LeaveRoom,
   deleteChat,
   modifiChat,
@@ -241,5 +269,6 @@ export {
   sendMessage,
   reciveMEssage,
   closeSocket,
-  closeConnection
+  closeConnection,
+  tokenExtractr
 };
