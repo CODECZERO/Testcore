@@ -80,7 +80,10 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
     const hashedPassword = yield bcrypt.hash(password, 10); //hashing the password
     const userCreate = yield createOp(req.body, hashedPassword); //passing req.body value to query function with hashed password
     const userData = { userCreate, password: "" }; //replacing the password with empty string
-    if (!userData)
+    const saveUserInNosql = yield User.create({
+        sqlId: userCreate.Id,
+    });
+    if (!userData || !saveUserInNosql)
         throw new ApiError(500, "Something went wrong while registering the user"); //if user isn't create then throw error
     return res.status(201).json(//if create then return user data
     new ApiResponse(201, userData, "User create successfuly"));

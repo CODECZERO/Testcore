@@ -13,6 +13,8 @@ import { cacheUpdateForChatRoom, } from '../db/database.redis.query.js';
 import { chatModel } from '../models/chatRoomData.model.nosql.js';
 import { User } from '../models/user.model.nosql.js';
 import { findUsers } from '../db/Query.nosql.db.js';
+import { nanoid } from 'nanoid';
+import { randomBytes } from 'crypto';
 import mongoose from 'mongoose';
 import { ApiError } from '../util/apiError.js';
 import { options } from './user.controller.js';
@@ -29,8 +31,11 @@ const joinChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
     if (!findChatID)
         throw new ApiError(404, 'room not found');
     const joinChat = yield User.updateOne({
-        chatRoomIDs: findChatID === null || findChatID === void 0 ? void 0 : findChatID._id,
+        sqlId: user.Id
+    }, {
+        chatRoomIDs: findChatID._id,
     });
+    console.log(joinChat);
     //check chai aur backend as there is some command missing here
     if (!joinChat)
         throw new ApiError(500, 'unable to join chat');
@@ -39,27 +44,34 @@ const joinChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
 const createChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomData = req.body;
     const { Id } = req.user;
-    const encryptCode = 'fsf';
-    if (!Id || !roomData.roomName || !encryptCode)
+    if (!Id || !roomData.roomName)
         throw new ApiError(400, 'group name or Admin id is not provided');
-    //  const secretKey = nanoid(12);
-    // const iv = randomBytes(16);
+    const secretKey = nanoid(12);
+    const iv = randomBytes(16);
     // if (!(secretKey || iv)) throw new A piError(500, 'error while making keys');
+    const user = yield User.findOne({
+        sqlId: Id
+    });
+    if (!user)
+        throw new ApiError(404, "No user Found");
     const createRoom = yield chatModel.create({
         romeName: roomData.roomName,
+        encryptCode: secretKey,
+        iv,
+        AdminId: user === null || user === void 0 ? void 0 : user._id,
     });
     if (!(createRoom))
         throw new ApiError(500, 'unable to create chat group');
     const data = yield cacheUpdateForChatRoom(roomData.roomName, JSON.stringify(createRoom === null || createRoom === void 0 ? void 0 : createRoom._id));
-    console.log(data);
     return res.status(200).json(new ApiResponse(200, createRoom));
 }));
 const getUserInChat = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomdata = req.chatRoomData;
     const { Id } = req.user;
+    console.log(Id);
     if (!roomdata)
         throw new ApiError(400, 'Inviad data provied');
-    const getUser = yield findUsers(roomdata.roomName, undefined, Id);
+    const getUser = yield findUsers(roomdata.roomID.replace(/"/g, ''), undefined, Id);
     if (!getUser)
         throw new ApiError(500, 'unable to find total users');
     return res.status(200).json(new ApiResponse(200, getUser, 'Total user'));

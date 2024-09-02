@@ -8,13 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { chatModel } from "../models/chatRoomData.model.nosql.js";
-import { ApiError } from "../util/apiError.js";
-const findUsers = (roomName, AdminId, userId) => __awaiter(void 0, void 0, void 0, function* () {
+import mongoose from "mongoose";
+const findUsers = (roomID, AdminId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield chatModel.aggregate([
             {
                 $match: {
-                    roomName: roomName,
+                    _id: new mongoose.Types.ObjectId(roomID),
                 }
             },
             {
@@ -42,7 +42,7 @@ const findUsers = (roomName, AdminId, userId) => __awaiter(void 0, void 0, void 
         ]);
     }
     catch (error) {
-        throw new ApiError(500, `someting wnet worng while searching room ${error}`);
+        return error;
     }
 });
 export { findUsers };
