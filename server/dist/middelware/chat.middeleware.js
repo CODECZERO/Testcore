@@ -17,18 +17,6 @@ const SearchChatRoom = AsyncHandler((req, res, next) => __awaiter(void 0, void 0
         throw new ApiError(404, "chat room not found, make sure it's register");
     req.chatRoomData = findRoom;
     next();
-    // const ws = new WebSocket("ws://localhost:9000");
-    // ws.onopen = () => {
-    //     // Room name could be set here or retrieved from some UI input
-    //     const roomName = roomNameUrl;
-    //     const message = "Hello, room!";
-    //     // Sending message along with the room name
-    //     ws.send(JSON.stringify({ roomName, message }));
-    // };
-    // ws.onmessage = (event) => {
-    //     const data = JSON.parse(event.data as string);
-    //     console.log("Received:", data.message);
-    // };
 }));
 const encryptDecryptData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;

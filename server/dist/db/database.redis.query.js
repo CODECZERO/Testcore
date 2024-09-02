@@ -68,7 +68,6 @@ const cacheSearchForChatRoom = (CollegeName, ClassRoomName) => __awaiter(void 0,
                 "BranchName3":"MongodbId Of that chat room",
             }
         */
-        console.log(roomSearch);
         if (!roomSearch)
             return null; //if data is not present return null as the further error handling can be implemented
         return roomSearch; //retunr the hashset or id of the chatroom and futher operation can be performed on it.
