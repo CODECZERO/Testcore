@@ -47,36 +47,42 @@ const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
     romeName: roomdata.roomName,
   });
   if (!findChatID) throw new ApiError(404, 'room not found');
-
   const joinChat = await User.updateOne({
-    chatRoomIDs: findChatID?._id,
+    sqlId:user.Id
+  },{
+    chatRoomIDs: findChatID._id,
   });
+  console.log(joinChat)
   //check chai aur backend as there is some command missing here
   if (!joinChat) throw new ApiError(500, 'unable to join chat');
   return res.status(200).json(new ApiResponse(200, joinChat));
 });
 
 const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
-  const roomData:roomData = req.body;
+  const roomData: roomData = req.body;
   const { Id } = req.user;
-  const encryptCode = 'fsf';
-  if (!Id || !roomData.roomName || !encryptCode)
+  if (!Id || !roomData.roomName)
     throw new ApiError(400, 'group name or Admin id is not provided');
-  //  const secretKey = nanoid(12);
-  // const iv = randomBytes(16);
+  const secretKey = nanoid(12);
+  const iv = randomBytes(16);
   // if (!(secretKey || iv)) throw new A piError(500, 'error while making keys');
-
+  const user = await User.findOne({
+    sqlId: Id
+  });
+  if (!user) throw new ApiError(404, "No user Found");
   const createRoom = await chatModel.create({
     romeName: roomData.roomName,
+    encryptCode: secretKey,
+    iv,
+    AdminId: user?._id,
   });
 
   if (!(createRoom)) throw new ApiError(500, 'unable to create chat group');
-  
-  const data=await cacheUpdateForChatRoom(
+
+  const data = await cacheUpdateForChatRoom(
     roomData.roomName,
     JSON.stringify(createRoom?._id),
   );
-  console.log(data);
 
   return res.status(200).json(new ApiResponse(200, createRoom));
 });
@@ -84,8 +90,9 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
 const getUserInChat = AsyncHandler(async (req: Requestany, res: Response) => {
   const roomdata: roomData = req.chatRoomData;
   const { Id } = req.user;
+  console.log(Id);
   if (!roomdata) throw new ApiError(400, 'Inviad data provied');
-  const getUser = await findUsers(roomdata.roomName, undefined, Id);
+  const getUser = await findUsers(roomdata.roomID.replace(/"/g, ''), undefined, Id);
   if (!getUser) throw new ApiError(500, 'unable to find total users');
   return res.status(200).json(new ApiResponse(200, getUser, 'Total user'));
 });
@@ -128,10 +135,10 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
   return res.status(200).json(new ApiResponse(200, removeUser, 'user remvoe'));
 });
 
-const checkUserAccess = async (userId:string,roomID:string) => {//should be called when user enter in chat app or chat window, only one time it, should be called
+const checkUserAccess = async (userId: string, roomID: string) => {//should be called when user enter in chat app or chat window, only one time it, should be called
   //checks wheater user is part of that chat room
 
- 
+
   try {
     const checkUserChatAccess = await User.aggregate([
       {
@@ -157,10 +164,10 @@ const checkUserAccess = async (userId:string,roomID:string) => {//should be call
     ]);
     if (!checkUserChatAccess || checkUserChatAccess.length === 0)
       throw new ApiError(409, "user don't have access to chat ");
-  
+
     return checkUserChatAccess[0];
   } catch (error) {
-      return new ApiError(500,"Something went wrong while checking user access");
+    return new ApiError(500, "Something went wrong while checking user access");
   }
 }
 
@@ -189,5 +196,5 @@ export {
   // ReciveMessageDecryption,
   getUserInChat,
   connectChat
- 
+
 };

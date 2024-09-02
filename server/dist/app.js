@@ -14,7 +14,7 @@ const app = express();
 //limiting the rate of the user per node
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000,
-    max: 100,
+    max: 10,
     message: 'Too many connections from this IP, please try again later',
 });
 //applying to whole server

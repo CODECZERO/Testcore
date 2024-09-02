@@ -4,6 +4,7 @@ const UserSchema = new mongoose.Schema({
     sqlId: {
         type: String,
         require: true,
+        unique:true,
         index:true
     },
     profile: {
