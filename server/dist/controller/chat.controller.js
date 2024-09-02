@@ -68,7 +68,6 @@ const createChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
 const getUserInChat = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const roomdata = req.chatRoomData;
     const { Id } = req.user;
-    console.log(Id);
     if (!roomdata)
         throw new ApiError(400, 'Inviad data provied');
     const getUser = yield findUsers(roomdata.roomID.replace(/"/g, ''), undefined, Id);
@@ -102,7 +101,7 @@ const LeaveRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, f
     const findChatID = yield chatModel.findOne({
         romeName: roomData.roomName,
     });
-    const removeUser = yield User.updateOne({ _id: new mongoose.Types.ObjectId(user.Id) }, { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID === null || findChatID === void 0 ? void 0 : findChatID._id) } });
+    const removeUser = yield User.updateOne({ sqlId: user.Id }, { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID === null || findChatID === void 0 ? void 0 : findChatID._id) } });
     if (!removeUser)
         throw new ApiError(406, 'User unable to remove');
     return res.status(200).json(new ApiResponse(200, removeUser, 'user remvoe'));
@@ -146,8 +145,8 @@ const connectChat = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0,
     if (!roomData)
         throw new ApiError(400, 'invalid request');
     const Checker = yield checkUserAccess(user.Id, roomData.roomID);
-    if (Checker instanceof ApiError || !Checker)
-        throw new ApiError(500, "someting went wrong while checking user access");
+    if (!Checker)
+        throw new ApiError(409, "user don't have access to chat");
     //call token generater here
     const tokenGen = yield ChatTokenGen(Checker[0]);
     if (!tokenGen)

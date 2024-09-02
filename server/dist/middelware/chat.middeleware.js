@@ -13,7 +13,7 @@ import { cacheSearchForChatRoom } from "../db/database.redis.query.js";
 import jwt from 'jsonwebtoken';
 const SearchChatRoom = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const roomID = yield cacheSearchForChatRoom(req.params.College, req.params.Branch);
-    if (!roomID)
+    if (!(roomID))
         throw new ApiError(404, "chat room not found, make sure it's register");
     const roomName = `${req.params.College}/${req.params.Branch}`;
     req.chatRoomData = { roomID, roomName };

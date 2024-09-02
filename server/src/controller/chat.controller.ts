@@ -90,7 +90,6 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
 const getUserInChat = AsyncHandler(async (req: Requestany, res: Response) => {
   const roomdata: roomData = req.chatRoomData;
   const { Id } = req.user;
-  console.log(Id);
   if (!roomdata) throw new ApiError(400, 'Inviad data provied');
   const getUser = await findUsers(roomdata.roomID.replace(/"/g, ''), undefined, Id);
   if (!getUser) throw new ApiError(500, 'unable to find total users');
@@ -124,11 +123,12 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
   const roomData: roomData = req.chatRoomData;
   const user: user = req.user;
   if (!(roomData || user)) throw new ApiError(400, 'invalid data');
+
   const findChatID = await chatModel.findOne({
     romeName: roomData.roomName,
   });
   const removeUser = await User.updateOne(
-    { _id: new mongoose.Types.ObjectId(user.Id) },
+    { sqlId:user.Id},
     { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID?._id) } },
   );
   if (!removeUser) throw new ApiError(406, 'User unable to remove');
@@ -176,7 +176,7 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {
   const user: user = req.user;
   if (!roomData) throw new ApiError(400, 'invalid request');
   const Checker = await checkUserAccess(user.Id, roomData.roomID);
-  if (Checker instanceof ApiError || !Checker) throw new ApiError(500, "someting went wrong while checking user access");
+  if(!Checker) throw new ApiError(409,"user don't have access to chat");
   //call token generater here
   const tokenGen = await ChatTokenGen(Checker[0]);
   if (!tokenGen) throw new ApiError(500, "someting went wrong while making token");
