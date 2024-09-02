@@ -40,7 +40,7 @@ interface Requestany extends Request {
 
 //write this fnction
 const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
-  const roomdata: roomData = req.chatRoomData;
+  const roomdata: roomData = req.body;
   const user: user = req.user;
   if (!roomdata || !user) throw new ApiError(400, 'Inviad data provied');
   const findChatID = await chatModel.findOne({

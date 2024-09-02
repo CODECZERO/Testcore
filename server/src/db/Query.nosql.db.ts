@@ -1,4 +1,5 @@
 import { chatModel } from "../models/chatRoomData.model.nosql.js";
+import { ApiError } from "../util/apiError.js";
 import mongoose from "mongoose";
 
 const findUsers = async (roomName: string, AdminId?: string, userId?: string) => {
@@ -7,7 +8,6 @@ const findUsers = async (roomName: string, AdminId?: string, userId?: string) =>
             {
                 $match: {
                     roomName: roomName,
-                    ...(AdminId && { AdminId: new mongoose.Types.ObjectId(AdminId) })
                 }
             },
             {
@@ -20,7 +20,7 @@ const findUsers = async (roomName: string, AdminId?: string, userId?: string) =>
             },
             {
                 $match: {
-                    ...(userId && { "ChatUsers._id":new  mongoose.Types.ObjectId(userId) })
+                   "ChatUsers.sqlId":userId
                 }
             },
             {
@@ -30,12 +30,11 @@ const findUsers = async (roomName: string, AdminId?: string, userId?: string) =>
                     AdminId: 1,
                     ChatUsers: 1,
                     UserCount:{$size:"$ChatUsers"},
-                    encryptCode: 0
                 }
             }
         ]);
     } catch (error) {
-        return error;
+        throw new ApiError(500,`someting wnet worng while searching room ${error}`);
     }
 };
 

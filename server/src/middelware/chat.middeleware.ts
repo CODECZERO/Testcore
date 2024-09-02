@@ -15,21 +15,6 @@ const SearchChatRoom = AsyncHandler(async (req: Requestany, res: Response, next:
     req.chatRoomData =findRoom;
     next();
 
-    // const ws = new WebSocket("ws://localhost:9000");
-    // ws.onopen = () => {
-    //     // Room name could be set here or retrieved from some UI input
-    //     const roomName = roomNameUrl;
-    //     const message = "Hello, room!";
-
-    //     // Sending message along with the room name
-    //     ws.send(JSON.stringify({ roomName, message }));
-    // };
-
-    // ws.onmessage = (event) => {
-    //     const data = JSON.parse(event.data as string);
-    //     console.log("Received:", data.message);
-    // };
-
 });
 
 const encryptDecryptData=AsyncHandler(async(req:Request,res:Response,next:NextFunction)=>{

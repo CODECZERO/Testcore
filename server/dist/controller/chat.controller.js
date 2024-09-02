@@ -19,7 +19,7 @@ import { options } from './user.controller.js';
 import { ChatTokenGen } from '../services/chat/chatToken.services.js';
 //write this fnction
 const joinChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const roomdata = req.chatRoomData;
+    const roomdata = req.body;
     const user = req.user;
     if (!roomdata || !user)
         throw new ApiError(400, 'Inviad data provied');
