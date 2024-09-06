@@ -26,6 +26,7 @@ import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from '../
 import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
+import Tracker from './loginTracker.controller.js';
 //all error retunr/out format
 // {
 //     "statusCode": error status code,
@@ -45,15 +46,9 @@ const tokenGen = (user) => __awaiter(void 0, void 0, void 0, function* () {
 //
 const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, role } = req.body;
-    if (!(email || password || role))
+    if (!(email && password && role))
         throw new ApiError(400, "Invaild email id,role or password");
-    const findUser = yield findOp({
-        email, role,
-        name: '',
-        phoneNumber: '',
-        address: '',
-        refreshToken: ''
-    }); //finding user using email
+    const findUser = yield findOp({ email, role }); //finding user using email
     if (!findUser)
         throw new ApiError(400, "Invaild User"); //checking if user passwrod is valid or not
     const passwordCheck = yield bcrypt.compare(password, findUser.password);
@@ -62,16 +57,17 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     const findAndRole = Object.assign(Object.assign({}, findUser), { role });
     const { refreshToken, accesToken } = yield tokenGen(findAndRole); //genereating token for the user
     const data = Object.assign(Object.assign({}, findUser), { refreshToken });
-    yield updateOp(data); //pass the role to user it's necessary
+    yield updateOp(data, role); //pass the role to user it's necessary
+    const trackerUpdate = yield Tracker(findUser.Id, req);
     const { password: _ } = findUser, userWithOutPassword = __rest(findUser, ["password"]); //removing user password form find user
-    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, userWithOutPassword, "Login in successfully"));
+    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, { userWithOutPassword, trackerUpdate }, "Login in successfully"));
 }));
 //registering user on the site and store data on sql/postgresSql
 //
 const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { name, email, password, phoneNumber, address, role } = req.body;
     //checking if values are provide or not if not provide throw error 
-    if (!(email || password || phoneNumber || address || name || role))
+    if (!(email && password && phoneNumber && address && name && role))
         throw new ApiError(400, "All fields are required");
     const findUser = yield findOp(req.body); //passing req.body value to query function
     if (findUser)
@@ -86,7 +82,10 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
     const hashedPassword = yield bcrypt.hash(password, 10); //hashing the password
     const userCreate = yield createOp(req.body, hashedPassword); //passing req.body value to query function with hashed password
     const userData = { userCreate, password: "" }; //replacing the password with empty string
-    if (!userData)
+    const saveUserInNosql = yield User.create({
+        sqlId: userCreate.Id,
+    });
+    if (!userData || !saveUserInNosql)
         throw new ApiError(500, "Something went wrong while registering the user"); //if user isn't create then throw error
     return res.status(201).json(//if create then return user data
     new ApiResponse(201, userData, "User create successfuly"));
@@ -96,7 +95,7 @@ const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
     //updates password of user based on the roles
     const { email, role } = req.user; //taking email,role,passwrod from user
     const { password } = req.body;
-    if (!(password || role || email))
+    if (!(password && role && email))
         return res.status(400).json("password is not provided"); //if not found then return error
     const hashedPassword = yield bcrypt.hash(password, 10); //hash password
     const update = yield updatePasswordInDB(req.user, hashedPassword); //chage hash password in db
@@ -123,7 +122,7 @@ const updateProfileImage = AsyncHandler((req, res) => __awaiter(void 0, void 0, 
     if (!fileURI)
         return res.status(400).json(new ApiError(400, "please provide images"));
     const upload = yield uploadFile(fileURI); //upload file on the cloud server
-    if (!(upload || findUser.email))
+    if (!(upload && findUser.email))
         return res.status(500).json(new ApiError(500, "error while uploading file on server"));
     const user = yield User.findOneAndUpdate(//finding user on mongodb if it'exists with that email id then chage photo
     findUser.email, {
@@ -149,4 +148,4 @@ const getCollege = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, 
         return res.status(400).json(new ApiError(400, "No college is register")); //throws error if it doesn't exists
     return res.status(200).json(new ApiResponse(200, findCollegeName)); //returns college name
 }));
-export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen };
+export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen, options };

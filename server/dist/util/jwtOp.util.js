@@ -22,7 +22,7 @@ const genAccToken = (user) => __awaiter(void 0, void 0, void 0, function* () {
             name,
             role,
             phoneNumber,
-            address
+            address,
         }, secreat, //Access token secreat 
         {
             expiresIn: process.env.ATE //access token expriery

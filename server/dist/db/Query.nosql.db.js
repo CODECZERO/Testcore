@@ -7,13 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { chatModel } from "../models/chatRoomData.model.nosql";
+import { chatModel } from "../models/chatRoomData.model.nosql.js";
 import mongoose from "mongoose";
-const findUsers = (roomName, AdminId, userId) => __awaiter(void 0, void 0, void 0, function* () {
+const findUsers = (roomID, AdminId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield chatModel.aggregate([
             {
-                $match: Object.assign({ roomName: roomName }, (AdminId && { AdminId: new mongoose.Types.ObjectId(AdminId) }))
+                $match: {
+                    _id: new mongoose.Types.ObjectId(roomID),
+                }
             },
             {
                 $lookup: {
@@ -24,7 +26,9 @@ const findUsers = (roomName, AdminId, userId) => __awaiter(void 0, void 0, void 
                 }
             },
             {
-                $match: Object.assign({}, (userId && { "ChatUsers._id": new mongoose.Types.ObjectId(userId) }))
+                $match: {
+                    "ChatUsers.sqlId": userId
+                }
             },
             {
                 $project: {
@@ -33,7 +37,6 @@ const findUsers = (roomName, AdminId, userId) => __awaiter(void 0, void 0, void 
                     AdminId: 1,
                     ChatUsers: 1,
                     UserCount: { $size: "$ChatUsers" },
-                    encryptCode: 0
                 }
             }
         ]);
