@@ -77,3 +77,5 @@ and radit mq
 # make a seprate file which, checks if all the services of you're app are running like rabbitmq,database,websocket ,etc 
 and then use or call file in index.ts/index.js file as it will ensure that all things are running and working propley.
 i'll give it a name , named pre-final stage
+
+# try to integreat twilo api for notfication & other stuff

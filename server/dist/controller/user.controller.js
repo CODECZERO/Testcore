@@ -26,6 +26,7 @@ import { createOp, findCollege, findOp, updateOp, updatePasswordInDB } from '../
 import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
+import Tracker from './loginTracker.controller.js';
 //all error retunr/out format
 // {
 //     "statusCode": error status code,
@@ -57,8 +58,9 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     const { refreshToken, accesToken } = yield tokenGen(findAndRole); //genereating token for the user
     const data = Object.assign(Object.assign({}, findUser), { refreshToken });
     yield updateOp(data, role); //pass the role to user it's necessary
+    const trackerUpdate = yield Tracker(findUser.Id, req);
     const { password: _ } = findUser, userWithOutPassword = __rest(findUser, ["password"]); //removing user password form find user
-    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, userWithOutPassword, "Login in successfully"));
+    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, { userWithOutPassword, trackerUpdate }, "Login in successfully"));
 }));
 //registering user on the site and store data on sql/postgresSql
 //

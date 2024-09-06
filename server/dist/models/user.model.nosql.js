@@ -6,6 +6,12 @@ const UserSchema = new mongoose.Schema({
         unique: true,
         index: true
     },
+    logInDevices: [
+        {
+            IpAddress: String,
+            userAgent: String,
+        }
+    ],
     profile: {
         type: String,
         require: true
