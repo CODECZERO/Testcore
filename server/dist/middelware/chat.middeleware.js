@@ -10,27 +10,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import AsyncHandler from "../util/ayscHandler.js";
 import { ApiError } from "../util/apiError.js";
 import { cacheSearchForChatRoom } from "../db/database.redis.query.js";
+import jwt from 'jsonwebtoken';
 const SearchChatRoom = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const roomNameUrl = req.url.valueOf();
-    if (!roomNameUrl)
-        throw new ApiError(400, "room name is not provided");
-    const findRoom = yield cacheSearchForChatRoom(roomNameUrl);
-    if (!findRoom)
+    const roomID = yield cacheSearchForChatRoom(req.params.College, req.params.Branch);
+    if (!(roomID))
         throw new ApiError(404, "chat room not found, make sure it's register");
-    req.chatRoomData = findRoom;
+    const roomName = `${req.params.College}/${req.params.Branch}`;
+    req.chatRoomData = { roomID, roomName };
     next();
-    // const ws = new WebSocket("ws://localhost:9000");
-    // ws.onopen = () => {
-    //     // Room name could be set here or retrieved from some UI input
-    //     const roomName = roomNameUrl;
-    //     const message = "Hello, room!";
-    //     // Sending message along with the room name
-    //     ws.send(JSON.stringify({ roomName, message }));
-    // };
-    // ws.onmessage = (event) => {
-    //     const data = JSON.parse(event.data as string);
-    //     console.log("Received:", data.message);
-    // };
 }));
 const encryptDecryptData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;

@@ -66,7 +66,7 @@ const createOp = async (user: User, password: string) => {
         //puting value in student table if role is student because it has one to one reffernces to college
 
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
 
     }
 }
@@ -88,16 +88,15 @@ const findOp = async (user: User) => {//find user based on the role of user
             }
         });
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 //update value of user based on the 
 //pssing of role is necessary, so the function can select on whic table it should perform operations
-const updateOp = async (user: User) => {//user is previous values , current user is new value
-    try {            //
+const updateOp = async (user: User,role:UserRole) => {//user is previous values , current user is new value
+    try {
         //@ts-ignore
-        return await roleToModel[user.role].update({
-
+        return await roleToModel[role].update({
             where: {
                 email: user.email
             },
@@ -106,7 +105,7 @@ const updateOp = async (user: User) => {//user is previous values , current user
             }
         });
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 //it's removes single value/user from that table based on role and email
@@ -120,7 +119,7 @@ const deleteOp = async (user: User) => {
             }
         });
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 
@@ -137,7 +136,7 @@ const deletMOp = async (user: User, keyword: String) => {
             }
         });
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 
@@ -153,7 +152,7 @@ const updatePasswordInDB = async (user: User, password: string) => {//update pas
             }
         });
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 
@@ -165,7 +164,7 @@ const findCollege = async () => {//findig college name from college table
             }
         });
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 
@@ -189,7 +188,7 @@ const getSubject = async (subjectCode: string, subjectName: string) => {
             },
         });
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 
@@ -212,7 +211,7 @@ const findStudnet = async (studnetData: { Id: string }) => {
         });
 
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 
 
@@ -234,7 +233,7 @@ const getQuestionPaper = async (examId: string) => {
             }
         });
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 
@@ -255,7 +254,7 @@ const getQuestionPaperForExaminer = async (examID: string) => {
             }
         })
     } catch (error) {
-        throw new ApiError(500,error)
+        throw new ApiError(500, error)
     }
 }
 

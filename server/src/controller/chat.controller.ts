@@ -1,18 +1,17 @@
-import AsyncHandler from '../util/ayscHandler';
-import { ApiError } from '../util/apiError';
-import { ApiResponse } from '../util/apiResponse';
-import {
-  cacheSearchForChatRoom,
-  cacheUpdateForChatRoom,
-} from '../db/database.redis.query';
+import AsyncHandler from '../util/ayscHandler.js';
+import { ApiResponse } from '../util/apiResponse.js';
+import { cacheSearchForChatRoom, cacheUpdateForChatRoom, } from '../db/database.redis.query.js';
 import { Response, Request } from 'express';
-import { chatModel } from '../models/chatRoomData.model.nosql';
-import { User } from '../models/user.model.nosql';
-import { findUsers } from '../db/Query.nosql.db';
+import { chatModel } from '../models/chatRoomData.model.nosql.js';
+import { User } from '../models/user.model.nosql.js';
+import { findUsers } from '../db/Query.nosql.db.js';
 import { nanoid } from 'nanoid';
 import { randomBytes } from 'crypto';
-import mongoose from 'mongoose';
-import { encryptDataFunc } from '../util/cryptographi.util';
+import mongoose, { ObjectId } from 'mongoose';
+import { ApiError } from '../util/apiError.js';
+import { options } from './user.controller.js';
+import { ChatTokenGen } from '../services/chat/chatToken.services.js';
+
 
 type roomData = {
   roomName: string;
@@ -38,43 +37,53 @@ interface Requestany extends Request {
   chatEncryption?: any;
 }
 
+
 //write this fnction
 const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
-  const roomdata: roomData = req.chatRoomData;
+  const roomdata: roomData = req.body;
   const user: user = req.user;
   if (!roomdata || !user) throw new ApiError(400, 'Inviad data provied');
   const findChatID = await chatModel.findOne({
     romeName: roomdata.roomName,
   });
   if (!findChatID) throw new ApiError(404, 'room not found');
-
   const joinChat = await User.updateOne({
-    chatRoomIDs: findChatID?._id,
+    sqlId:user.Id
+  },{
+    chatRoomIDs: findChatID._id,
   });
+  console.log(joinChat)
   //check chai aur backend as there is some command missing here
   if (!joinChat) throw new ApiError(500, 'unable to join chat');
   return res.status(200).json(new ApiResponse(200, joinChat));
 });
 
 const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {
-  const roomData: roomData = req.chatRoomData;
+  const roomData: roomData = req.body;
   const { Id } = req.user;
-  const encryptCode = 'fsf';
-  if (!Id || !roomData || !encryptCode)
+  if (!Id || !roomData.roomName)
     throw new ApiError(400, 'group name or Admin id is not provided');
-  const secretKey = nanoid(32);
+  const secretKey = nanoid(12);
   const iv = randomBytes(16);
-  if (!(secretKey || iv)) throw new ApiError(500, 'error while making keys');
+  // if (!(secretKey || iv)) throw new A piError(500, 'error while making keys');
+  const user = await User.findOne({
+    sqlId: Id
+  });
+  if (!user) throw new ApiError(404, "No user Found");
   const createRoom = await chatModel.create({
     romeName: roomData.roomName,
     encryptCode: secretKey,
-    AdminId: Id,
+    iv,
+    AdminId: user?._id,
   });
-  if (!createRoom) throw new ApiError(500, 'unable to create chat group');
-  await cacheUpdateForChatRoom(
+
+  if (!(createRoom)) throw new ApiError(500, 'unable to create chat group');
+
+  const data = await cacheUpdateForChatRoom(
     roomData.roomName,
     JSON.stringify(createRoom?._id),
   );
+
   return res.status(200).json(new ApiResponse(200, createRoom));
 });
 
@@ -82,7 +91,7 @@ const getUserInChat = AsyncHandler(async (req: Requestany, res: Response) => {
   const roomdata: roomData = req.chatRoomData;
   const { Id } = req.user;
   if (!roomdata) throw new ApiError(400, 'Inviad data provied');
-  const getUser = await findUsers(roomdata.roomName, undefined, Id);
+  const getUser = await findUsers(roomdata.roomID.replace(/"/g, ''), undefined, Id);
   if (!getUser) throw new ApiError(500, 'unable to find total users');
   return res.status(200).json(new ApiResponse(200, getUser, 'Total user'));
 });
@@ -96,7 +105,7 @@ const deleteChat = AsyncHandler(async (req: Requestany, res: Response) => {
   // return res.status(200).json(new ApiResponse(200, modifi, "message deleted"));
 });
 
-const modifiChat = AsyncHandler(async () => {});
+const modifiChat = AsyncHandler(async () => { });
 
 // const SendMessageEncryption = AsyncHandler(async () => {
 //      const roomData:roomData=cacheSearchForChatRoom();
@@ -114,60 +123,78 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
   const roomData: roomData = req.chatRoomData;
   const user: user = req.user;
   if (!(roomData || user)) throw new ApiError(400, 'invalid data');
+
   const findChatID = await chatModel.findOne({
     romeName: roomData.roomName,
   });
   const removeUser = await User.updateOne(
-    { _id: new mongoose.Types.ObjectId(user.Id) },
+    { sqlId:user.Id},
     { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID?._id) } },
   );
   if (!removeUser) throw new ApiError(406, 'User unable to remove');
   return res.status(200).json(new ApiResponse(200, removeUser, 'user remvoe'));
 });
 
-const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {
+const checkUserAccess = async (userId: string, roomID: string) => {//should be called when user enter in chat app or chat window, only one time it, should be called
   //checks wheater user is part of that chat room
+
+
+  try {
+    const checkUserChatAccess = await User.aggregate([
+      {
+        $match: {
+          sqlId: new mongoose.Types.ObjectId(userId),
+          chatRoomIDs: { $eq: new mongoose.Types.ObjectId(roomID) },
+        },
+      },
+      {
+        $lookup: {
+          from: 'chatmodels',
+          localField: 'chatRoomIDs',
+          foreignField: '_id',
+          as: 'ChatUsers',
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          ChatUsers: 1,
+        },
+      },
+    ]);
+    if (!checkUserChatAccess || checkUserChatAccess.length === 0)
+      throw new ApiError(409, "user don't have access to chat ");
+
+    return checkUserChatAccess[0];
+  } catch (error) {
+    return new ApiError(500, "Something went wrong while checking user access");
+  }
+}
+
+const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {
   const roomData: roomData = req.chatRoomData;
   const user: user = req.user;
   if (!roomData) throw new ApiError(400, 'invalid request');
-  const checkUserAccess = await User.aggregate([
-    {
-      $match: {
-        sqlId: new mongoose.Types.ObjectId(user.Id),
-        chatRoomIDs: { $eq: new mongoose.Types.ObjectId(roomData.roomID) },
-      },
-    },
-    {
-      $lookup: {
-        from: 'chatmodels',
-        localField: 'chatRoomIDs',
-        foreignField: '_id',
-        as: 'ChatUsers',
-      },
-    },
-    {
-      $project: {
-        _id: 1,
-        ChatUsers: 1,
-      },
-    },
-  ]);
-  if (!checkUserAccess || checkUserAccess.length === 0)
-    throw new ApiError(409, "user don't have access to chat ");
+  const Checker = await checkUserAccess(user.Id, roomData.roomID);
+  if(!Checker) throw new ApiError(409,"user don't have access to chat");
+  //call token generater here
+  const tokenGen = await ChatTokenGen(Checker[0]);
+  if (!tokenGen) throw new ApiError(500, "someting went wrong while making token");
+  return res.status(200).cookie("UserChatToken", tokenGen, options).json(new ApiResponse(200, Checker, "Token create succesfuly"));
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, checkUserAccess[0], 'user have access to chat'));
-});
+})
+
 
 export {
   createChatRoom,
   joinChatRoom,
-  connectChat,
+  checkUserAccess,
   LeaveRoom,
   deleteChat,
   modifiChat,
   // SendMessageEncryption,
   // ReciveMessageDecryption,
   getUserInChat,
+  connectChat
+
 };

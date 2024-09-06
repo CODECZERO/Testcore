@@ -2,8 +2,16 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema({
     sqlId: {
         type: String,
-        require: true
+        require: true,
+        unique: true,
+        index: true
     },
+    logInDevices: [
+        {
+            IpAddress: String,
+            userAgent: String,
+        }
+    ],
     profile: {
         type: String,
         require: true
