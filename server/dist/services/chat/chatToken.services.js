@@ -33,7 +33,6 @@ const ChatTokenDec = (token) => __awaiter(void 0, void 0, void 0, function* () {
         // Verify the token here
         const secert = process.env.ChatSecretAccessToken;
         const decoded = yield jwt.verify(token, secert);
-        const { _id, ChatUsers } = decoded;
         //finding user using email email
         return decoded;
     }

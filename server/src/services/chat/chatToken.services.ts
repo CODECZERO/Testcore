@@ -47,7 +47,6 @@ const ChatTokenDec = async (token:string) => {
 
         const decoded = await jwt.verify(token, secert) as UserChatData;
 
-        const { _id,ChatUsers } = decoded;
         //finding user using email email
         return decoded
 
