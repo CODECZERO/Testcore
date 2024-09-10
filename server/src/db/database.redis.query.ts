@@ -6,7 +6,7 @@ import { ApiResponse } from "../util/apiResponse.js";
 //redis is use for caching to store data realte to exam and chat room's
 //usign env to load value of redis server
 const REDIS_HOST = process.env.REDIS_HOST || 'redis';
-const REDIS_PORT = process.env.REDIS_PORT || 6379;  
+const REDIS_PORT = process.env.REDIS_PORT || 6379;
 
 let client: RedisClientType;
 const connectReids = async () => {//connecting redis
@@ -18,7 +18,7 @@ const connectReids = async () => {//connecting redis
 
         // You can now use the Redis client
     } catch (error) {
-        throw new ApiError(500,error);
+        throw new ApiError(500, error);
     }
 }
 
@@ -31,7 +31,7 @@ const cacheUpdate = async (tokenID: string, examID: string) => {//using this fun
         if (!data) return null;//if data is not found in redis return null as the futher use of code have implement logic to reload the chache or update it 
         return data//return data if present
     } catch (error) {
-        throw new ApiError(500,error);
+        throw new ApiError(500, error);
     }
 }
 
@@ -42,14 +42,14 @@ const cacheSearch = async (tokenID: string) => {//this function to search tokenI
         if (!dataSearch) return null;//if data is not present return null as the further error handling can be implemented
         return dataSearch//if data is present then return data
     } catch (error) {
-        throw new ApiError(500,error);
+        throw new ApiError(500, error);
     }
 }
 
-const cacheSearchForChatRoom = async (CollegeName: string,ClassRoomName:string) => {//this function takes room name from user and search it on redis 
+const cacheSearchForChatRoom = async (CollegeName: string, ClassRoomName: string) => {//this function takes room name from user and search it on redis 
     try {
         //this function spilt the college name and branch name
-        if (!CollegeName || !ClassRoomName) throw new ApiError(500,"Invalid room name format");//if it wasn't able to split theme throw erro
+        if (!CollegeName || !ClassRoomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
         const roomSearch = await client.hGet(CollegeName, ClassRoomName);//if the college and branch name is provied then search theme in redis 
         //cache , the cache uses Hashe datatype as the one College can have many Brach
@@ -79,7 +79,7 @@ const cacheUpdateForChatRoom = async (roomName: string, roomID: string) => {//th
         const ClassRoomName = roomName.match(/(?<=\/)\w+$/);//BrachName
         //this function spilt the college name and branch name
 
-        if (!CollegeName || !ClassRoomName) throw new ApiError(500,"Invalid room name format");//if it wasn't able to split theme throw erro
+        if (!CollegeName || !ClassRoomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
         const roomSearch = await client.hSet(CollegeName[0], ClassRoomName[0], roomID);
         //the data will store like this 

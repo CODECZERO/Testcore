@@ -15,6 +15,7 @@ import { runWebSocket } from "../services/chat/chatServer.service.js"; //this fu
 import prisma from "../db/database.Postgres.js";
 import { connectDb } from "../db/database.MongoDb.js";
 import { connectReids } from "../db/database.redis.query.js";
+import { runVideoServer } from "../services/videostream/videoMain.services.js";
 const connectAll = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //@ts-ignore
@@ -25,6 +26,8 @@ const connectAll = () => __awaiter(void 0, void 0, void 0, function* () {
         yield connectDb();
         console.log("Mongodb is Runing");
         yield connectReids();
+        yield runVideoServer();
+        console.log("runing video server");
     }
     catch (error) {
         throw new ApiError(500, `Service is down ${error}`);
