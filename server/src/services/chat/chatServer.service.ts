@@ -54,9 +54,8 @@ const actions = {
 const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create webscoket server and performe action, such as on message or other
   wss.on('connection', (ws: CustomWebSocket, req: Request) => {//if webserver is running
     const token = tokenExtractr(req);//this function extract the token from req objcet in starting and verify's it
-    console.log(token);
     
-    if(!token){
+    if(!token){//for some reason , i am feeling that it can lead to vulnerability
       ws.close(4000,"Invalid request,User not have access to this group");
       return;
     }
