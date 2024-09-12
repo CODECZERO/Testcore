@@ -1,9 +1,9 @@
 import { WebSocketServer, WebSocket } from "ws";
 import mediasoup from "mediasoup";
 import { UniError } from "../../util/UniErrorHandler.js";
-import { createTransportForService, getRouterRtpCapabilities, } from "./videoMethodes.services.js";
-import { createRouter,createWorker } from "./videoCoreMethode.services.js";
-
+import videoMethode from "./videoMethodes.services.js";
+import { DtlsParameters } from "mediasoup/node/lib/fbs/web-rtc-transport.js";
+import { RtpParameters } from "mediasoup/node/lib/fbs/rtp-parameters.js";
 
 
 /*
@@ -17,13 +17,18 @@ import { createRouter,createWorker } from "./videoCoreMethode.services.js";
     }
 */
 
-interface CustomWebSocket extends WebSocket{
+interface CustomWebSocket extends WebSocket {
 
 }
 
-type actionType="getRouterRtpCapabilities"|"createTransport"|"connectTransport"|"produce"|"consume";
-type message={
-    actionType:actionType,
+type actionType = "getRouterRtpCapabilities" | "createTransport" | "connectTransport" | "produce" | "consume";
+
+type message = {
+    actionType: actionType,
+    dtlsParameters:DtlsParameters,
+    kind:any,
+    rtpParameters:RtpParameters
+
 }
 
 let router: mediasoup.types.Router;
@@ -31,18 +36,15 @@ let producerTransport: mediasoup.types.WebRtcTransport;
 let consumerTransport: mediasoup.types.WebRtcTransport;
 let producer: mediasoup.types.Producer;
 let consumer: mediasoup.types.Consumer;
+let connectTransport:mediasoup.types.WebRtcTransport;
 
 const port: number = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 3000;//running websocket on same webserver but different port,
 const wss = new WebSocketServer({ port });
-const action={
-    "getRouterRtpCapabilities":getRouterRtpCapabilities,
-    "createTransport":createTransportForService,
-    "connectTransport":,
-    "produce":,
-    "consume":,
-}
+
+
 
 const runVideoServer = async () => {
+    router = await videoMethode.startConnection(router);
     wss.on('connection', (ws: WebSocket, req: Request) => {
         // const token = VideoTokenExtracter();
         // if (!token) {//for some reason , i am feeling that it can lead to vulnerability
@@ -50,13 +52,49 @@ const runVideoServer = async () => {
         //     return;
         // }
 
-        ws.on('message',(message:message)=>{
-            const actionType=message.actionType;
-            const output=action[actionType](ws,actionType,router);
-          
+        ws.on('message', async (message: string) => {
+            try {
+                const messageData: message = JSON.parse(message);
+                switch (messageData.actionType) {
+                    case 'getRouterRtpCapabilities':
+                        await videoMethode.getRouterRtpCapabilities(ws, router);
+                        break;
+
+                    case "createTransport":
+                        producerTransport = await videoMethode.createTransportForService(router, true, producerTransport);
+                        const transportParams = {
+                            id: producerTransport.id,
+                            iceParameters: producerTransport.iceParameters,
+                            iceCandidates: producerTransport.iceCandidates,
+                            dtlsParameters: producerTransport.dtlsParameters,
+                        };
+                        ws.send(JSON.stringify(transportParams));
+                        break;
+
+                    case "connectTransport":
+                            connectTransport=await videoMethode.connectTransport(false,messageData.dtlsParameters,producerTransport);
+                            ws.send("connected");
+                        break;
+                    case "consume":
+
+                        break;
+                    case "produce":
+                        
+                        producer=await videoMethode.producer(producerTransport,messageData.kind,messageData.rtpParameters);
+                        console.log(producer)
+                        break;
+                    default:
+                        ws.send("action/message action wasn't define");
+                        ws.close(4004);
+                        break;
+
+                }
+            } catch (error) {
+                ws.close(5000, `Some error occure ${error}`);
+            }
         })
 
-        ws.on('close',()=>{
+        ws.on('close', () => {
             ws.send("close");
             return;
         })
