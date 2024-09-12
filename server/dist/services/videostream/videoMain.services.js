@@ -8,84 +8,63 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { WebSocketServer } from "ws";
-import { consumerTransport, init, producerTransport, createConsumer } from "./videoMethode.services.js";
+import videoMethode from "./videoMethodes.services.js";
+let router;
+let producerTransport;
+let consumerTransport;
+let producer;
+let consumer;
+let connectTransport;
 const port = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 3000; //running websocket on same webserver but different port,
 const wss = new WebSocketServer({ port });
 const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield init();
-    wss.on('connection', (ws) => {
-        console.log('Client connected');
-        // Step 1: Handle signaling messages
+    router = yield videoMethode.startConnection(router);
+    wss.on('connection', (ws, req) => {
+        // const token = VideoTokenExtracter();
+        // if (!token) {//for some reason , i am feeling that it can lead to vulnerability
+        //     ws.close(4000, "Invalid request,User not have access to this group");
+        //     return;
+        // }
         ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
-            const { action, data } = JSON.parse(message);
-            switch (action) {
-                case 'createProducerTransport':
-                    // Client requests producer transport creation
-                    const producerTransportParams = {
-                        id: producerTransport.id,
-                        iceParameters: producerTransport.iceParameters,
-                        iceCandidates: producerTransport.iceCandidates,
-                        dtlsParameters: producerTransport.dtlsParameters
-                    };
-                    ws.send(JSON.stringify({ action: 'producerTransportCreated', data: producerTransportParams }));
-                    break;
-                case 'createConsumerTransport':
-                    // Client requests consumer transport creation
-                    const consumerTransportParams = {
-                        id: consumerTransport.id,
-                        iceParameters: consumerTransport.iceParameters,
-                        iceCandidates: consumerTransport.iceCandidates,
-                        dtlsParameters: consumerTransport.dtlsParameters
-                    };
-                    ws.send(JSON.stringify({ action: 'consumerTransportCreated', data: consumerTransportParams }));
-                    break;
-                case 'connectProducerTransport':
-                    // Connect producer transport to the DTLS parameters sent by the client
-                    yield producerTransport.connect({ dtlsParameters: data.dtlsParameters });
-                    ws.send(JSON.stringify({ action: 'producerTransportConnected' }));
-                    break;
-                case 'connectConsumerTransport':
-                    // Connect consumer transport to the DTLS parameters sent by the client
-                    yield consumerTransport.connect({ dtlsParameters: data.dtlsParameters });
-                    ws.send(JSON.stringify({ action: 'consumerTransportConnected' }));
-                    break;
-                case 'produce':
-                    // Client sends RTP parameters to create a producer
-                    const producer = yield producerTransport.produce({ kind: data.kind, rtpParameters: data.rtpParameters });
-                    ws.send(JSON.stringify({ action: 'producerCreated', producerId: producer.id }));
-                    break;
-                case 'consume':
-                    // Client requests to consume a producer's stream
-                    const consumer = yield createConsumer(consumerTransport, data.producerId, data.rtpCapabilities);
-                    ws.send(JSON.stringify({
-                        action: 'consumerCreated',
-                        id: consumer.id,
-                        producerId: data.producerId,
-                        kind: consumer.kind,
-                        rtpParameters: consumer.rtpParameters
-                    }));
-                    break;
-                case 'iceCandidate':
-                    // Handle incoming ICE candidate from the client
-                    const { candidate } = data;
-                    if (candidate) {
-                        yield producerTransport.addIceCandidate(candidate);
-                    }
-                    break;
-                case 'closeTransport':
-                    // Clean up when the client disconnects or closes a transport
-                    producerTransport.close();
-                    consumerTransport.close();
-                    break;
-                default:
-                    console.log(`Unknown action: ${action}`);
+            try {
+                const messageData = JSON.parse(message);
+                switch (messageData.actionType) {
+                    case 'getRouterRtpCapabilities':
+                        yield videoMethode.getRouterRtpCapabilities(ws, router);
+                        break;
+                    case "createTransport":
+                        producerTransport = yield videoMethode.createTransportForService(router, true, producerTransport);
+                        const transportParams = {
+                            id: producerTransport.id,
+                            iceParameters: producerTransport.iceParameters,
+                            iceCandidates: producerTransport.iceCandidates,
+                            dtlsParameters: producerTransport.dtlsParameters,
+                        };
+                        ws.send(JSON.stringify(transportParams));
+                        break;
+                    case "connectTransport":
+                        connectTransport = yield videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransport);
+                        ws.send("connected");
+                        break;
+                    case "consume":
+                        break;
+                    case "produce":
+                        producer = yield videoMethode.producer(producerTransport, messageData.kind, messageData.rtpParameters);
+                        console.log(producer);
+                        break;
+                    default:
+                        ws.send("action/message action wasn't define");
+                        ws.close(4004);
+                        break;
+                }
+            }
+            catch (error) {
+                ws.close(5000, `Some error occure ${error}`);
             }
         }));
-        // Handle WebSocket connection close
         ws.on('close', () => {
-            console.log('Client disconnected');
-            producerTransport.close();
-            consumerTransport.close();
+            ws.send("close");
+            return;
         });
     });
 });
