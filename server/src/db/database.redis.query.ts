@@ -97,10 +97,33 @@ const cacheUpdateForChatRoom = async (roomName: string, roomID: string) => {//th
     }
 }
 
+const getVideoServerTransport=async(Id:string)=>{
+    try {
+        const data= await client.hGet("Video",Id);
+        if(!data) return new ApiResponse(404,"data not found");
+        return data;
+    } catch (error) {
+        throw new ApiError(500,`Something went wrong, while searching data ${error}`)
+    }
+}
+
+const setVideoServerTransport=async(Id:string,Transport:any)=>{
+    try {
+        const data=client.hSet("Video",Id,Transport);
+        if(!data) return new ApiResponse(404,"data not found");
+        return data;
+    } catch (error) {
+        throw new ApiError(500,`something went Wrong while saving data ${error}`);
+    }
+}
+
 export {
     cacheSearch,
     cacheUpdate,
     connectReids,
     cacheSearchForChatRoom,
-    cacheUpdateForChatRoom
+    cacheUpdateForChatRoom,
+    getVideoServerTransport,
+    setVideoServerTransport
+    
 }

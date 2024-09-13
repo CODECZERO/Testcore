@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { createClient } from "redis";
 import { ApiError } from "../util/apiError.js";
+import { ApiResponse } from "../util/apiResponse.js";
 //redis is use for caching to store data realte to exam and chat room's
 //usign env to load value of redis server
 const REDIS_HOST = process.env.REDIS_HOST || 'redis';
@@ -106,4 +107,26 @@ const cacheUpdateForChatRoom = (roomName, roomID) => __awaiter(void 0, void 0, v
         throw new ApiError(500, error);
     }
 });
-export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom };
+const getVideoServerTransport = (Id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = yield client.hGet("Video", Id);
+        if (!data)
+            return new ApiResponse(404, "data not found");
+        return data;
+    }
+    catch (error) {
+        throw new ApiError(500, `Something went wrong, while searching data ${error}`);
+    }
+});
+const setVideoServerTransport = (Id, Transport) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = client.hSet("Video", Id, Transport);
+        if (!data)
+            return new ApiResponse(404, "data not found");
+        return data;
+    }
+    catch (error) {
+        throw new ApiError(500, `something went Wrong while saving data ${error}`);
+    }
+});
+export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom, getVideoServerTransport, setVideoServerTransport };
