@@ -9,16 +9,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { WebSocketServer } from "ws";
 import videoMethode from "./videoMethodes.services.js";
-let router;
+import { nanoid } from "nanoid";
+let Transport = new Map();
 let producerTransport;
 let consumerTransport;
-let producer;
-let consumer;
 let connectTransport;
+let MangaeProducerAndconsumer = new Map();
 const port = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 3000; //running websocket on same webserver but different port,
 const wss = new WebSocketServer({ port });
 const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
-    router = yield videoMethode.startConnection(router);
+    const router = yield videoMethode.startConnection();
     wss.on('connection', (ws, req) => {
         // const token = VideoTokenExtracter();
         // if (!token) {//for some reason , i am feeling that it can lead to vulnerability
@@ -33,24 +33,30 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                         yield videoMethode.getRouterRtpCapabilities(ws, router);
                         break;
                     case "createTransport":
-                        producerTransport = yield videoMethode.createTransportForService(router, true, producerTransport);
+                        const id = nanoid(12);
+                        const TransportData = yield videoMethode.createTransportForService(router, true, producerTransport);
                         const transportParams = {
-                            id: producerTransport.id,
-                            iceParameters: producerTransport.iceParameters,
-                            iceCandidates: producerTransport.iceCandidates,
-                            dtlsParameters: producerTransport.dtlsParameters,
+                            id: TransportData.id,
+                            iceParameters: TransportData.iceParameters,
+                            iceCandidates: TransportData.iceCandidates,
+                            dtlsParameters: TransportData.dtlsParameters,
                         };
-                        ws.send(JSON.stringify(transportParams));
+                        Transport.set(id, TransportData);
+                        ws.send(JSON.stringify({ "Id": id, transportParams }));
                         break;
                     case "connectTransport":
-                        connectTransport = yield videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransport);
+                        const producerTransportxL = Transport.get(messageData.Id);
+                        connectTransport = yield videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransportxL);
                         ws.send("connected");
                         break;
                     case "consume":
+                        const consumerTransportL = Transport.get(messageData.Id);
+                        const consumer = yield videoMethode.consumer(consumerTransportL, router, messageData.producerId, messageData.rtpCapabilities);
                         break;
                     case "produce":
-                        producer = yield videoMethode.producer(producerTransport, messageData.kind, messageData.rtpParameters);
-                        console.log(producer);
+                        const producerTransportL = Transport.get(messageData.Id);
+                        const producer = yield videoMethode.producer(producerTransportL, messageData.kind, messageData.rtpParameters);
+                        ws.send(JSON.stringify(producer));
                         break;
                     default:
                         ws.send("action/message action wasn't define");

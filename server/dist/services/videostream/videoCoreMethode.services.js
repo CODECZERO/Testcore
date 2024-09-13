@@ -40,7 +40,7 @@ const createWorkerForService = () => __awaiter(void 0, void 0, void 0, function*
 const createRouterForService = (worker) => __awaiter(void 0, void 0, void 0, function* () {
     if (!worker)
         throw new UniError("worker not provide");
-    return yield worker.createRouter({ rtpCapabilities });
+    return yield worker.createRouter({ mediaCodecs: rtpCapabilities }); //rtpCapabilities are codecs
 });
 const createTransportForService = (router) => __awaiter(void 0, void 0, void 0, function* () {
     const publicIp = yield axios.get('https://api.ipify.org?format=json').then((res) => res.data.ip);

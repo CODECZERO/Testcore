@@ -25,8 +25,8 @@ class VideoMethode {
         try {
             const transport = await createTransportForService(router);
             if (sender) {
-                 producerTransport = transport;
-                 
+                producerTransport = transport;
+
             }
             return consumerTransport = transport;
         } catch (error) {
@@ -43,21 +43,23 @@ class VideoMethode {
 
     public producer = async (producerTransport: WebRtcTransport, kind: any, rtpParameters: any) => {
         try {
-            return await producerTransport.produce({
+            const f = producerTransport.produce({
                 kind,
                 rtpParameters
             });
+            return f;
         } catch (error) {
             throw new UniError(`error in producer ${error}`)
         }
     }
 
-    public consumer = async (consumerTransport: WebRtcTransport, router: Router, producer: any, rtpCapabilities: any) => {
+    public consumer = async (consumerTransport: WebRtcTransport, router: Router, producerId: any, rtpCapabilities: any) => {
         try {
             if (!router.canConsume) throw new UniError("unable to consume data");
-            router.canConsume({ producerId: producer.id, rtpCapabilities });
+            router.canConsume({ producerId: producerId, rtpCapabilities });
+
             return await consumerTransport.consume({
-                producerId: producer?.id,
+                producerId,
                 rtpCapabilities,
                 paused: false
             });
@@ -66,11 +68,11 @@ class VideoMethode {
         }
     }
 
-    public startConnection = async (router: Router) => {
+    public startConnection = async () => {
         try {
             this.worker = await createWorkerForService();
             this.router = await createRouterForService(this.worker);
-            return router = this.router;
+            return this.router;
         } catch (error) {
             throw new UniError(`error while connecting to server ${error}`);
         }

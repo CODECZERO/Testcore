@@ -4,6 +4,9 @@ import { UniError } from "../../util/UniErrorHandler.js";
 import videoMethode from "./videoMethodes.services.js";
 import { DtlsParameters } from "mediasoup/node/lib/fbs/web-rtc-transport.js";
 import { RtpParameters } from "mediasoup/node/lib/fbs/rtp-parameters.js";
+import { RtpCapabilities } from "mediasoup/node/lib/RtpParameters.js";
+import { nanoid } from "nanoid";
+import { Router, WebRtcTransport } from "mediasoup/node/lib/types.js";
 
 
 /*
@@ -17,26 +20,34 @@ import { RtpParameters } from "mediasoup/node/lib/fbs/rtp-parameters.js";
     }
 */
 
-interface CustomWebSocket extends WebSocket {
+interface userTransport {
+    Transport: mediasoup.types.WebRtcTransport;
+}
 
+interface ProducerAndConsumerState {
+    producer: mediasoup.types.Producer;
+    consumer: mediasoup.types.Consumer;
 }
 
 type actionType = "getRouterRtpCapabilities" | "createTransport" | "connectTransport" | "produce" | "consume";
 
 type message = {
     actionType: actionType,
-    dtlsParameters:DtlsParameters,
-    kind:any,
-    rtpParameters:RtpParameters
+    dtlsParameters: DtlsParameters,
+    kind: any,
+    rtpParameters: RtpParameters,
+    producerId: any;
+    rtpCapabilities: RtpCapabilities,
+    Id: string
 
 }
 
-let router: mediasoup.types.Router;
-let producerTransport: mediasoup.types.WebRtcTransport;
-let consumerTransport: mediasoup.types.WebRtcTransport;
-let producer: mediasoup.types.Producer;
-let consumer: mediasoup.types.Consumer;
-let connectTransport:mediasoup.types.WebRtcTransport;
+let Transport = new Map<string, userTransport>();
+let producerTransport: mediasoup.types.Producer;
+let consumerTransport: mediasoup.types.Producer;
+let connectTransport: mediasoup.types.WebRtcTransport;
+let MangaeProducerAndconsumer = new Map<string, ProducerAndConsumerState>();
+
 
 const port: number = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 3000;//running websocket on same webserver but different port,
 const wss = new WebSocketServer({ port });
@@ -44,7 +55,7 @@ const wss = new WebSocketServer({ port });
 
 
 const runVideoServer = async () => {
-    router = await videoMethode.startConnection(router);
+    const router:Router = await videoMethode.startConnection();
     wss.on('connection', (ws: WebSocket, req: Request) => {
         // const token = VideoTokenExtracter();
         // if (!token) {//for some reason , i am feeling that it can lead to vulnerability
@@ -61,27 +72,36 @@ const runVideoServer = async () => {
                         break;
 
                     case "createTransport":
-                        producerTransport = await videoMethode.createTransportForService(router, true, producerTransport);
+                        const id = nanoid(12);
+                        const TransportData = await videoMethode.createTransportForService(router, true, producerTransport);
+
                         const transportParams = {
-                            id: producerTransport.id,
-                            iceParameters: producerTransport.iceParameters,
-                            iceCandidates: producerTransport.iceCandidates,
-                            dtlsParameters: producerTransport.dtlsParameters,
+                            id: TransportData.id,
+                            iceParameters: TransportData.iceParameters,
+                            iceCandidates: TransportData.iceCandidates,
+                            dtlsParameters: TransportData.dtlsParameters,
                         };
-                        ws.send(JSON.stringify(transportParams));
+
+                        Transport.set(id, TransportData);
+
+                        ws.send(JSON.stringify({ "Id": id, transportParams }));
                         break;
 
                     case "connectTransport":
-                            connectTransport=await videoMethode.connectTransport(false,messageData.dtlsParameters,producerTransport);
-                            ws.send("connected");
+                        const producerTransportxL = Transport.get(messageData.Id);
+                        connectTransport = await videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransportxL);
+                        ws.send("connected");
                         break;
-                    case "consume":
 
+                    case "consume":
+                        const consumerTransportL = Transport.get(messageData.Id);
+                        const consumer = await videoMethode.consumer(consumerTransportL, router, messageData.producerId, messageData.rtpCapabilities);
                         break;
+
                     case "produce":
-                        
-                        producer=await videoMethode.producer(producerTransport,messageData.kind,messageData.rtpParameters);
-                        console.log(producer)
+                        const producerTransportL = Transport.get(messageData.Id);
+                        const producer = await videoMethode.producer(producerTransportL, messageData.kind, messageData.rtpParameters);
+                        ws.send(JSON.stringify(producer));
                         break;
                     default:
                         ws.send("action/message action wasn't define");

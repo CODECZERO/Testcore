@@ -41,22 +41,23 @@ class VideoMethode {
         });
         this.producer = (producerTransport, kind, rtpParameters) => __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield producerTransport.produce({
+                const f = producerTransport.produce({
                     kind,
                     rtpParameters
                 });
+                return f;
             }
             catch (error) {
                 throw new UniError(`error in producer ${error}`);
             }
         });
-        this.consumer = (consumerTransport, router, producer, rtpCapabilities) => __awaiter(this, void 0, void 0, function* () {
+        this.consumer = (consumerTransport, router, producerId, rtpCapabilities) => __awaiter(this, void 0, void 0, function* () {
             try {
                 if (!router.canConsume)
                     throw new UniError("unable to consume data");
-                router.canConsume({ producerId: producer.id, rtpCapabilities });
+                router.canConsume({ producerId: producerId, rtpCapabilities });
                 return yield consumerTransport.consume({
-                    producerId: producer === null || producer === void 0 ? void 0 : producer.id,
+                    producerId,
                     rtpCapabilities,
                     paused: false
                 });
@@ -65,11 +66,11 @@ class VideoMethode {
                 throw new UniError(`error in consumer ${error}`);
             }
         });
-        this.startConnection = (router) => __awaiter(this, void 0, void 0, function* () {
+        this.startConnection = () => __awaiter(this, void 0, void 0, function* () {
             try {
                 this.worker = yield createWorkerForService();
                 this.router = yield createRouterForService(this.worker);
-                return router = this.router;
+                return this.router;
             }
             catch (error) {
                 throw new UniError(`error while connecting to server ${error}`);

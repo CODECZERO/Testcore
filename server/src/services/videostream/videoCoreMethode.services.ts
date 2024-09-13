@@ -37,7 +37,7 @@ const createWorkerForService = async (): Promise<Worker> => {
 
 const createRouterForService = async (worker: Worker): Promise<Router> => {
     if (!worker) throw new UniError("worker not provide");
-    return await worker.createRouter({rtpCapabilities});
+    return await worker.createRouter({mediaCodecs:rtpCapabilities});//rtpCapabilities are codecs
 }
 
 const createTransportForService = async (router: Router): Promise<WebRtcTransport> => {
