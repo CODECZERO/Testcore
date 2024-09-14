@@ -34,18 +34,23 @@ class VideoMethode {
             }
         });
         this.connectTransport = (sender, dtlsParameters, producerTransport, consumerTransport) => __awaiter(this, void 0, void 0, function* () {
-            if (sender) {
-                return yield (producerTransport === null || producerTransport === void 0 ? void 0 : producerTransport.connect({ dtlsParameters }));
+            try {
+                if (sender) {
+                    return yield (producerTransport === null || producerTransport === void 0 ? void 0 : producerTransport.connect({ dtlsParameters }));
+                }
+                return yield (consumerTransport === null || consumerTransport === void 0 ? void 0 : consumerTransport.connect({ dtlsParameters }));
             }
-            return yield (consumerTransport === null || consumerTransport === void 0 ? void 0 : consumerTransport.connect({ dtlsParameters }));
+            catch (error) {
+                throw new UniError(`error in connection transport ${error}`);
+            }
         });
         this.producer = (producerTransport, kind, rtpParameters) => __awaiter(this, void 0, void 0, function* () {
             try {
-                const f = producerTransport.produce({
+                const producerData = yield producerTransport.produce({
                     kind,
                     rtpParameters
                 });
-                return f;
+                return producerData;
             }
             catch (error) {
                 throw new UniError(`error in producer ${error}`);
@@ -56,11 +61,12 @@ class VideoMethode {
                 if (!router.canConsume)
                     throw new UniError("unable to consume data");
                 router.canConsume({ producerId: producerId, rtpCapabilities });
-                return yield consumerTransport.consume({
+                const consumer = yield consumerTransport.consume({
                     producerId,
                     rtpCapabilities,
                     paused: false
                 });
+                return consumer;
             }
             catch (error) {
                 throw new UniError(`error in consumer ${error}`);
