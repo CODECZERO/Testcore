@@ -8,7 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { createClient } from "redis";
-import { ApiError } from "../util/apiError";
+import { ApiError } from "../util/apiError.js";
+import { ApiResponse } from "../util/apiResponse.js";
 //redis is use for caching to store data realte to exam and chat room's
 //usign env to load value of redis server
 const REDIS_HOST = process.env.REDIS_HOST || 'redis';
@@ -16,7 +17,7 @@ const REDIS_PORT = process.env.REDIS_PORT || 6379;
 let client;
 const connectReids = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        client = createClient({ url: `redis://${REDIS_HOST}:${REDIS_PORT}` });
+        client = createClient({ url: process.env.REDISURL });
         client.on('error', (err) => console.log('Redis Client Error', err));
         yield client.connect();
         console.log('Redis connected successfully');
@@ -52,17 +53,13 @@ const cacheSearch = (tokenID) => __awaiter(void 0, void 0, void 0, function* () 
         throw new ApiError(500, error);
     }
 });
-const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, function* () {
+const cacheSearchForChatRoom = (CollegeName, ClassRoomName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //using regex to spilt.
-        //eg College/BranchName
-        const CollegeName = roomName.match(/^\w+/); //College
-        const ClassRoomName = roomName.match(/(?<=\/)\w+$/); //BrachName
         //this function spilt the college name and branch name
         if (!CollegeName || !ClassRoomName)
             throw new ApiError(500, "Invalid room name format"); //if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = yield client.hGet(CollegeName[0], ClassRoomName[0]); //if the college and branch name is provied then search theme in redis 
+        const roomSearch = yield client.hGet(CollegeName, ClassRoomName); //if the college and branch name is provied then search theme in redis 
         //cache , the cache uses Hashe datatype as the one College can have many Brach
         //the output will be like this 
         /*
@@ -71,6 +68,9 @@ const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, f
                 "BranchName2":"MongodbId Of that chat room",
                 "BranchName3":"MongodbId Of that chat room",
             }
+
+
+            output-MongodbID of that chat room
         */
         if (!roomSearch)
             return null; //if data is not present return null as the further error handling can be implemented
@@ -107,4 +107,26 @@ const cacheUpdateForChatRoom = (roomName, roomID) => __awaiter(void 0, void 0, v
         throw new ApiError(500, error);
     }
 });
-export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom };
+const getVideoServerTransport = (Id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = yield client.hGet("Video", Id);
+        if (!data)
+            return new ApiResponse(404, "data not found");
+        return data;
+    }
+    catch (error) {
+        throw new ApiError(500, `Something went wrong, while searching data ${error}`);
+    }
+});
+const setVideoServerTransport = (Id, Transport) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = client.hSet("Video", Id, Transport);
+        if (!data)
+            return new ApiResponse(404, "data not found");
+        return data;
+    }
+    catch (error) {
+        throw new ApiError(500, `something went Wrong while saving data ${error}`);
+    }
+});
+export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom, getVideoServerTransport, setVideoServerTransport };

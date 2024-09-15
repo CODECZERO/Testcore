@@ -25,7 +25,7 @@ const App: React.FC = () => {
   };
 
   // Handle form submission
-  const handleSubmit = async (e: FormEvent <HTMLFormElement> ) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setSuccess('');
@@ -81,9 +81,9 @@ const App: React.FC = () => {
         </div>
         <button type="submit">Sign Up</button>
       </form>
-      
+
     </div>
-  );
+  )
 };
 
 export default App;

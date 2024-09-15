@@ -66,3 +66,16 @@
 # rember to rewrite and check code working
 kafka is need in backend as there are many live action to be handle
 and radit mq
+
+
+
+# know handle why message is not to user in same group in backend;
+    add security feature in websocket , so that anybody can not connect , whithout access to it 
+    becaue if ther is no feature such as this , any body can connect to it and websocket server can be ddos,dos
+
+
+# make a seprate file which, checks if all the services of you're app are running like rabbitmq,database,websocket ,etc 
+and then use or call file in index.ts/index.js file as it will ensure that all things are running and working propley.
+i'll give it a name , named pre-final stage
+
+# try to integreat twilo api for notfication & other stuff
