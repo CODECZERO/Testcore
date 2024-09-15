@@ -24,11 +24,10 @@ interface decodedUser {
 }
 
 
-const verifyData = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+const verifyData = AsyncHandler(async (req: RequestWithCookies, res: Response, next: NextFunction) => {
     try {
-        const request = req as RequestWithCookies;
         const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
-        const token = request.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
+        const token = req.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
         if (!token) {
             throw new ApiError(401, "Unauthorized");
         }
@@ -41,12 +40,9 @@ const verifyData = AsyncHandler(async (req: Request, res: Response, next: NextFu
         const findUser = await findOp({
             email,
             role,
-            name: '',
-            phoneNumber: '',
-            address: '',
-            refreshToken: ''
         });//finding user using email
-        request.user = decoded; // Assuming `req.user` is where you store the decoded token
+        if(!findUser) throw new ApiError(400,"Invalid Token");
+        req.user = decoded; // Assuming `req.user` is where you store the decoded token
 
         next();
     } catch (error) {
@@ -57,6 +53,8 @@ const verifyData = AsyncHandler(async (req: Request, res: Response, next: NextFu
 
 const examData = AsyncHandler(async (req: Request, res: Response) => {
 
-})
+});
+
+
 
 export { verifyData };

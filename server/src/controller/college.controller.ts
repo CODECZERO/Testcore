@@ -10,18 +10,18 @@ import { TimeTable } from "../models/timetable.model.nosql.js";
 interface Requestany extends Request {
     user?: any
 }
-type subject={
-    subjectCode:string
-    subjectName:string
+type subject = {
+    subjectCode: string
+    subjectName: string
 
 }
-type timetable={
-    timetableId:string,
-    approve:boolean
+type timetable = {
+    timetableId: string,
+    approve: boolean
 }
-//@ts-ignore
+
 const getSubjects = AsyncHandler(async (req: Request, res: Response) => {//get subject for college
-    const subject:subject = req.body;//taking subject name and code 
+    const subject: subject = req.body;//taking subject name and code 
     let subjects;
     if (!subject) {//if it doesn't exist then return whole table or subject name or code is not provide then return all
         subjects = await prisma.subject.findMany({//try puting pagenation here and function like it because , it can increase load on database
@@ -40,10 +40,9 @@ const getSubjects = AsyncHandler(async (req: Request, res: Response) => {//get s
 });
 
 //this function creates subject for college
-//@ts-ignore
 
 const CreateSubject = AsyncHandler(async (req: Request, res: Response) => {
-    const subject:subject = req.body;//takes subject from college to create
+    const subject: subject = req.body;//takes subject from college to create
     if (!subject) throw new ApiError(400, "subjectcode or subjectName is not provided");//check if value is provided or not
     //checking if subject exists or not if yes return subject exists if not then create it 
     const subjectFind = await getSubject(subject.subjectCode, subject.subjectName);//checking database if subject exists
@@ -52,14 +51,13 @@ const CreateSubject = AsyncHandler(async (req: Request, res: Response) => {
     const createSubject = await prisma.subject.create({//else create subject 
         //@ts-ignore
         data: {
-            subjectCode:subject.subjectCode,
-            subjectName:subject.subjectName
+            subjectCode: subject.subjectCode,
+            subjectName: subject.subjectName
         }
     });
     if (!createSubject) throw new ApiError(500, "Something went wrrong while creating subject");//check if the subject is create and throw error if doesn't
     return res.status(201).json(new ApiResponse(201, createSubject, "Subject created"));//if create then return
 })
-//@ts-ignore
 
 const findStudnets = AsyncHandler(async (req: Requestany, res: Response) => {
     const { Id } = req.user;
@@ -71,7 +69,6 @@ const findStudnets = AsyncHandler(async (req: Requestany, res: Response) => {
     return res.status(200).json(new ApiResponse(200, StudentData));
 
 })
-//@ts-ignore
 
 const StudentVeryify = AsyncHandler(async (req: Requestany, res: Response) => {
     const { Id } = req.user;
@@ -92,9 +89,7 @@ const StudentVeryify = AsyncHandler(async (req: Requestany, res: Response) => {
 
     if (!veryifyStudent) throw new ApiError(503, "some thing went wrong while updating data")
     return res.status(200).json(new ApiResponse(200, veryifyStudent, "Student veryify"));
-}
-)
-//@ts-ignore
+});
 
 const getExaminer = AsyncHandler(async (req: Requestany, res: Response) => {
     const { Id } = req.user;
@@ -117,7 +112,7 @@ const getExaminer = AsyncHandler(async (req: Requestany, res: Response) => {
 
 
 });
-//@ts-ignore
+
 const TimeTableSearch = AsyncHandler(async (req: Requestany, res: Response) => {//search's time table for college
     try {
         const CollegeData = req.user;//take college name by using it's access token
@@ -135,9 +130,10 @@ const TimeTableSearch = AsyncHandler(async (req: Requestany, res: Response) => {
         throw new ApiError(500, "some thing went wrong, while searching time table");//if error occure throw error
     }
 })
-//@ts-ignore
+
+
 const AprroveTimeTable = AsyncHandler(async (req: Request, res: Response) => {//approve time table function
-    const timetable:timetable = req.body;//takes data like time table id and aprrove , approve is true or false
+    const timetable: timetable = req.body;//takes data like time table id and aprrove , approve is true or false
     if (!timetable) return res.status(200).json(new ApiResponse(200, "aprrove is false or timetableId is not provided"));//if aprrove or id is false then there is no database operation
 
     const updateAprrove = await TimeTable.findByIdAndUpdate({//if both of the things are given then find theme and update theme
@@ -146,8 +142,8 @@ const AprroveTimeTable = AsyncHandler(async (req: Request, res: Response) => {//
 
     if (!(updateAprrove)) throw new ApiError(200, "something went wrong while updating time table");//if updateAprrove fail then return error
     return res.status(200).json(new ApiResponse(200, updateAprrove));//else return updated time table
-}
-);
+});
+
 export {
     getSubjects,
     AprroveTimeTable,
@@ -155,5 +151,6 @@ export {
     CreateSubject,
     StudentVeryify,
     getExaminer,
-    findStudnet
+    findStudnet,
+    findStudnets
 }

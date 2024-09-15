@@ -21,7 +21,8 @@ const genAccToken = async (user: {//create access token so user don't have to lo
             name,
             role,
             phoneNumber,
-            address
+            address,
+            
 
         }, 
        secreat,//Access token secreat 
