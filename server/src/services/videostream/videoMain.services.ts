@@ -7,6 +7,7 @@ import { RtpParameters } from "mediasoup/node/lib/fbs/rtp-parameters.js";
 import { RtpCapabilities } from "mediasoup/node/lib/RtpParameters.js";
 import { nanoid } from "nanoid";
 import { Router, WebRtcTransport } from "mediasoup/node/lib/types.js";
+import { getVideoServerTransport, removeVideoServerTranspor, setVideoServerTransport } from "../../db/database.redis.query.js";
 
 
 /*
@@ -24,12 +25,9 @@ interface userTransport {
     Transport: mediasoup.types.WebRtcTransport;
 }
 
-interface ProducerAndConsumerState {
-    producer: mediasoup.types.Producer;
-    consumer: mediasoup.types.Consumer;
-}
 
-type actionType = "getRouterRtpCapabilities" | "createTransport" | "connectTransport" | "produce" | "consume";
+
+type actionType = "getRouterRtpCapabilities" | "createTransport" | "connectTransport" | "produce" | "consume" | "remove";
 
 type message = {
     actionType: actionType,
@@ -44,9 +42,7 @@ type message = {
 
 let Transport = new Map<string, userTransport>();
 let producerTransport: mediasoup.types.Producer;
-let consumerTransport: mediasoup.types.Producer;
 let connectTransport: mediasoup.types.WebRtcTransport;
-let MangaeProducerAndconsumer = new Map<string, ProducerAndConsumerState>();
 
 
 const port: number = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 3000;//running websocket on same webserver but different port,
@@ -55,7 +51,7 @@ const wss = new WebSocketServer({ port });
 
 
 const runVideoServer = async () => {
-    const router:Router = await videoMethode.startConnection();
+    const router: Router = await videoMethode.startConnection();
     wss.on('connection', (ws: WebSocket, req: Request) => {
         // const token = VideoTokenExtracter();
         // if (!token) {//for some reason , i am feeling that it can lead to vulnerability
@@ -82,27 +78,33 @@ const runVideoServer = async () => {
                             dtlsParameters: TransportData.dtlsParameters,
                         };
 
-                        Transport.set(id, TransportData);
-
+                        await setVideoServerTransport(id,TransportData)
                         ws.send(JSON.stringify({ "Id": id, transportParams }));
                         break;
 
                     case "connectTransport":
-                        const producerTransportxL = Transport.get(messageData.Id);
-                        connectTransport = await videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransportxL);
+                        const producerTransportxL = await getVideoServerTransport(messageData.Id);
+                        connectTransport = await videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransportxL as any);
                         ws.send("connected");
                         break;
 
                     case "consume":
-                        const consumerTransportL = Transport.get(messageData.Id);
-                        const consumer = await videoMethode.consumer(consumerTransportL, router, messageData.producerId, messageData.rtpCapabilities);
+                        const consumerTransportL = await getVideoServerTransport(messageData.Id)
+                        const consumer = await videoMethode.consumer(consumerTransportL as any, router, messageData.producerId, messageData.rtpCapabilities);
+                        ws.send(JSON.stringify(consumer));
                         break;
 
                     case "produce":
-                        const producerTransportL = Transport.get(messageData.Id);
-                        const producer = await videoMethode.producer(producerTransportL, messageData.kind, messageData.rtpParameters);
+                        const producerTransportL = await getVideoServerTransport(messageData.Id)
+                        const producer = await videoMethode.producer(producerTransportL as any, messageData.kind, messageData.rtpParameters);
                         ws.send(JSON.stringify(producer));
                         break;
+
+                    case "remove":
+                        await removeVideoServerTranspor(messageData.Id);
+                        ws.send("Removed");
+                        break;
+
                     default:
                         ws.send("action/message action wasn't define");
                         ws.close(4004);
@@ -122,4 +124,4 @@ const runVideoServer = async () => {
 
 }
 
-export { runVideoServer };
+export { runVideoServer, userTransport };

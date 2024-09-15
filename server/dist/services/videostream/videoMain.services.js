@@ -12,9 +12,7 @@ import videoMethode from "./videoMethodes.services.js";
 import { nanoid } from "nanoid";
 let Transport = new Map();
 let producerTransport;
-let consumerTransport;
 let connectTransport;
-let MangaeProducerAndconsumer = new Map();
 const port = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 3000; //running websocket on same webserver but different port,
 const wss = new WebSocketServer({ port });
 const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
@@ -52,11 +50,16 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                     case "consume":
                         const consumerTransportL = Transport.get(messageData.Id);
                         const consumer = yield videoMethode.consumer(consumerTransportL, router, messageData.producerId, messageData.rtpCapabilities);
+                        ws.send(JSON.stringify(consumer));
                         break;
                     case "produce":
                         const producerTransportL = Transport.get(messageData.Id);
                         const producer = yield videoMethode.producer(producerTransportL, messageData.kind, messageData.rtpParameters);
                         ws.send(JSON.stringify(producer));
+                        break;
+                    case "remove":
+                        Transport.delete(messageData.Id);
+                        ws.send("Removed");
                         break;
                     default:
                         ws.send("action/message action wasn't define");
