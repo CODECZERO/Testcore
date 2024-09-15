@@ -93,7 +93,7 @@ const findOp = async (user: User) => {//find user based on the role of user
 }
 //update value of user based on the 
 //pssing of role is necessary, so the function can select on whic table it should perform operations
-const updateOp = async (user: User,role:UserRole) => {//user is previous values , current user is new value
+const updateOp = async (user: User, role: UserRole) => {//user is previous values , current user is new value
     try {
         //@ts-ignore
         return await roleToModel[role].update({
@@ -258,6 +258,26 @@ const getQuestionPaperForExaminer = async (examID: string) => {
     }
 }
 
+
+const getStudnetNumber = async (collegeID:string,SubjectID:string) => {
+   try {
+     return await prisma.student.findMany({
+         where: {
+             collegeID,
+             subject: {
+                 some: {
+                     Id: SubjectID
+                 }
+             }
+         },
+         select: {
+             phoneNumber: true
+         }
+     })
+   } catch (error) {
+        throw new ApiError(500,`something went wrong while searching number ${error}`)
+   }
+}
 export {
     createOp,
     findOp,
@@ -269,6 +289,7 @@ export {
     getSubject,
     findStudnet,
     getQuestionPaper,
-    getQuestionPaperForExaminer
+    getQuestionPaperForExaminer,
+    getStudnetNumber
 
 }
