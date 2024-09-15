@@ -243,4 +243,24 @@ const getQuestionPaperForExaminer = (examID) => __awaiter(void 0, void 0, void 0
         throw new ApiError(500, error);
     }
 });
-export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer };
+const getStudnetNumber = (collegeID, SubjectID) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield prisma.student.findMany({
+            where: {
+                collegeID,
+                subject: {
+                    some: {
+                        Id: SubjectID
+                    }
+                }
+            },
+            select: {
+                phoneNumber: true
+            }
+        });
+    }
+    catch (error) {
+        throw new ApiError(500, `something went wrong while searching number ${error}`);
+    }
+});
+export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer, getStudnetNumber };

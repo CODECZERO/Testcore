@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { WebSocketServer } from "ws";
 import videoMethode from "./videoMethodes.services.js";
 import { nanoid } from "nanoid";
+import { getVideoServerTransport, removeVideoServerTranspor, setVideoServerTransport } from "../../db/database.redis.query.js";
 let Transport = new Map();
 let producerTransport;
 let connectTransport;
@@ -39,26 +40,26 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                             iceCandidates: TransportData.iceCandidates,
                             dtlsParameters: TransportData.dtlsParameters,
                         };
-                        Transport.set(id, TransportData);
+                        yield setVideoServerTransport(id, TransportData);
                         ws.send(JSON.stringify({ "Id": id, transportParams }));
                         break;
                     case "connectTransport":
-                        const producerTransportxL = Transport.get(messageData.Id);
+                        const producerTransportxL = yield getVideoServerTransport(messageData.Id);
                         connectTransport = yield videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransportxL);
                         ws.send("connected");
                         break;
                     case "consume":
-                        const consumerTransportL = Transport.get(messageData.Id);
+                        const consumerTransportL = yield getVideoServerTransport(messageData.Id);
                         const consumer = yield videoMethode.consumer(consumerTransportL, router, messageData.producerId, messageData.rtpCapabilities);
                         ws.send(JSON.stringify(consumer));
                         break;
                     case "produce":
-                        const producerTransportL = Transport.get(messageData.Id);
+                        const producerTransportL = yield getVideoServerTransport(messageData.Id);
                         const producer = yield videoMethode.producer(producerTransportL, messageData.kind, messageData.rtpParameters);
                         ws.send(JSON.stringify(producer));
                         break;
                     case "remove":
-                        Transport.delete(messageData.Id);
+                        yield removeVideoServerTranspor(messageData.Id);
                         ws.send("Removed");
                         break;
                     default:

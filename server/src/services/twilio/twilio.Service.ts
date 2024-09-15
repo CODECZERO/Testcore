@@ -1,15 +1,16 @@
 import { UniError } from "../../util/UniErrorHandler.js";
 import { clinet } from "./twilioClinet.service.js";
 
-const sendMessage = async (number:string, message: string) => {
+const sendMessage = async (number: string, message: string) => {
     try {
-        return clinet.messages.create({
+        const result = await clinet.messages.create({
             body: message,
             from: `whatsapp:${process.env.TWILIO_ACCOUNT_FROM}`,
             to: `whatsapp:${number}`
         })
+        return result;
     } catch (error) {
-        throw new UniError(`Error while sending message ${error}`)
+        console.log(new UniError(`Error while sending message ${error}`))
     }
 
 }
