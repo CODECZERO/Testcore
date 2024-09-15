@@ -1,207 +1,89 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as mediasoupClient from 'mediasoup-client';
-
-// Define the TURN server configuration
-const ICE_SERVERS = [
-    {
-        urls: 'turn:openrelay.metered.ca:80',
-        username: 'openrelayproject',
-        credential: 'openrelayproject',
-    },
-];
-
-// WebSocket server URL
-const WS_SERVER_URL = 'ws://localhost:9020';
+// App.tsx
+import React, { useState, ChangeEvent, FormEvent } from 'react';
+import axios from 'axios';
+import "./App.css";
 
 const App: React.FC = () => {
-    // Refs for local and remote video elements
-    const localVideoRef = useRef<HTMLVideoElement>(null);
-    const remoteVideoRef = useRef<HTMLVideoElement>(null);
+  // State for form fields
+  const [formData, setFormData] = useState({
+    username: '',
+    email: '',
+    password: ''
+  });
 
-    // States for MediaStreams and signaling
-    const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-    const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
-    const [socket, setSocket] = useState<WebSocket | null>(null);
-    const [device, setDevice] = useState<mediasoupClient.Device | null>(null);
-    const [producerTransport, setProducerTransport] = useState<mediasoupClient.types.Transport | null>(null);
-    const [consumerTransport, setConsumerTransport] = useState<mediasoupClient.types.Transport | null>(null);
+  // State for error and success messages
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
 
-    useEffect(() => {
-        // Initialize WebSocket connection
-        const initializeSocket = () => {
-            const ws = new WebSocket(WS_SERVER_URL);
-            setSocket(ws);
+  // Handle form field changes
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
 
-            ws.onopen = () => {
-                console.log('Connected to WebSocket server');
-            };
+  // Handle form submission
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
 
-            ws.onmessage = async (event) => {
-                const { action, data } = JSON.parse(event.data);
+    try {
+      const response = await axios.post('https://your-api-endpoint/signup', formData);
+      setSuccess('Sign-up successful!');
+      console.log(response.data);
+    } catch (err) {
+      setError('An error occurred during sign-up.');
+      console.error(err);
+    }
+  };
 
-                switch (action) {
-                    case 'producerTransportCreated':
-                        await connectProducerTransport(data);
-                        break;
-
-                    case 'producerTransportConnected':
-                        await produceMedia();
-                        break;
-
-                    case 'consumerTransportCreated':
-                        await connectConsumerTransport(data);
-                        break;
-
-                    case 'consumerCreated':
-                        await consumeMedia(data);
-                        break;
-
-                    case 'iceCandidate':
-                        const candidate = new RTCIceCandidate(data.candidate);
-                        if (producerTransport) await producerTransport.addIceCandidate(candidate);
-                        break;
-
-                    default:
-                        console.error(`Unknown action: ${action}`);
-                }
-            };
-        };
-
-        initializeSocket();
-    }, [producerTransport]);
-
-    // Get local stream from media devices
-    const getLocalStream = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            setLocalStream(stream);
-            if (localVideoRef.current) {
-                localVideoRef.current.srcObject = stream;
-            }
-        } catch (error) {
-            console.error('Error accessing media devices.', error);
-        }
-    };
-
-    // Create MediaSoup device and transport
-    const createMediasoupDevice = async () => {
-        const device = new mediasoupClient.Device();
-        setDevice(device);
-    };
-
-    // Create producer transport
-    const createProducerTransport = async () => {
-        if (!socket) return;
-        createMediasoupDevice();
-        socket.send(JSON.stringify({ action: 'createProducerTransport' }));
-    };
-
-    // Connect producer transport
-    const connectProducerTransport = async (data: any) => {
-        if (!device) return;
-
-        const transport = device.createSendTransport(data);
-
-        transport.on('connect', async ({ dtlsParameters }, callback, errback) => {
-            if (socket) {
-                socket.send(JSON.stringify({ action: 'connectProducerTransport', data: { dtlsParameters } }));
-                callback();
-            } else {
-                errback(new Error('Socket not connected'));
-            }
-        });
-
-        transport.on('produce', async ({ kind, rtpParameters }, callback, errback) => {
-            if (socket) {
-                socket.send(JSON.stringify({ action: 'produce', data: { kind, rtpParameters } }));
-                callback();
-            } else {
-                errback(new Error('Socket not connected'));
-            }
-        });
-
-        setProducerTransport(transport);
-    };
-
-    // Produce media (local stream)
-    const produceMedia = async () => {
-        if (!producerTransport || !localStream) return;
-
-        localStream.getTracks().forEach(async (track) => {
-            await producerTransport.produce({
-                track: track,
-                encodings: [{ maxBitrate: 1000000 }],
-                codecOptions: { videoGoogleStartBitrate: 1000 },
-            });
-        });
-    };
-
-    // Create consumer transport
-    const createConsumerTransport = async () => {
-        if (socket) {
-            socket.send(JSON.stringify({ action: 'createConsumerTransport' }));
-        }
-    };
-
-    // Connect consumer transport
-    const connectConsumerTransport = async (data: any) => {
-        if (!device) return;
-
-        const transport = device.createRecvTransport(data);
-
-        transport.on('connect', async ({ dtlsParameters }, callback, errback) => {
-            if (socket) {
-                socket.send(JSON.stringify({ action: 'connectConsumerTransport', data: { dtlsParameters } }));
-                callback();
-            } else {
-                errback(new Error('Socket not connected'));
-            }
-        });
-
-        setConsumerTransport(transport);
-  
-    };
-
-    // Consume remote media stream
-    const consumeMedia = async (data: any) => {
-        if (!consumerTransport) return;
-
-        const consumer = await consumerTransport.consume({
-            id: data.id,
-            producerId: data.producerId,
-            kind: data.kind,
-            rtpParameters: data.rtpParameters,
-        });
-        console.log(consumer.rtpParameters);
-
-        const stream = new MediaStream();
-        stream.addTrack(consumer.track);
-        setRemoteStream(stream);
-
-        if (remoteVideoRef.current) {
-            remoteVideoRef.current.srcObject = stream;
-        }
-
-    };
-
-    // Start the call process
-    const startCall = async () => {
-        await getLocalStream();
-        await createProducerTransport();
-        await createConsumerTransport();
-    };
-    
-
-    return (
-        <div>
-            <h1>MediaSoup Video Call</h1>
-            <div>
-                <video ref={localVideoRef} autoPlay muted style={{ width: '300px', marginRight: '20px' }} />
-                <video ref={remoteVideoRef} autoPlay style={{ width: '300px' }} />
-            </div>
-            <button onClick={startCall}>Start Call</button>
+  return (
+    <div className="signup-container">
+      <h2>Sign Up</h2>
+      {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
         </div>
-    );
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+          />
+        </div>
+        <button type="submit">Sign Up</button>
+      </form>
+
+    </div>
+  )
 };
 
 export default App;
