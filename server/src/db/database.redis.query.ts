@@ -109,7 +109,7 @@ const getVideoServerTransport=async(Id:string)=>{
 
 const setVideoServerTransport=async(Id:string,Transport:any)=>{
     try {
-        const data=client.hSet("Video",Id,Transport);
+        const data= await client.hSet("Video",Id,Transport);
         if(!data) return new ApiResponse(404,"data not found");
         return data;
     } catch (error) {
@@ -117,6 +117,15 @@ const setVideoServerTransport=async(Id:string,Transport:any)=>{
     }
 }
 
+const removeVideoServerTranspor=async(Id:string)=>{
+    try {
+        const data=await client.hDel("Video",Id);
+        if (!data) throw new ApiError(404,"data not found");
+        return data;
+    } catch (error) {
+        throw new ApiError(500,`something went wrong while removeing data ${error}`)
+    }
+}
 export {
     cacheSearch,
     cacheUpdate,
@@ -124,6 +133,7 @@ export {
     cacheSearchForChatRoom,
     cacheUpdateForChatRoom,
     getVideoServerTransport,
-    setVideoServerTransport
+    setVideoServerTransport,
+    removeVideoServerTranspor
     
 }

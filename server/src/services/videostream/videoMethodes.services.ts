@@ -35,19 +35,23 @@ class VideoMethode {
     }
 
     public connectTransport = async (sender: boolean, dtlsParameters?: any, producerTransport?: WebRtcTransport, consumerTransport?: WebRtcTransport) => {
-        if (sender) {
-            return await producerTransport?.connect({ dtlsParameters });
-        }
-        return await consumerTransport?.connect({ dtlsParameters });
+       try {
+         if (sender) {
+             return await producerTransport?.connect({ dtlsParameters });
+         }
+         return await consumerTransport?.connect({ dtlsParameters });
+       } catch (error) {
+            throw new UniError(`error in connection transport ${error}`)
+       }
     }
 
     public producer = async (producerTransport: WebRtcTransport, kind: any, rtpParameters: any) => {
         try {
-            const f = producerTransport.produce({
+            const producerData = await producerTransport.produce({
                 kind,
                 rtpParameters
             });
-            return f;
+            return producerData;
         } catch (error) {
             throw new UniError(`error in producer ${error}`)
         }
@@ -58,11 +62,12 @@ class VideoMethode {
             if (!router.canConsume) throw new UniError("unable to consume data");
             router.canConsume({ producerId: producerId, rtpCapabilities });
 
-            return await consumerTransport.consume({
+            const consumer= await consumerTransport.consume({
                 producerId,
                 rtpCapabilities,
                 paused: false
             });
+            return consumer;
         } catch (error) {
             throw new UniError(`error in consumer ${error}`);
         }
