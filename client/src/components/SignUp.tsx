@@ -32,7 +32,7 @@ const Login: React.FC = () => {
             password : formData.get("password") as string,
         }
 
-        console.log(formData);
+        console.log(UserData);
 
         try {
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/login`, UserData);
