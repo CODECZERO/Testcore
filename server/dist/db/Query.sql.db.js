@@ -182,7 +182,8 @@ const getSubject = (subjectCode, subjectName) => __awaiter(void 0, void 0, void 
         throw new ApiError(500, error);
     }
 });
-const findStudnet = (studnetData) => __awaiter(void 0, void 0, void 0, function* () {
+const findStudnet = (studnetData, page = 1, limit = 10) => __awaiter(void 0, void 0, void 0, function* () {
+    const skip = (page - 1) * limit;
     try {
         yield prisma.student.findMany({
             where: {
