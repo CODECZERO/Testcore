@@ -24,10 +24,18 @@ const Login: React.FC = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-        const UserData:UserData=e.target;
-        console.log(UserData.role?.value)
+        const form=e.currentTarget;
+        const formData=new FormData(form);
+        const UserData:UserData={
+            role: formData.get("role") as Role,
+            email: formData.get("email") as string,
+            password : formData.get("password") as string,
+        }
+
+        console.log(formData);
+
         try {
-            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}`, UserData);
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/login`, UserData);
             setSuccess('Sign-up successful!');
             console.log(response.data);
         } catch (err) {
