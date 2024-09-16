@@ -192,7 +192,8 @@ const getSubject = async (subjectCode: string, subjectName: string) => {
     }
 }
 
-const findStudnet = async (studnetData: { Id: string }) => {
+const findStudnet = async (studnetData: { Id: string },page:number=1,limit:number=10) => {
+    const skip=(page-1)*limit;
     try {
         await prisma.student.findMany({
             where: {
@@ -259,24 +260,24 @@ const getQuestionPaperForExaminer = async (examID: string) => {
 }
 
 
-const getStudnetNumber = async (collegeID:string,SubjectID:string) => {
-   try {
-     return await prisma.student.findMany({
-         where: {
-             collegeID,
-             subject: {
-                 some: {
-                     Id: SubjectID
-                 }
-             }
-         },
-         select: {
-             phoneNumber: true
-         }
-     })
-   } catch (error) {
-        throw new ApiError(500,`something went wrong while searching number ${error}`)
-   }
+const getStudnetNumber = async (collegeID: string, SubjectID: string) => {
+    try {
+        return await prisma.student.findMany({
+            where: {
+                collegeID,
+                subject: {
+                    some: {
+                        Id: SubjectID
+                    }
+                }
+            },
+            select: {
+                phoneNumber: true
+            }
+        })
+    } catch (error) {
+        throw new ApiError(500, `something went wrong while searching number ${error}`)
+    }
 }
 export {
     createOp,
