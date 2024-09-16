@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import userRouter from "./router/user.router.js";
 import logingRouter from "./router/loging.router.js";
 import ChatRouter from "./router/chat.router.js"
+import NotificationRouter from "./router/notification.router.js"
 import { MiddlewareCount } from "./services/logging and monitoring/Grafana/grafana.service.js";
 import rateLimit from "express-rate-limit";
 
@@ -32,6 +33,7 @@ app.use(cookieParser());
 //routes import
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/chat",ChatRouter);
+app.use("/api/v1/notification",NotificationRouter);
 //confing the loging service
 app.use("/api/v1/superuser", logingRouter);
 app.use(MiddlewareCount);
