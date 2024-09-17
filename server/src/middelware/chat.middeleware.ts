@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import AsyncHandler from "../util/ayscHandler.js";
 import { ApiError } from "../util/apiError.js";
 import { cacheSearchForChatRoom } from "../db/database.redis.query.js";
-import jwt from 'jsonwebtoken';
 
 
 interface Requestany extends Request {
@@ -10,35 +9,14 @@ interface Requestany extends Request {
 }
 
 
-const SearchChatRoom = AsyncHandler(async (req: Requestany, res: Response, next: NextFunction) => {
-    const roomID = await cacheSearchForChatRoom(req.params.College, req.params.Branch);
+const SearchChatRoom = AsyncHandler(async (req: Requestany, res: Response, next: NextFunction) => {//this function check if chat room exists for that college and branch
+    const roomID = await cacheSearchForChatRoom(req.params.College, req.params.Branch);//check for chat room in chace
     if (!(roomID)) throw new ApiError(404, "chat room not found, make sure it's register");
-    const roomName = `${req.params.College}/${req.params.Branch}`;
-    req.chatRoomData = { roomID, roomName };
+    const roomName = `${req.params.College}/${req.params.Branch}`;//room name would be collegeName/branch
+    req.chatRoomData = { roomID, roomName };//then return that data in req.chatRoomData object
     next();
-
 });
 
-const encryptDecryptData = AsyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const request = req;
-        const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
-        const token = request.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
-        if (!token) {
-            throw new ApiError(401, "Unauthorized");
-        }
-
-        // Verify the token here
-        const secert: any = process.env.ATS;
-        const decoded = await jwt.verify(token, secert) as decodedUser;
-        const { email, role } = decoded;
-        request.user = decoded; // Assuming `req.user` is where you store the decoded token
-
-        next();
-    } catch (error) {
-        next(new ApiError(401, "Unauthorized: Invalid secret key"));
-    }
-})
 
 export {
     SearchChatRoom

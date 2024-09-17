@@ -13,9 +13,8 @@ import { ApiResponse } from "../util/apiResponse.js";
 import AsyncHandler from "../util/ayscHandler.js";
 import { TimeTable } from "../models/timetable.model.nosql.js";
 import { getQuestionPaper } from "../db/Query.sql.db.js";
-//@ts-ignore
 const giveExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const examdata = req.examData;
+    const examdata = req.examData; //takes data from user
     const answerQuestion = yield prisma.questionPaper.update({
         where: {
             Id: examdata.examID
@@ -25,14 +24,14 @@ const giveExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, fu
         }
     });
     if (!answerQuestion)
-        throw new ApiError(421, "answer was not updated");
-    return res.status(201).json(new ApiResponse(201, answerQuestion, "answer saved"));
+        throw new ApiError(421, "answer was not updated"); //if unable to update then throw error
+    return res.status(201).json(new ApiResponse(201, answerQuestion, "answer saved")); //else return successfuly message
 }));
 //@ts-ignore
 const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const examdata = req.examData;
-    if (!examdata)
-        throw new ApiError(401, "exam data is not provied");
+    const examdata = req.examData; //takes parameters from user
+    if (!examdata || !examdata.examID)
+        throw new ApiError(401, "exam data is not provied"); //throw error if not provided
     //@ts-ignore
     const findexam = prisma.exam.findFirst({
         where: {
@@ -55,30 +54,28 @@ const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, fun
                     subjectName: true,
                 }
             }
-        }
+        } //return nested object 
     });
     if (!findexam)
-        throw new ApiError(404, "exam not found");
-    return res.status(200).json(new ApiResponse(200, findexam, "Exam Found"));
+        throw new ApiError(404, "exam not found"); //if not found then throw error
+    return res.status(200).json(new ApiResponse(200, findexam, "Exam Found")); //else return response
 }));
-//@ts-ignore
 const getTimeTable = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const classdata = req.body;
-    if (!classdata)
-        throw new ApiError(400, "Invalid data");
+    const classdata = req.body; //takes data from user
+    if (!classdata || !classdata.Class || !classdata.CollegeName)
+        throw new ApiError(400, "Invalid data"); //if not provided then throw error
     const findtimetable = yield TimeTable.findOne({
         Class: classdata.Class,
         CollegeName: classdata.CollegeName
     });
     if (!findtimetable)
-        throw new ApiError(404, "time table not found");
-    return res.status(200).json(new ApiResponse(200, findtimetable, `time table of class ${classdata.Class} of ${classdata.CollegeName}`));
+        throw new ApiError(404, "time table not found"); //not found throw error
+    return res.status(200).json(new ApiResponse(200, findtimetable, `time table of class ${classdata.Class} of ${classdata.CollegeName}`)); //else return data
 }));
-//@ts-ignore
 const getResult = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const resultdata = req.examData;
+    const resultdata = req.examData; //takes parameters from user
     if (!resultdata)
-        throw new ApiError(401, "no data is provied");
+        throw new ApiError(401, "no data is provied"); //if not provided then throw error
     const findresult = yield prisma.result.findMany({
         where: {
             OR: [
@@ -98,15 +95,16 @@ const getResult = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, f
         }
     });
     if (!resultdata)
-        throw new ApiError(404, "result Not found");
-    return res.status(200).json(new ApiResponse(200, findresult, "result found"));
+        throw new ApiError(404, "result Not found"); //throw error if not found
+    return res.status(200).json(new ApiResponse(200, findresult, "result found")); //return value if found
 }));
-//@ts-ignore
 const getQuestionPaperForStundet = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const examdata = req.examData;
-    const findexam = yield getQuestionPaper(examdata.examID);
+    const examdata = req.examData; //take parameters from studnet
+    if (!examdata.examID)
+        throw new ApiError(400, "exmaid is not provided");
+    const findexam = yield getQuestionPaper(examdata.examID); //find in database
     if (!findexam)
-        throw new ApiError(400, "no exam found");
-    return res.status(200).json(new ApiResponse(200, findexam, "Question papre data"));
+        throw new ApiError(400, "no exam found"); //if not found throw error
+    return res.status(200).json(new ApiResponse(200, findexam, "Question papre data")); //if found then return data
 }));
 export { getExam, getResult, getTimeTable, getQuestionPaperForStundet, giveExam };
