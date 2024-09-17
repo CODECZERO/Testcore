@@ -65,131 +65,139 @@ const CreateAccount: React.FC = () => {
     };
 
     const getCollege = async () => {
+
         if (clikc) {
             return;
         }
-        try {
-            console.log(formData)
-            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`);
-            console.log(res.data.data)
-            setSuccess('Account created successfully!');
-            setCollegeID(res.data.data)
-            console.log(collegeID);
-            setClick(true);
-        } catch (err) {
-            setError(`An error occurred while creating the account.${err}`);
+            try {
+                console.log(formData)
+                await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`).then((res) => {
+                    if (res) {
+                        res.data.map((data: any) => {
+                            setCollegeID(data);
+                        })
+                    }
+                });
+                setSuccess('Account created successfully!');
+                setCollegeID(res.data.data)
+                console.log(collegeID);
+                setClick(true);
 
-        }
+            }
+            catch (err) {
+                setError(`An error occurred while creating the account.${err}`);
+
+            }
     }
 
-    return (
-        <div className="create-account-page">
-            <div className="create-account-container">
-                <h2>Create Account</h2>
-                {error && <p className="error-message">{error}</p>}
-                {success && <p className="success-message">{success}</p>}
-                <form onSubmit={handleSubmit}>
+return (
+    <div className="create-account-page">
+        <div className="create-account-container">
+            <h2>Create Account</h2>
+            {error && <p className="error-message">{error}</p>}
+            {success && <p className="success-message">{success}</p>}
+            <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label htmlFor="role">Role</label>
+                    <select
+                        id="role"
+                        name="role"
+                        value={formData.role}
+                        onChange={handleRoleChange}
+                        required
+                    >
+                        <option value="Student">Student</option>
+                        <option value="College">College</option>
+                        <option value="Examiner">Examiner</option>
+                    </select>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="name">Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="phoneNumber">Phone Number</label>
+                    <input
+                        type="tel"
+                        id="phoneNumber"
+                        name="phoneNumber"
+                        value={formData.phoneNumber}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="age">Age</label>
+                    <input
+                        type="number"
+                        id="age"
+                        name="age"
+                        value={formData.age}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="address">Address</label>
+                    <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        value={formData.address}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+
+                {formData.role === 'Student' && (
                     <div className="form-group">
-                        <label htmlFor="role">Role</label>
+                        <label htmlFor="role">College Name</label>
                         <select
-                            id="role"
-                            name="role"
-                            value={formData.role}
-                            onChange={handleRoleChange}
+                            id="collegeName"
+                            name="collegeID"
+                            value={formData.collegeId}
+                            onClick={getCollege}
                             required
                         >
-                            <option value="Student">Student</option>
-                            <option value="College">College</option>
-                            <option value="Examiner">Examiner</option>
+                            {collegeID.map((college, index) => (
+                                <option key={index} value={college.name}>{college.name}</option>
+                            ))}
                         </select>
                     </div>
-                    <div className="form-group">
-                        <label htmlFor="name">Name</label>
-                        <input
-                            type="text"
-                            id="name"
-                            name="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="phoneNumber">Phone Number</label>
-                        <input
-                            type="tel"
-                            id="phoneNumber"
-                            name="phoneNumber"
-                            value={formData.phoneNumber}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="age">Age</label>
-                        <input
-                            type="number"
-                            id="age"
-                            name="age"
-                            value={formData.age}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="address">Address</label>
-                        <input
-                            type="text"
-                            id="address"
-                            name="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    {formData.role === 'Student' && (
-                        <div className="form-group">
-                            <label htmlFor="role">College Name</label>
-                            <select
-                                id="collegeName"
-                                name="collegeID"
-                                value={formData.collegeId}
-                                onClick={getCollege}
-                                required
-                            >
-                                {collegeID.map((college, index) => (
-                                    <option key={index} value={college.name}>{college.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                    )}
-                    <div className="form-group">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                    <button type="submit">Create Account</button>
-                </form>
-            </div>
-            <style>{`
+                )}
+                <div className="form-group">
+                    <label htmlFor="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <button type="submit">Create Account</button>
+            </form>
+        </div>
+        <style>{`
                 .create-account-page {
                     display: flex;
                     align-items: center;
@@ -278,8 +286,7 @@ const CreateAccount: React.FC = () => {
                     margin-bottom: 15px;
                 }
             `}</style>
-        </div>
-    )
-};
+    </div>
+)}};
 
 export default CreateAccount;
