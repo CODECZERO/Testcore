@@ -12,11 +12,6 @@ const app = express();
 
 // allowing data from specifie site to this backend
 app.use(cors({
-
-   origin:process.env.CROS_ORGIN,
-   credentials: true
- }))
-
     origin: true,  // This allows all origins
     credentials: true
 }));
