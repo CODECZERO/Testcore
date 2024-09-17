@@ -10,33 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import AsyncHandler from "../util/ayscHandler.js";
 import { ApiError } from "../util/apiError.js";
 import { cacheSearchForChatRoom } from "../db/database.redis.query.js";
-import jwt from 'jsonwebtoken';
 const SearchChatRoom = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const roomID = yield cacheSearchForChatRoom(req.params.College, req.params.Branch);
+    const roomID = yield cacheSearchForChatRoom(req.params.College, req.params.Branch); //check for chat room in chace
     if (!(roomID))
         throw new ApiError(404, "chat room not found, make sure it's register");
-    const roomName = `${req.params.College}/${req.params.Branch}`;
-    req.chatRoomData = { roomID, roomName };
+    const roomName = `${req.params.College}/${req.params.Branch}`; //room name would be collegeName/branch
+    req.chatRoomData = { roomID, roomName }; //then return that data in req.chatRoomData object
     next();
-}));
-const encryptDecryptData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    try {
-        const request = req;
-        const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
-        const token = ((_a = request.cookies) === null || _a === void 0 ? void 0 : _a.accesToken) || (headertoken === null || headertoken === void 0 ? void 0 : headertoken.replace("Bearer ", "")); // Handling cookies and headers
-        if (!token) {
-            throw new ApiError(401, "Unauthorized");
-        }
-        // Verify the token here
-        const secert = process.env.ATS;
-        const decoded = yield jwt.verify(token, secert);
-        const { email, role } = decoded;
-        request.user = decoded; // Assuming `req.user` is where you store the decoded token
-        next();
-    }
-    catch (error) {
-        next(new ApiError(401, "Unauthorized: Invalid secret key"));
-    }
 }));
 export { SearchChatRoom };

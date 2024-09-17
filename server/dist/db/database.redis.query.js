@@ -109,7 +109,7 @@ const cacheUpdateForChatRoom = (roomName, roomID) => __awaiter(void 0, void 0, v
 });
 const getVideoServerTransport = (Id) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield client.hGet("Video", Id);
+        const data = yield client.hGet("Video", Id); //finds through unique id of video call server
         if (!data)
             return new ApiResponse(404, "data not found");
         return data;
@@ -120,7 +120,7 @@ const getVideoServerTransport = (Id) => __awaiter(void 0, void 0, void 0, functi
 });
 const setVideoServerTransport = (Id, Transport) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = yield client.hSet("Video", Id, Transport);
+        const data = yield client.hSet("Video", Id, Transport); //takes unique id and transport data
         if (!data)
             return new ApiResponse(404, "data not found");
         return data;

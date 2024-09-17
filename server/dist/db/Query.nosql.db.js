@@ -14,7 +14,7 @@ const findUsers = (roomID, AdminId, userId) => __awaiter(void 0, void 0, void 0,
         return yield chatModel.aggregate([
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId(roomID),
+                    _id: new mongoose.Types.ObjectId(roomID), //matchs _id with roomID
                 }
             },
             {
@@ -27,7 +27,7 @@ const findUsers = (roomID, AdminId, userId) => __awaiter(void 0, void 0, void 0,
             },
             {
                 $match: {
-                    "ChatUsers.sqlId": userId
+                    "ChatUsers.sqlId": userId //match sqlid with userid in chatuser, ensuring that user have access to chat
                 }
             },
             {
