@@ -97,9 +97,9 @@ const cacheUpdateForChatRoom = async (roomName: string, roomID: string) => {//th
     }
 }
 
-const getVideoServerTransport=async(Id:string)=>{
+const getVideoServerTransport=async(Id:string)=>{//this function helps video server to get transport from cache 
     try {
-        const data= await client.hGet("Video",Id);
+        const data= await client.hGet("Video",Id);//finds through unique id of video call server
         if(!data) return new ApiResponse(404,"data not found");
         return data;
     } catch (error) {
@@ -107,9 +107,9 @@ const getVideoServerTransport=async(Id:string)=>{
     }
 }
 
-const setVideoServerTransport=async(Id:string,Transport:any)=>{
+const setVideoServerTransport=async(Id:string,Transport:any)=>{//this function helps video server to set transport from cache
     try {
-        const data= await client.hSet("Video",Id,Transport);
+        const data= await client.hSet("Video",Id,Transport);//takes unique id and transport data
         if(!data) return new ApiResponse(404,"data not found");
         return data;
     } catch (error) {
@@ -117,7 +117,7 @@ const setVideoServerTransport=async(Id:string,Transport:any)=>{
     }
 }
 
-const removeVideoServerTranspor=async(Id:string)=>{
+const removeVideoServerTranspor=async(Id:string)=>{//remove video server data after the meeting is ended
     try {
         const data=await client.hDel("Video",Id);
         if (!data) throw new ApiError(404,"data not found");

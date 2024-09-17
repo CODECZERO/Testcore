@@ -172,9 +172,9 @@ const findCollege = async () => {//findig college name from college table
 //find single subject for college,examiner and student
 
 
-const getSubject = async (subjectCode: string, subjectName: string) => {
+const getSubject = async (subjectCode: string, subjectName: string) => {//this function get all the subject in the database
     try {
-        return await prisma.subject.findFirst({//
+        return await prisma.subject.findFirst({//first subject which it finds
 
             where: {
                 OR: [
@@ -193,14 +193,12 @@ const getSubject = async (subjectCode: string, subjectName: string) => {
     }
 }
 
-const findStudnet = async (studnetData: { Id: string },page:number=1,limit:number=10) => {
-    const skip=(page-1)*limit;
+const findStudnet = async (studnetData: { Id: string }) => {//findt students for college
     try {
-        await prisma.student.findMany({
+        await prisma.student.findMany({//find all the studnet 
             where: {
                 collegeID: studnetData?.Id
-            }
-            ,
+            },
             select: {
                 Id: true,
                 name: true,
@@ -219,9 +217,9 @@ const findStudnet = async (studnetData: { Id: string },page:number=1,limit:numbe
 
 }
 
-const getQuestionPaper = async (examId: string) => {
+const getQuestionPaper = async (examId: string) => {//get question paper form data base
     try {
-        return await prisma.questionPaper.findMany({
+        return await prisma.questionPaper.findMany({//find all question with exam id
             where: {
                 examID: examId
             },
@@ -240,7 +238,7 @@ const getQuestionPaper = async (examId: string) => {
 }
 
 
-const getQuestionPaperForExaminer = async (examID: string) => {
+const getQuestionPaperForExaminer = async (examID: string) => {//get question paper for college with smae exam id
     try {
         return await prisma.questionPaper.findMany({
             where: {
@@ -261,7 +259,7 @@ const getQuestionPaperForExaminer = async (examID: string) => {
 }
 
 
-const getStudnetNumber = async (collegeID: string, SubjectID: string) => {
+const getStudnetNumber = async (collegeID: string, SubjectID: string) => {//get student number , so they can recive notififcation
     try {
         return await prisma.student.findMany({
             where: {

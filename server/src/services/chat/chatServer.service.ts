@@ -47,6 +47,10 @@ const actions = {
   // the both functin will be call in O(1) time.
   'SEND_MESSAGE': sendMessage,
   'LEAVE_ROOM': closeSocket,
+  'DELETE_MESSAGE':sendMessage,
+  'MODIFI_MESSAGE':sendMessage,
+
+
 
 }
 
