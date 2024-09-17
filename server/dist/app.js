@@ -10,13 +10,16 @@ import rateLimit from "express-rate-limit";
 const app = express();
 // allowing data from specifie site to this backend
 app.use(cors({
+
+    origin: process.env.CROS_ORGIN,
+
     origin: true,
     credentials: true
 }));
 //limiting the rate of the user per node
 const limiter = rateLimit({
-    windowMs: 10 * 60 * 1000,
-    max: 10,
+    windowMs: 10 * 60 * 1000, // 10 minutes
+    max: 10, // limit each IP to 100 requests per windowMs
     message: 'Too many connections from this IP, please try again later',
 });
 //applying to whole server
