@@ -6,12 +6,12 @@ import { ApiResponse } from "../util/apiResponse.js";
 
 
 const valiAndSan = [
-    check('*').trim().escape().customSanitizer(value => xss(value)),
+    check('*').trim().escape().customSanitizer(value => xss(value)),//checks for data which is provided by user
 ];
 
-const validateAndSanitizeFunction = (req: Request, res: Response, next: NextFunction) => {
-    const InputResult = validationResult(req);
-    if (!InputResult.isEmpty()) {
+const validateAndSanitizeFunction = (req: Request, res: Response, next: NextFunction) => {//this function will check for xss and whitespace , validating user data
+    const InputResult = validationResult(req);//takes data and pass to function and store it value
+    if (!InputResult.isEmpty()) {//then check if it' emtpy then it will return data
         return res.status(400).json(new ApiResponse(400, new ApiError(400, `Invalid request ${InputResult}`)));
     }
     next();
