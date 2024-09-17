@@ -12,13 +12,13 @@ import { ApiError } from "../util/apiError";
 import fs from "fs";
 import scanFile from "../util/anitvriusScaner";
 export const ScanForVirus = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const filePath = req.filePath;
+    const filePath = req.filePath; //takes file path 
     if (!filePath)
         throw new ApiError(400, "File address not provided");
-    const scanResult = yield scanFile(filePath);
+    const scanResult = yield scanFile(filePath); //put the file through virus scan
     if (!scanResult)
-        next();
-    yield fs.promises.unlink(filePath);
-    res.status(400).send({ message: 'Malware detected' });
+        next(); //if there is no result then it means , it's malaware free
+    yield fs.promises.unlink(filePath); //else remove the file from server
+    res.status(400).send({ message: 'Malware detected' }); //and not uploaded to cloud
     next();
 }));

@@ -10,12 +10,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { User } from "../models/user.model.nosql.js";
 import { ApiError } from "../util/apiError.js";
 const Tracker = (Id, req) => __awaiter(void 0, void 0, void 0, function* () {
-    const IpAddress = String(req.ip);
-    const userAgent = String(req.headers['user-agent']);
+    const IpAddress = String(req.ip); //takes ip address of  device
+    const userAgent = String(req.headers['user-agent']); // header or user agent
     if (!Id || !IpAddress || !userAgent)
-        throw new ApiError(400, "invalid request");
+        throw new ApiError(400, "invalid request"); //throw error if not provided
     const deviceSave = yield User.updateOne({
-        sqlId: Id,
+        sqlId: Id, //user id
     }, {
         logInDevices: {
             IpAddress,
@@ -24,6 +24,6 @@ const Tracker = (Id, req) => __awaiter(void 0, void 0, void 0, function* () {
     });
     if (!deviceSave)
         throw new ApiError(404, "user not find");
-    return deviceSave;
+    return deviceSave; //return if every thing goes correct
 });
 export default Tracker;

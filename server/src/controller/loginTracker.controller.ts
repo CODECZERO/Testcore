@@ -1,30 +1,29 @@
 import { User } from "../models/user.model.nosql.js";
 import { ApiError } from "../util/apiError.js";
-import { ApiResponse } from "../util/apiResponse.js";
-import { Request,Response,NextFunction } from "express";
+import { Request} from "express";
 
 
 interface Requestany extends Request{
     user?:any
 }
 
-const Tracker=async (Id:string,req:Requestany)=>{
-    const IpAddress:string=String(req.ip);
-    const userAgent:string=String(req.headers['user-agent']);
+const Tracker=async (Id:string,req:Requestany)=>{//take data to log
+    const IpAddress:string=String(req.ip);//takes ip address of  device
+    const userAgent:string=String(req.headers['user-agent']);// header or user agent
 
-    if(!Id||!IpAddress||!userAgent) throw new ApiError(400,"invalid request");
+    if(!Id||!IpAddress||!userAgent) throw new ApiError(400,"invalid request");//throw error if not provided
 
-    const deviceSave=await User.updateOne({
-        sqlId:Id,
+    const deviceSave=await User.updateOne({//update user model info , telling which user has loged in the website
+        sqlId:Id,//user id
     },{
-        logInDevices:{
+        logInDevices:{//saving this data in array or nested object
             IpAddress,
             userAgent,
         }
     });
 
     if(!deviceSave) throw new ApiError(404,"user not find");
-    return deviceSave
+    return deviceSave//return if every thing goes correct
 }
 
 export default Tracker;
