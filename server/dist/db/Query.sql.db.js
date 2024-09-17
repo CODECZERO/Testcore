@@ -153,6 +153,7 @@ const findCollege = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield prisma.college.findMany({
             select: {
+                Id: true,
                 name: true
             }
         });

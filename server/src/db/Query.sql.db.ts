@@ -160,6 +160,7 @@ const findCollege = async () => {//findig college name from college table
     try {
         return await prisma.college.findMany({//it's only checking retrieving college name
             select: {
+                Id:true,
                 name: true
             }
         });
