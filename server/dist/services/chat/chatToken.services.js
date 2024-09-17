@@ -13,7 +13,7 @@ const ChatTokenGen = (UserChatData) => __awaiter(void 0, void 0, void 0, functio
     try {
         if (!UserChatData)
             throw new ApiError(500, "Chat data is not provied");
-        const { _id, ChatUsers } = UserChatData;
+        const { _id, ChatUsers } = UserChatData; //extract info 
         return yield jwt.sign({
             _id,
             ChatUsers
@@ -32,7 +32,7 @@ const ChatTokenDec = (token) => __awaiter(void 0, void 0, void 0, function* () {
         }
         // Verify the token here
         const secert = process.env.ChatSecretAccessToken;
-        const decoded = yield jwt.verify(token, secert);
+        const decoded = yield jwt.verify(token, secert); //decrypt data 
         //finding user using email email
         return decoded;
     }
