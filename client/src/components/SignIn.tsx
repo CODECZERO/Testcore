@@ -26,9 +26,9 @@ const CreateAccount: React.FC = () => {
         collegeId: ''
     });
     const [collegeID, setCollegeID] = useState<any[]>([]);
-
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
+    const [clikc, setClick] = useState(false);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -65,17 +65,17 @@ const CreateAccount: React.FC = () => {
     };
 
     const getCollege = async () => {
+        if (clikc) {
+            return;
+        }
         try {
             console.log(formData)
-            await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`).then((res) => {
-                if (res) {
-                    res.data.map((data: any) => {
-                        setCollegeID(data);
-                    })
-                }
-            });
+            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`);
+            console.log(res.data.data)
             setSuccess('Account created successfully!');
+            setCollegeID(res.data.data)
             console.log(collegeID);
+            setClick(true);
         } catch (err) {
             setError(`An error occurred while creating the account.${err}`);
 
@@ -170,7 +170,7 @@ const CreateAccount: React.FC = () => {
                                 required
                             >
                                 {collegeID.map((college, index) => (
-                                    <option key={index} value={college}>{college}</option>
+                                    <option key={index} value={college.name}>{college.name}</option>
                                 ))}
                             </select>
                         </div>
