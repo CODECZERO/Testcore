@@ -1,7 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
 
-type UserRole = 'Student' | 'College' | 'Examiner'; 
+type UserRole = 'Student' | 'College' | 'Examiner';
 
 interface FormData {
     name: string;
@@ -21,10 +21,11 @@ const CreateAccount: React.FC = () => {
         phoneNumber: '',
         age: 0,
         address: '',
-        role: 'College', 
+        role: 'College',
         password: '',
-        collegeId: '' 
+        collegeId: ''
     });
+    const [collegeID, setCollegeID] = useState<any[]>([]);
 
     const [error, setError] = useState<string>('');
     const [success, setSuccess] = useState<string>('');
@@ -54,7 +55,7 @@ const CreateAccount: React.FC = () => {
 
         try {
             console.log(formData)
-            const response = await axios.post("http://localhost:4008/api/v1/user/signup", formData);
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`, formData);
             setSuccess('Account created successfully!');
             console.log(response.data);
         } catch (err) {
@@ -62,6 +63,24 @@ const CreateAccount: React.FC = () => {
             console.error(err);
         }
     };
+
+    const getCollege = async () => {
+        try {
+            console.log(formData)
+            await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`).then((res) => {
+                if (res) {
+                    res.data.map((data: any) => {
+                        setCollegeID(data);
+                    })
+                }
+            });
+            setSuccess('Account created successfully!');
+            console.log(collegeID);
+        } catch (err) {
+            setError(`An error occurred while creating the account.${err}`);
+
+        }
+    }
 
     return (
         <div className="create-account-page">
@@ -139,17 +158,21 @@ const CreateAccount: React.FC = () => {
                             required
                         />
                     </div>
-                   
+
                     {formData.role === 'Student' && (
                         <div className="form-group">
-                            <label htmlFor="collegeId">College ID</label>
-                            <input
-                                type="text"
-                                id="collegeId"
-                                name="collegeId"
-                                value={formData.collegeId || ''}
-                                onChange={handleChange}
-                            />
+                            <label htmlFor="role">College Name</label>
+                            <select
+                                id="collegeName"
+                                name="collegeID"
+                                value={formData.collegeId}
+                                onClick={getCollege}
+                                required
+                            >
+                                {collegeID.map((college, index) => (
+                                    <option key={index} value={college}>{college}</option>
+                                ))}
+                            </select>
                         </div>
                     )}
                     <div className="form-group">
