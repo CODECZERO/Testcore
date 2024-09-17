@@ -24,7 +24,7 @@ const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function*
                 return yield roleToModel[user.role].create({
                     data: {
                         email: (_a = user.email) !== null && _a !== void 0 ? _a : "",
-                        password,
+                        password, // password is hashed before storing
                         name: (_b = user.name) !== null && _b !== void 0 ? _b : "",
                         phoneNumber: (_c = user.phoneNumber) !== null && _c !== void 0 ? _c : "",
                         address: (_d = user.address) !== null && _d !== void 0 ? _d : "",
@@ -36,7 +36,7 @@ const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function*
                 return yield roleToModel[user.role].create({
                     data: {
                         email: (_e = user.email) !== null && _e !== void 0 ? _e : "",
-                        password,
+                        password, // password is hashed before storing
                         name: (_f = user.name) !== null && _f !== void 0 ? _f : "",
                         phoneNumber: (_g = user.phoneNumber) !== null && _g !== void 0 ? _g : "",
                         address: (_h = user.address) !== null && _h !== void 0 ? _h : "",
@@ -49,7 +49,7 @@ const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function*
                 return yield roleToModel[user.role].create({
                     data: {
                         email: (_k = user.email) !== null && _k !== void 0 ? _k : "",
-                        password,
+                        password, // password is hashed before storing
                         name: (_l = user.name) !== null && _l !== void 0 ? _l : "",
                         phoneNumber: (_m = user.phoneNumber) !== null && _m !== void 0 ? _m : "",
                         address: (_o = user.address) !== null && _o !== void 0 ? _o : "",
