@@ -14,7 +14,6 @@ const validateAndSanitizeFunction = (req: Request, res: Response, next: NextFunc
     if (!InputResult.isEmpty()) {
         return res.status(400).json(new ApiResponse(400, new ApiError(400, `Invalid request ${InputResult}`)));
     }
-    console.log(req.body);
     next();
 
 }
