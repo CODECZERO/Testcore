@@ -12,6 +12,11 @@ const app = express();
 
 // allowing data from specifie site to this backend
 app.use(cors({
+
+   origin:process.env.CROS_ORGIN,
+   credentials: true
+ }))
+
     origin: true,  // This allows all origins
     credentials: true
 }));
@@ -20,7 +25,7 @@ app.use(cors({
 //limiting the rate of the user per node
 const limiter = rateLimit({
     windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 10, // limit each IP to 100 requests per windowMs
+    max: 100, // limit each IP to 100 requests per windowMs
     message: 'Too many connections from this IP, please try again later',
 });
 //applying to whole server
