@@ -65,7 +65,6 @@ const findStudnets = AsyncHandler(async (req: Requestany, res: Response) => {
     if (Id)
         StudentData = await findStudnet(req.user);
 
-    if (!StudentData) return res.status(200).json(new ApiResponse(200, "no student is cruently register"));
     return res.status(200).json(new ApiResponse(200, StudentData));
 
 })
@@ -75,7 +74,6 @@ const StudentVeryify = AsyncHandler(async (req: Requestany, res: Response) => {
     const { approve } = req.body;
     if (!Id) throw new ApiError(400, "id is not provied");
     const studentdata = await findStudnet(req.user);
-    if (!studentdata) throw new ApiError(502, "error while finding student");
     const veryifyStudent = await prisma.student.updateMany(
         {
             where: {
