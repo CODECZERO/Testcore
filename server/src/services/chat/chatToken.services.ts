@@ -20,11 +20,11 @@ interface RequestWithCookies extends Request {
 }
 
 
-const ChatTokenGen = async (UserChatData: UserChatData) => {
+const ChatTokenGen = async (UserChatData: UserChatData) => {//take user data
     try {
         if (!UserChatData) throw new ApiError(500, "Chat data is not provied");
-        const { _id, ChatUsers } = UserChatData;
-        return await jwt.sign({
+        const { _id, ChatUsers } = UserChatData;//extract info 
+        return await jwt.sign({//encrypt data
             _id,
             ChatUsers
         }, process.env.ChatSecretAccessToken as string,
@@ -36,7 +36,7 @@ const ChatTokenGen = async (UserChatData: UserChatData) => {
     }
 }
 
-const ChatTokenDec = async (token:string) => {
+const ChatTokenDec = async (token:string) => {//take data
     try {
         if (!token) {
             throw new ApiError(401, "Unauthorized");
@@ -45,7 +45,7 @@ const ChatTokenDec = async (token:string) => {
         // Verify the token here
         const secert: any = process.env.ChatSecretAccessToken;
 
-        const decoded = await jwt.verify(token, secert) as UserChatData;
+        const decoded = await jwt.verify(token, secert) as UserChatData;//decrypt data 
 
         //finding user using email email
         return decoded
