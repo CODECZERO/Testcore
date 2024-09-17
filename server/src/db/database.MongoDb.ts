@@ -6,7 +6,7 @@ interface ExamDocument {
     // Add other properties that exist in the document
 }
 
-const connectDb = async () => {
+const connectDb = async () => {//connects data base and handle error
     try {
         const connectionInstance = await mongoose.connect(`${process.env.MONGODB_URL}`);
         return "connected";
@@ -16,7 +16,7 @@ const connectDb = async () => {
     }
 }
 
-const searchMongodb = async (tokenID: string): Promise<ExamDocument | null> => {
+const searchMongodb = async (tokenID: string): Promise<ExamDocument | null> => {//search monogdb for exam data
     try {
         const findExam = await examDataStore.findOne<ExamDocument>({ tokenID });
         if (!findExam) return null;
