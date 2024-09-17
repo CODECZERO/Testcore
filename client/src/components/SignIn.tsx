@@ -11,7 +11,7 @@ interface FormData {
     address: string;
     role: UserRole;
     password: string;
-    collegeId?: string; // Optional field for 'Student' role
+    collegeID?: string; // Optional field for 'Student' role
 }
 
 const CreateAccount: React.FC = () => {
@@ -23,7 +23,7 @@ const CreateAccount: React.FC = () => {
         address: '',
         role: 'College',
         password: '',
-        collegeId: ''
+        collegeID: ''
     });
     const [collegeID, setCollegeID] = useState<any[]>([]);
     const [error, setError] = useState<string>('');
@@ -39,12 +39,23 @@ const CreateAccount: React.FC = () => {
         }));
     };
 
+    const getCollegeID = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
+        const collegeSearch = collegeID.find(c => c.name === value);
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            collegeID:collegeSearch.Id
+        }));
+
+    }
+
     const handleRoleChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const newRole = e.target.value as UserRole;
         setFormData(prevFormData => ({
             ...prevFormData,
             role: newRole,
-            collegeId: newRole === 'Student' ? prevFormData.collegeId : '' // Clear collegeId if role is not 'Student'
+            collegeId: newRole === 'Student' ? prevFormData.collegeID : '' // Clear collegeId if role is not 'Student'
         }));
     };
 
@@ -52,7 +63,8 @@ const CreateAccount: React.FC = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-
+        console.log(formData);
+        
         try {
             console.log(formData)
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`, formData);
@@ -165,8 +177,9 @@ const CreateAccount: React.FC = () => {
                             <select
                                 id="collegeName"
                                 name="collegeID"
-                                value={formData.collegeId}
+                                value={formData.collegeID}
                                 onClick={getCollege}
+                                onChange={getCollegeID as any}
                                 required
                             >
                                 {collegeID.map((college, index) => (
