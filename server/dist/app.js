@@ -10,7 +10,10 @@ import rateLimit from "express-rate-limit";
 const app = express();
 // allowing data from specifie site to this backend
 app.use(cors({
+
     origin: process.env.CROS_ORGIN,
+
+    origin: true,
     credentials: true
 }));
 //limiting the rate of the user per node

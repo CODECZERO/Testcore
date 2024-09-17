@@ -33,12 +33,9 @@ const Login: React.FC = () => {
             password: formData.get("password") as string,
         }
 
-        console.log(UserData)
 
-
-        
         try {
-            const response = await axios.post("http://localhost:4008/api/v1/user/Login", formData, {
+            const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/Login`, formData, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
