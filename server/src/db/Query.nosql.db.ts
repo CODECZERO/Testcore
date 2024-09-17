@@ -1,16 +1,16 @@
 import { chatModel } from "../models/chatRoomData.model.nosql.js";
 import mongoose from "mongoose";
 
-const findUsers = async (roomID: string, AdminId?: string, userId?: string) => {
+const findUsers = async (roomID: string, AdminId?: string, userId?: string) => {//this function user in chatroom
     try {
-        return await chatModel.aggregate([
+        return await chatModel.aggregate([//use's aggreagation
             {
                 $match: {
-                    _id: new mongoose.Types.ObjectId(roomID),
+                    _id: new mongoose.Types.ObjectId(roomID),//matchs _id with roomID
                 }
             },
             {
-                $lookup: {
+                $lookup: {//looks in user collection
                     from: "users",
                     localField: "_id",
                     foreignField: "chatRoomIDs",
@@ -19,11 +19,11 @@ const findUsers = async (roomID: string, AdminId?: string, userId?: string) => {
             },
             {
                 $match: {
-                   "ChatUsers.sqlId":userId
+                   "ChatUsers.sqlId":userId//match sqlid with userid in chatuser, ensuring that user have access to chat
                 }
             },
             {
-                $project: {
+                $project: {//return data in this format
                     _id:1,
                     roomName: 1,
                     AdminId: 1,
@@ -36,9 +36,6 @@ const findUsers = async (roomID: string, AdminId?: string, userId?: string) => {
         return error;
     }
 };
-
-
-
 
 
 export{
