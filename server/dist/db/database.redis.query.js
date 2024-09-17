@@ -120,7 +120,7 @@ const getVideoServerTransport = (Id) => __awaiter(void 0, void 0, void 0, functi
 });
 const setVideoServerTransport = (Id, Transport) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const data = client.hSet("Video", Id, Transport);
+        const data = yield client.hSet("Video", Id, Transport);
         if (!data)
             return new ApiResponse(404, "data not found");
         return data;
@@ -129,4 +129,15 @@ const setVideoServerTransport = (Id, Transport) => __awaiter(void 0, void 0, voi
         throw new ApiError(500, `something went Wrong while saving data ${error}`);
     }
 });
-export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom, getVideoServerTransport, setVideoServerTransport };
+const removeVideoServerTranspor = (Id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const data = yield client.hDel("Video", Id);
+        if (!data)
+            throw new ApiError(404, "data not found");
+        return data;
+    }
+    catch (error) {
+        throw new ApiError(500, `something went wrong while removeing data ${error}`);
+    }
+});
+export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom, getVideoServerTransport, setVideoServerTransport, removeVideoServerTranspor };

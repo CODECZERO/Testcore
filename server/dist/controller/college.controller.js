@@ -13,7 +13,6 @@ import { findStudnet, getSubject } from "../db/Query.sql.db.js";
 import { ApiError } from "../util/apiError.js";
 import { ApiResponse } from "../util/apiResponse.js";
 import { TimeTable } from "../models/timetable.model.nosql.js";
-//@ts-ignore
 const getSubjects = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const subject = req.body; //taking subject name and code 
     let subjects;
@@ -34,7 +33,6 @@ const getSubjects = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0,
     return res.status(200).json(new ApiResponse(200, subjectGeter, "Subjects found"));
 }));
 //this function creates subject for college
-//@ts-ignore
 const CreateSubject = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const subject = req.body; //takes subject from college to create
     if (!subject)
@@ -54,27 +52,21 @@ const CreateSubject = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 
         throw new ApiError(500, "Something went wrrong while creating subject"); //check if the subject is create and throw error if doesn't
     return res.status(201).json(new ApiResponse(201, createSubject, "Subject created")); //if create then return
 }));
-//@ts-ignore
 const findStudnets = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { Id } = req.user;
-    let StudentData;
-    if (Id)
-        StudentData = yield findStudnet(req.user);
-    if (!StudentData)
-        return res.status(200).json(new ApiResponse(200, "no student is cruently register"));
-    return res.status(200).json(new ApiResponse(200, StudentData));
+    const { Id } = req.user; //takes college id
+    if (!Id)
+        throw new ApiError(400, "invliad request"); //check's if provided
+    const StudentData = yield findStudnet(req.user); // then call database how many student are there
+    return res.status(200).json(new ApiResponse(200, StudentData)); //return if data is found
 }));
-//@ts-ignore
 const StudentVeryify = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { Id } = req.user;
-    const { approve } = req.body;
+    const { Id } = req.user; //take college id
+    const { approve } = req.body; //check if approve is given or not 
     if (!Id)
-        throw new ApiError(400, "id is not provied");
-    const studentdata = yield findStudnet(req.user);
-    if (!studentdata)
-        throw new ApiError(502, "error while finding student");
-    const veryifyStudent = yield prisma.student.updateMany({
+        throw new ApiError(400, "id is not provied"); //if there not id then throw error
+    const veryifyStudent = yield prisma.student.updateMany(//update studnet profile
+    {
         where: {
             collegeID: (_a = req.user) === null || _a === void 0 ? void 0 : _a.Id
         },
@@ -83,12 +75,13 @@ const StudentVeryify = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
         }
     });
     if (!veryifyStudent)
-        throw new ApiError(503, "some thing went wrong while updating data");
-    return res.status(200).json(new ApiResponse(200, veryifyStudent, "Student veryify"));
+        throw new ApiError(503, "some thing went wrong while updating data"); //if not able to update then throw errror
+    return res.status(200).json(new ApiResponse(200, veryifyStudent, "Student veryify")); //return new data if able to update
 }));
-//@ts-ignore
 const getExaminer = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { Id } = req.user;
+    const { Id } = req.user; //takes college id
+    if (!Id)
+        throw new ApiError(400, "invlaid request");
     const findExaminer = yield prisma.examiner.findMany({
         where: {
             college: Id
@@ -103,10 +96,9 @@ const getExaminer = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0,
         }
     });
     if (!findExaminer)
-        return res.status(200).json(new ApiResponse(200, "no examiner register at time"));
-    return res.status(200).json(new ApiResponse(200, findExaminer));
+        return res.status(200).json(new ApiResponse(200, "no examiner register at time")); //if unable to find examiner then throw error
+    return res.status(200).json(new ApiResponse(200, findExaminer)); //else return the data
 }));
-//@ts-ignore
 const TimeTableSearch = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const CollegeData = req.user; //take college name by using it's access token
@@ -123,7 +115,6 @@ const TimeTableSearch = AsyncHandler((req, res) => __awaiter(void 0, void 0, voi
         throw new ApiError(500, "some thing went wrong, while searching time table"); //if error occure throw error
     }
 }));
-//@ts-ignore
 const AprroveTimeTable = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const timetable = req.body; //takes data like time table id and aprrove , approve is true or false
     if (!timetable)
@@ -134,4 +125,4 @@ const AprroveTimeTable = AsyncHandler((req, res) => __awaiter(void 0, void 0, vo
         throw new ApiError(200, "something went wrong while updating time table"); //if updateAprrove fail then return error
     return res.status(200).json(new ApiResponse(200, updateAprrove)); //else return updated time table
 }));
-export { getSubjects, AprroveTimeTable, TimeTableSearch, CreateSubject, StudentVeryify, getExaminer, findStudnet };
+export { getSubjects, AprroveTimeTable, TimeTableSearch, CreateSubject, StudentVeryify, getExaminer, findStudnet, findStudnets };

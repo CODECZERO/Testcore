@@ -22,10 +22,10 @@ type classData = {
     Class: string
     CollegeName: string
 }
-//@ts-ignore
-const giveExam = AsyncHandler(async (req: Requestany, res: Response) => {
-    const examdata: examdata = req.examData;
-    const answerQuestion = await prisma.questionPaper.update({
+
+const giveExam = AsyncHandler(async (req: Requestany, res: Response) => {//this function saves question data in database
+    const examdata: examdata = req.examData;//takes data from user
+    const answerQuestion = await prisma.questionPaper.update({//updates question paper answer col
         where: {
             Id: examdata.examID
         },
@@ -33,18 +33,18 @@ const giveExam = AsyncHandler(async (req: Requestany, res: Response) => {
             answer: examdata.Answer
         }
     });
-    if (!answerQuestion) throw new ApiError(421, "answer was not updated");
-    return res.status(201).json(new ApiResponse(201, answerQuestion, "answer saved"));
+    if (!answerQuestion) throw new ApiError(421, "answer was not updated");//if unable to update then throw error
+    return res.status(201).json(new ApiResponse(201, answerQuestion, "answer saved"));//else return successfuly message
 
 
 })
 
 //@ts-ignore
-const getExam = AsyncHandler(async (req: Requestany, res: Response) => {
-    const examdata: examdata = req.examData;
-    if (!examdata) throw new ApiError(401, "exam data is not provied");
+const getExam = AsyncHandler(async (req: Requestany, res: Response) => {//get exam data
+    const examdata: examdata = req.examData;//takes parameters from user
+    if (!examdata||!examdata.examID) throw new ApiError(401, "exam data is not provied");//throw error if not provided
     //@ts-ignore
-    const findexam = prisma.exam.findFirst({
+    const findexam = prisma.exam.findFirst({//find first data which matchs examID
         where: {
             Id: examdata.examID
         },
@@ -57,36 +57,36 @@ const getExam = AsyncHandler(async (req: Requestany, res: Response) => {
             examDuration: true,
             examinerID: true
         },
-        include: {
+        include: {//query subject table too
             Subject: {
-                select: {
+                select: {//takes this values from subject table
                     Id: true,
                     subjectCode: true,
                     subjectName: true,
                 }
             }
-        }
+        }//return nested object 
     });
-    if (!findexam) throw new ApiError(404, "exam not found");
-    return res.status(200).json(new ApiResponse(200, findexam, "Exam Found"));
+    if (!findexam) throw new ApiError(404, "exam not found");//if not found then throw error
+    return res.status(200).json(new ApiResponse(200, findexam, "Exam Found"));//else return response
 
 })
-//@ts-ignore
-const getTimeTable = AsyncHandler(async (req: Request, res: Response) => {
-    const classdata: classData = req.body;
-    if (!classdata) throw new ApiError(400, "Invalid data");
-    const findtimetable = await TimeTable.findOne({
+
+const getTimeTable = AsyncHandler(async (req: Request, res: Response) => {//get tiem table from mongodb
+    const classdata: classData = req.body;//takes data from user
+    if (!classdata||!classdata.Class||!classdata.CollegeName) throw new ApiError(400, "Invalid data");//if not provided then throw error
+    const findtimetable = await TimeTable.findOne({//find only one data which have class and college name provided
         Class: classdata.Class,
         CollegeName: classdata.CollegeName
     })
-    if (!findtimetable) throw new ApiError(404, "time table not found");
-    return res.status(200).json(new ApiResponse(200, findtimetable, `time table of class ${classdata.Class} of ${classdata.CollegeName}`));
+    if (!findtimetable) throw new ApiError(404, "time table not found");//not found throw error
+    return res.status(200).json(new ApiResponse(200, findtimetable, `time table of class ${classdata.Class} of ${classdata.CollegeName}`));//else return data
 })
-//@ts-ignore
-const getResult = AsyncHandler(async (req: Requestany, res: Response) => {
-    const resultdata:examdata=req.examData;
-    if(!resultdata)throw new ApiError(401,"no data is provied");
-    const findresult=await prisma.result.findMany({
+
+const getResult = AsyncHandler(async (req: Requestany, res: Response) => {//get result for student
+    const resultdata:examdata=req.examData;//takes parameters from user
+    if(!resultdata)throw new ApiError(401,"no data is provied");//if not provided then throw error
+    const findresult=await prisma.result.findMany({//find all data realted to that student or question paper
         where:{
             OR:[
                 {questionPaperID:resultdata.QuestionPaperId},
@@ -104,15 +104,16 @@ const getResult = AsyncHandler(async (req: Requestany, res: Response) => {
             StudentId:true
         }
     });
-    if(!resultdata)throw new ApiError(404,"result Not found");
-    return res.status(200).json(new ApiResponse(200,findresult,"result found"));
+    if(!resultdata)throw new ApiError(404,"result Not found");//throw error if not found
+    return res.status(200).json(new ApiResponse(200,findresult,"result found"));//return value if found
 })
-//@ts-ignore
-const getQuestionPaperForStundet = AsyncHandler(async (req: Requestany, res: Response) => {
-    const examdata: examdata = req.examData;
-    const findexam = await getQuestionPaper(examdata.examID);
-    if (!findexam) throw new ApiError(400, "no exam found");
-    return res.status(200).json(new ApiResponse(200, findexam, "Question papre data"));
+
+const getQuestionPaperForStundet = AsyncHandler(async (req: Requestany, res: Response) => {//get question for studnet
+    const examdata: examdata = req.examData;//take parameters from studnet
+    if(!examdata.examID) throw new ApiError(400,"exmaid is not provided");
+    const findexam = await getQuestionPaper(examdata.examID);//find in database
+    if (!findexam) throw new ApiError(400, "no exam found");//if not found throw error
+    return res.status(200).json(new ApiResponse(200, findexam, "Question papre data"));//if found then return data
 })
 
 export {
