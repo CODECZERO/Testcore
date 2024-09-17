@@ -59,24 +59,19 @@ const CreateSubject = AsyncHandler(async (req: Request, res: Response) => {
     return res.status(201).json(new ApiResponse(201, createSubject, "Subject created"));//if create then return
 })
 
-const findStudnets = AsyncHandler(async (req: Requestany, res: Response) => {
-    const { Id } = req.user;
-    let StudentData;
-    if (Id)
-        StudentData = await findStudnet(req.user);
-
-    if (!StudentData) return res.status(200).json(new ApiResponse(200, "no student is cruently register"));
-    return res.status(200).json(new ApiResponse(200, StudentData));
+const findStudnets = AsyncHandler(async (req: Requestany, res: Response) => {//finds studnet for college
+    const { Id } = req.user;//takes college id
+    if (!Id) throw new ApiError(400,"invliad request")//check's if provided
+    const StudentData = await findStudnet(req.user);// then call database how many student are there
+    return res.status(200).json(new ApiResponse(200, StudentData));//return if data is found
 
 })
 
-const StudentVeryify = AsyncHandler(async (req: Requestany, res: Response) => {
-    const { Id } = req.user;
-    const { approve } = req.body;
-    if (!Id) throw new ApiError(400, "id is not provied");
-    const studentdata = await findStudnet(req.user);
-    if (!studentdata) throw new ApiError(502, "error while finding student");
-    const veryifyStudent = await prisma.student.updateMany(
+const StudentVeryify = AsyncHandler(async (req: Requestany, res: Response) => {//college can verify student
+    const { Id } = req.user;//take college id
+    const { approve } = req.body;//check if approve is given or not 
+    if (!Id) throw new ApiError(400, "id is not provied");//if there not id then throw error
+    const veryifyStudent = await prisma.student.updateMany(//update studnet profile
         {
             where: {
                 collegeID: req.user?.Id
@@ -87,13 +82,15 @@ const StudentVeryify = AsyncHandler(async (req: Requestany, res: Response) => {
         }
     )
 
-    if (!veryifyStudent) throw new ApiError(503, "some thing went wrong while updating data")
-    return res.status(200).json(new ApiResponse(200, veryifyStudent, "Student veryify"));
+    if (!veryifyStudent) throw new ApiError(503, "some thing went wrong while updating data");//if not able to update then throw errror
+    return res.status(200).json(new ApiResponse(200, veryifyStudent, "Student veryify"));//return new data if able to update
 });
 
-const getExaminer = AsyncHandler(async (req: Requestany, res: Response) => {
-    const { Id } = req.user;
-    const findExaminer = await prisma.examiner.findMany({
+const getExaminer = AsyncHandler(async (req: Requestany, res: Response) => {//get examiner for college
+    const { Id } = req.user;//takes college id
+    if(!Id) throw new ApiError(400,"invlaid request");
+
+    const findExaminer = await prisma.examiner.findMany({//find examiner
         where: {
             college: Id
         },
@@ -106,8 +103,8 @@ const getExaminer = AsyncHandler(async (req: Requestany, res: Response) => {
             address: true
         }
     });
-    if (!findExaminer) return res.status(200).json(new ApiResponse(200, "no examiner register at time"));
-    return res.status(200).json(new ApiResponse(200, findExaminer));
+    if (!findExaminer) return res.status(200).json(new ApiResponse(200, "no examiner register at time"));//if unable to find examiner then throw error
+    return res.status(200).json(new ApiResponse(200, findExaminer));//else return the data
 
 
 
