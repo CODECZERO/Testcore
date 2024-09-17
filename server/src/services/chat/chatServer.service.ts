@@ -95,7 +95,7 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
     
     ws.on('close', () => {
       clients.delete(ws);
-      console.log(`Client disconnected. Total clients: ${clients.size}`);
+      console.log(`Client disconnected. Total clients: ${clients.size}`);//tells how many clients are there
     });
   });
 });
