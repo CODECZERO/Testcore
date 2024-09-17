@@ -11,7 +11,7 @@ interface FormData {
     address: string;
     role: UserRole;
     password: string;
-    collegeId?: string; // Optional field for 'Student' role
+    collegeID?: string; // Optional field for 'Student' role
 }
 
 const CreateAccount: React.FC = () => {
@@ -23,7 +23,7 @@ const CreateAccount: React.FC = () => {
         address: '',
         role: 'College',
         password: '',
-        collegeId: ''
+        collegeID: ''
     });
     const [collegeID, setCollegeID] = useState<any[]>([]);
     const [error, setError] = useState<string>('');
@@ -39,12 +39,23 @@ const CreateAccount: React.FC = () => {
         }));
     };
 
+    const getCollegeID = (e: ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+
+        const collegeSearch = collegeID.find(c => c.name === value);
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            collegeID:collegeSearch.Id
+        }));
+
+    }
+
     const handleRoleChange = (e: ChangeEvent<HTMLSelectElement>) => {
         const newRole = e.target.value as UserRole;
         setFormData(prevFormData => ({
             ...prevFormData,
             role: newRole,
-            collegeId: newRole === 'Student' ? prevFormData.collegeId : '' // Clear collegeId if role is not 'Student'
+            collegeId: newRole === 'Student' ? prevFormData.collegeID : '' // Clear collegeId if role is not 'Student'
         }));
     };
 
@@ -52,7 +63,8 @@ const CreateAccount: React.FC = () => {
         e.preventDefault();
         setError('');
         setSuccess('');
-
+        console.log(formData);
+        
         try {
             console.log(formData)
             const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`, formData);
@@ -69,135 +81,128 @@ const CreateAccount: React.FC = () => {
         if (clikc) {
             return;
         }
-            try {
-                console.log(formData)
-                await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`).then((res) => {
-                    if (res) {
-                        res.data.map((data: any) => {
-                            setCollegeID(data);
-                        })
-                    }
-                });
-                setSuccess('Account created successfully!');
-                setCollegeID(res.data.data)
-                console.log(collegeID);
-                setClick(true);
+        try {
+            console.log(formData)
+            const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup`)
+            setCollegeID(res.data.data)
+            setClick(true);
 
-            }
-            catch (err) {
-                setError(`An error occurred while creating the account.${err}`);
+        }
+        catch (err) {
+            setError(`An error occurred while creating the account.${err}`);
 
-            }
+        }
     }
 
-return (
-    <div className="create-account-page">
-        <div className="create-account-container">
-            <h2>Create Account</h2>
-            {error && <p className="error-message">{error}</p>}
-            {success && <p className="success-message">{success}</p>}
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="role">Role</label>
-                    <select
-                        id="role"
-                        name="role"
-                        value={formData.role}
-                        onChange={handleRoleChange}
-                        required
-                    >
-                        <option value="Student">Student</option>
-                        <option value="College">College</option>
-                        <option value="Examiner">Examiner</option>
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label htmlFor="name">Name</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="phoneNumber">Phone Number</label>
-                    <input
-                        type="tel"
-                        id="phoneNumber"
-                        name="phoneNumber"
-                        value={formData.phoneNumber}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="age">Age</label>
-                    <input
-                        type="number"
-                        id="age"
-                        name="age"
-                        value={formData.age}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="address">Address</label>
-                    <input
-                        type="text"
-                        id="address"
-                        name="address"
-                        value={formData.address}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-
-                {formData.role === 'Student' && (
+    return (
+        <div className="create-account-page">
+            <div className="create-account-container">
+                <h2>Create Account</h2>
+                {error && <p className="error-message">{error}</p>}
+                {success && <p className="success-message">{success}</p>}
+                <form onSubmit={handleSubmit}>
                     <div className="form-group">
-                        <label htmlFor="role">College Name</label>
+                        <label htmlFor="role">Role</label>
                         <select
-                            id="collegeName"
-                            name="collegeID"
-                            value={formData.collegeId}
-                            onClick={getCollege}
+                            id="role"
+                            name="role"
+                            value={formData.role}
+                            onChange={handleRoleChange}
                             required
                         >
-                            {collegeID.map((college, index) => (
-                                <option key={index} value={college.name}>{college.name}</option>
-                            ))}
+                            <option value="Student">Student</option>
+                            <option value="College">College</option>
+                            <option value="Examiner">Examiner</option>
                         </select>
                     </div>
-                )}
-                <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <button type="submit">Create Account</button>
-            </form>
-        </div>
-        <style>{`
+                    <div className="form-group">
+                        <label htmlFor="name">Name</label>
+                        <input
+                            type="text"
+                            id="name"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="email">Email</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="phoneNumber">Phone Number</label>
+                        <input
+                            type="tel"
+                            id="phoneNumber"
+                            name="phoneNumber"
+                            value={formData.phoneNumber}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="age">Age</label>
+                        <input
+                            type="number"
+                            id="age"
+                            name="age"
+                            value={formData.age}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="address">Address</label>
+                        <input
+                            type="text"
+                            id="address"
+                            name="address"
+                            value={formData.address}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    {formData.role === 'Student' && (
+                        <div className="form-group">
+                            <label htmlFor="role">College Name</label>
+                            <select
+                                id="collegeName"
+                                name="collegeID"
+                                value={formData.collegeID}
+                                onClick={getCollege}
+                                onChange={getCollegeID as any}
+                                required
+                            >
+                                {collegeID.map((college, index) => (
+                                    <option key={index} value={college.name}>{college.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                    <div className="form-group">
+                        <label htmlFor="password">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <button type="submit">Create Account</button>
+                </form>
+            </div>
+            <style>{`
                 .create-account-page {
                     display: flex;
                     align-items: center;
@@ -286,7 +291,8 @@ return (
                     margin-bottom: 15px;
                 }
             `}</style>
-    </div>
-)}};
+        </div>
+    )
+};
 
 export default CreateAccount;
