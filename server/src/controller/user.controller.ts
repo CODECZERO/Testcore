@@ -8,6 +8,7 @@ import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
 import Tracker from './loginTracker.controller.js';
+import { console } from '@cloudflare/workers-types';
 
 
 //all error retunr/out format
@@ -80,6 +81,7 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     //     "errors": []
     // } 
     const hashedPassword = await bcrypt.hash(password, 10);//hashing the password
+    console.log("enterd");
     const userCreate = await createOp(req.body, hashedPassword);//passing req.body value to query function with hashed password
     const userData = { userCreate, password: "" };//replacing the password with empty string
 
