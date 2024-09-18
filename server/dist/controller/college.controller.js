@@ -125,4 +125,4 @@ const AprroveTimeTable = AsyncHandler((req, res) => __awaiter(void 0, void 0, vo
         throw new ApiError(200, "something went wrong while updating time table"); //if updateAprrove fail then return error
     return res.status(200).json(new ApiResponse(200, updateAprrove)); //else return updated time table
 }));
-export { getSubjects, AprroveTimeTable, TimeTableSearch, CreateSubject, StudentVeryify, getExaminer, findStudnet, findStudnets };
+export { getSubjects, AprroveTimeTable, TimeTableSearch, CreateSubject, StudentVeryify, getExaminer, findStudnet, };
