@@ -80,7 +80,6 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     //     "errors": []
     // } 
     const hashedPassword = await bcrypt.hash(password, 10);//hashing the password
-    console.log("enterd");
     const userCreate = await createOp(req.body, hashedPassword);//passing req.body value to query function with hashed password
     const userData = { userCreate, password: "" };//replacing the password with empty string
 
