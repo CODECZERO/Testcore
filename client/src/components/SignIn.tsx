@@ -15,6 +15,9 @@ interface FormData {
 }
 
 const CreateAccount:React.FC = () => {
+
+  const Backend_URL="http://localhost:4008/api/v1/user/signup";
+
   const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
@@ -30,7 +33,7 @@ const CreateAccount:React.FC = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const [clikc, setClick] = useState(false);
-
+  
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -74,7 +77,7 @@ const CreateAccount:React.FC = () => {
 
     try {
       console.log(formData)
-      const response = await axios.post('${import.meta.env.VITE_BACKEND_URL}/api/v1/user/signup', formData);
+      const response = await axios.post(`${Backend_URL}`, formData);
       setSuccess('Account created successfully!');
       console.log(response.data);
     } catch (err) {
@@ -90,7 +93,7 @@ const CreateAccount:React.FC = () => {
     }
     try {
       console.log(formData)
-      const res = await axios.get('http://localhost:4008/api/v1/user/signup')
+      const res = await axios.get(`${Backend_URL}`)
       console.log("Fetched College Data:", res.data); // Log the entire response to inspect its structure
       setCollegeID(res.data.data)
       setClick(true);
