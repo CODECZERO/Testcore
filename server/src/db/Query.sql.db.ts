@@ -23,7 +23,6 @@ interface User {
 // };
 
 const createOp = async (user: User, password: string) => {
-    console.log(user)
     try {
         switch (user.role) {
             case "College":
