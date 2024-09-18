@@ -15,19 +15,19 @@ import { TimeTable } from "../models/timetable.model.nosql.js";
 import { getQuestionPaper } from "../db/Query.sql.db.js";
 const giveExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examdata = req.examData; //takes data from user
-    const answerQuestion = yield prisma.questionPaper.update({
-        where: {
-            Id: examdata.examID
-        },
+    const answerQuestion = yield prisma.questionPaper.create({
         data: {
-            answer: examdata.Answer
+            SubjectID: examdata.SubjectID,
+            studentID: examdata.StudentId,
+            examID: examdata.examID,
+            answer: examdata.Answer,
+            question: JSON.stringify(examdata.QuestionPapaerData)
         }
     });
     if (!answerQuestion)
         throw new ApiError(421, "answer was not updated"); //if unable to update then throw error
     return res.status(201).json(new ApiResponse(201, answerQuestion, "answer saved")); //else return successfuly message
 }));
-//@ts-ignore
 const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examdata = req.examData; //takes parameters from user
     if (!examdata || !examdata.examID)
