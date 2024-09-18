@@ -148,6 +148,5 @@ export {
     CreateSubject,
     StudentVeryify,
     getExaminer,
-    findStudnet,
     findStudnets
 }
