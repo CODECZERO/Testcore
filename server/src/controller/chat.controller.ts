@@ -5,7 +5,6 @@ import { Response, Request } from 'express';
 import { chatModel } from '../models/chatRoomData.model.nosql.js';
 import { User } from '../models/user.model.nosql.js';
 import { findUsers } from '../db/Query.nosql.db.js';
-import { nanoid } from 'nanoid';
 import mongoose from 'mongoose';
 import { ApiError } from '../util/apiError.js';
 import { options } from './user.controller.js';
