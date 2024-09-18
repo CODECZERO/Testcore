@@ -4,6 +4,6 @@ import { AprroveTimeTable, CreateSubject, StudentVeryify, TimeTableSearch, findS
 const router = Router();
 router.route("/Subject").get(verifyData, TimeTableSearch).put(getSubjects).put(AprroveTimeTable);
 router.route("/createSubject").put(CreateSubject);
-router.route("/Student").get(findStudnet).put(verifyData, StudentVeryify);
+router.route("/Student").get(verifyData, findStudnet).put(verifyData, StudentVeryify);
 router.route("/Examiner").get(verifyData, getExaminer);
 export default router;

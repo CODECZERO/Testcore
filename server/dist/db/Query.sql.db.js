@@ -18,6 +18,7 @@ import { ApiError } from "../util/apiError.js";
 // };
 const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    console.log(user);
     try {
         switch (user.role) {
             case "College":
