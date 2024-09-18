@@ -5,7 +5,6 @@ import cacheCheck from "../middelware/ExamCache.middleware.js";
 
 const router=Router();
 
-router.use(cacheCheck);
 
 router.route("/Exam").get(getExam).put(giveExam);
 router.route("/TimeTalbe").put(getTimeTable);

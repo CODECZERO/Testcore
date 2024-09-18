@@ -12,8 +12,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.4.5",
-    "@cloudflare/workers-types": "^4.20240821.1",
     "@prisma/client": "^5.19.0",
     "@types/amqplib": "^0.10.5",
     "@types/bcrypt": "^5.0.2",
@@ -37,7 +35,6 @@
     "express-rate-limit": "^7.4.0",
     "express-validator": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
-    "kafkajs": "^2.2.4",
     "mediasoup": "^3.14.13",
     "mediasoup-client": "^3.7.16",
     "mongoose": "^8.5.1",
