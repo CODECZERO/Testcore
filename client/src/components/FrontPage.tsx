@@ -1,8 +1,12 @@
 // FrontPage.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
+import  './FrontPage.css';
+
+
 
 const FrontPage: React.FC = () => {
+  
   return (
     <div className="front-page">
       <h1>Welcome to Our Application</h1>

@@ -1,5 +1,6 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
+import './CreateAccount.css';
 
 type UserRole = 'Student' | 'College' | 'Examiner';
 
@@ -218,95 +219,6 @@ const CreateAccount:React.FC = () => {
         </form>
       </div>  
       
-      <style>{`
-                .create-account-page {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    min-height: 100vh;
-                    background: linear-gradient(135deg, #6e8efb, #a777e3);
-                    font-family: 'Arial', sans-serif;
-                    color: #fff;
-                }
-
-                .create-account-container {
-                    max-width: 400px;
-                    width: 100%;
-                    padding: 30px;
-                    border-radius: 12px;
-                    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-                    background: #ffffff;
-                    color: #333;
-                    text-align: center;
-                }
-
-                h2 {
-                    margin-bottom: 20px;
-                    font-size: 28px;
-                }
-
-                .form-group {
-                    margin-bottom: 20px;
-                    text-align: left;
-                }
-
-                label {
-                    display: block;
-                    margin-bottom: 8px;
-                    font-weight: 600;
-                    color: #333;
-                }
-
-                input, select {
-                    width: 100%;
-                    padding: 12px;
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    box-sizing: border-box;
-                    font-size: 16px;
-                    transition: border-color 0.3s ease;
-                }
-
-                input:focus, select:focus {
-                    border-color: #6e8efb;
-                    outline: none;
-                    box-shadow: 0 0 0 3px rgba(110, 143, 251, 0.3);
-                }
-
-                button {
-                    width: 100%;
-                    padding: 14px;
-                    background-color: #6e8efb;
-                    color: #fff;
-                    border: none;
-                    border-radius: 8px;
-                    cursor: pointer;
-                    font-size: 16px;
-                    transition: background-color 0.3s ease, transform 0.3s ease;
-                }
-
-                button:hover {
-                    background-color: #5a7dcd;
-                    transform: translateY(-2px);
-                }
-
-                button:active {
-                    background-color: #4a69d4;
-                    transform: translateY(0);
-                }
-
-                .error-message {
-                    color: #dc3545;
-                    font-size: 14px;
-                    margin-bottom: 15px;
-                }
-
-                .success-message {
-                    color: #28a745;
-                    font-size: 14px;
-                    margin-bottom: 15px;
-                }
-            `}</style>
     </div>
   );
 }
