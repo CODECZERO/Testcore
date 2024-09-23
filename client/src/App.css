@@ -42,9 +42,7 @@
   color: #888;
 }
 
-body{
-  background-color: #52cbcf;
-}
+
 .signup-container {
   width: 300px;
   height: 100px;
@@ -52,8 +50,8 @@ body{
   margin: 40px auto;
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  background: #75e6da;
+ 
+ 
   font-family: 'Arial', sans-serif;
 }
 
@@ -72,7 +70,7 @@ label {
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #495057;
+ 
 }
 
 input {
