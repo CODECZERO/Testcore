@@ -8,7 +8,6 @@ import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
 import Tracker from './loginTracker.controller.js';
-import { Request } from 'mediasoup/node/lib/fbs/request.js';
 
 
 //all error retunr/out format
@@ -160,12 +159,12 @@ const getCollege = AsyncHandler(async (req: Request, res: Response) => {//findin
 }
 )
 
-const SessionActive=AsyncHandler(async(req:Requestany,res:Response)=>{
-    const refreshToken=req.tokenID;
-    if(!refreshToken) throw new ApiError(401,"user is not auth");
-    const verify=await findOp({...req.body,refreshToken});
-    if(!verify) throw new ApiError(401,"user is not auth");
-    return res.status(200).json(new ApiResponse(200,verify,"user is auth"));
+const SessionActive=AsyncHandler(async(req:Requestany,res:Response)=>{//this function is to make check login session
+    const refreshToken=req.tokenID;//takes token from frontend
+    if(!refreshToken) throw new ApiError(401,"user is not auth");//if user doesn't have token then throw error
+    const verify=await findOp({...req.body,refreshToken});// find user in database
+    if(!verify) throw new ApiError(401,"user is not auth");//if user is not verify
+    return res.status(200).json(new ApiResponse(200,verify,"user is auth"));//return res and verfiy data
 })
 
 export {
