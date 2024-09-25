@@ -24,6 +24,10 @@ const options = {//options for cookies to secure theme
 }
 
 
+interface Requestany extends Request{
+    tokenID?:any
+}
+
 const tokenGen = async (user: {
     Id: string;
     email: string;
@@ -155,6 +159,14 @@ const getCollege = AsyncHandler(async (req: Request, res: Response) => {//findin
 }
 )
 
+const SessionActive=AsyncHandler(async(req:Requestany,res:Response)=>{//this function is to make check login session
+    const refreshToken=req.tokenID;//takes token from frontend
+    if(!refreshToken) throw new ApiError(401,"user is not auth");//if user doesn't have token then throw error
+    const verify=await findOp({...req.body,refreshToken});// find user in database
+    if(!verify) throw new ApiError(401,"user is not auth");//if user is not verify
+    return res.status(200).json(new ApiResponse(200,verify,"user is auth"));//return res and verfiy data
+})
+
 export {
     signup,
     login,
@@ -162,5 +174,6 @@ export {
     updateProfileImage,
     getCollege,
     tokenGen,
+    SessionActive,
     options
 }
