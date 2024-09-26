@@ -28,6 +28,7 @@ const verifyData = AsyncHandler(async (req: RequestWithCookies, res: Response, n
     try {
         const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
         const token = req.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
+        
         if (!token) {
             throw new ApiError(401, "Unauthorized");
         }

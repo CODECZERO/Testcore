@@ -148,4 +148,14 @@ const getCollege = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, 
         return res.status(400).json(new ApiError(400, "No college is register")); //throws error if it doesn't exists
     return res.status(200).json(new ApiResponse(200, findCollegeName)); //returns college name
 }));
-export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen, options };
+const SessionActive = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const refreshToken = req.user; //takes token from frontend
+    const role = req.user.role;
+    if (!refreshToken || !role)
+        throw new ApiError(401, "user is not auth"); //if user doesn't have token then throw error
+    const verify = yield findOp({ role, email: refreshToken.email }); // find user in database
+    if (!verify)
+        throw new ApiError(401, "user is not auth"); //if user is not verify
+    return res.status(200).json(new ApiResponse(200, verify, "user is auth")); //return res and verfiy data
+}));
+export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen, SessionActive, options };
