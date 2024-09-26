@@ -1,7 +1,7 @@
 // FrontPage.tsx
 import React from 'react';
 import { Link } from 'react-router-dom';
-import  './frontpage.css';
+import  './FrontPage.css';
 
 
 

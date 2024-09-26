@@ -15,12 +15,12 @@ datasource db {
 }
 
 model College {
-  Id            String     @id @default(uuid())
-  name          String     @unique
+  Id            String      @id @default(uuid())
+  name          String      @unique
   password      String
-  refreshToken  String     @unique
+  refreshToken  String
   phoneNumber   String
-  email         String     @unique
+  email         String      @unique
   address       String
   collegeVerify Boolean
   students      Student[]
@@ -34,8 +34,8 @@ model Examiner {
   phoneNumber    String
   password       String
   address        String
-  examinerVerify Boolean
-  refreshToken   String    @unique
+  examinerVerify Boolean  
+  refreshToken   String
   college        College[]
   exams          Exam[]
 }
@@ -47,8 +47,8 @@ model Student {
   phoneNumber    String
   password       String
   address        String
-  studentVerify  Boolean
-  refreshToken   String          @unique
+  studentVerify  Boolean       
+  refreshToken   String
   collegeID      String
   college        College         @relation(fields: [collegeID], references: [Id])
   exams          Exam[]
@@ -58,15 +58,15 @@ model Student {
 }
 
 model Exam {
-  Id           String   @id @default(uuid())
-  subjectID    String
-  examName     String
-  date         DateTime
-  examStart    DateTime
-  examEnd      DateTime
-  examDuration DateTime
-  examinerID   String
-
+  Id             String          @id @default(uuid())
+  subjectID      String
+  examName       String          
+  date           DateTime
+  examStart      DateTime
+  examEnd        DateTime
+  examDuration   DateTime
+  examinerID     String
+  
   examiner       Examiner        @relation(fields: [examinerID], references: [Id])
   students       Student[]
   results        Result[]
@@ -75,9 +75,9 @@ model Exam {
 }
 
 model Subject {
-  Id            String    @id @default(uuid())
-  subjectCode   String    @unique
-  subjectName   String    @unique
+  Id            String      @id @default(uuid())
+  subjectCode   String      @unique
+  subjectName   String      @unique
   subjectVerify Boolean
   exams         Exam[]
   student       Student[]
@@ -97,17 +97,17 @@ model QuestionPaper {
 }
 
 model Result {
-  Id              String  @id @default(uuid())
+  Id              String        @id @default(uuid())
   marks           Float
-  resultVerify    Boolean @default(false)
-  passingMark     Float   @default(35)
-  obtainedMarks   Float   @default(0)
-  totalMarks      Float   @default(100)
+  resultVerify    Boolean       @default(false)
+  passingMark     Float         @default(35)
+  obtainedMarks   Float         @default(0)
+  totalMarks      Float         @default(100)
   questionPaperID String
   StudentId       String
-
-  questionPaper QuestionPaper @relation(fields: [questionPaperID], references: [Id])
-  Student       Student?      @relation(fields: [StudentId], references: [Id])
-  Exam          Exam?         @relation(fields: [examExamID], references: [Id])
-  examExamID    String?
+  
+  questionPaper   QuestionPaper @relation(fields: [questionPaperID], references: [Id])
+  Student         Student?      @relation(fields: [StudentId], references: [Id])
+  Exam            Exam?         @relation(fields: [examExamID], references: [Id])
+  examExamID      String?
 }

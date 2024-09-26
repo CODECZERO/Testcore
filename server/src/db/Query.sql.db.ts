@@ -76,7 +76,10 @@ const findOp = async (user: User) => {//find user based on the role of user
         //@ts-ignore // the ingore is put here becase there is type error for findunique,but it works 
         return await roleToModel[user.role].findUnique({
             where: {
-                email: user.email
+                OR:[
+                    {email: user.email},
+                    {refreshToken:user.refreshToken}
+                ]
             },
             select: {
                 Id: true,
@@ -91,7 +94,6 @@ const findOp = async (user: User) => {//find user based on the role of user
         throw new ApiError(500, error)
     }
 }
-
 //update value of user based on the 
 //pssing of role is necessary, so the function can select on whic table it should perform operations
 const updateOp = async (user: User, role: UserRole) => {//user is previous values , current user is new value
@@ -161,7 +163,7 @@ const findCollege = async () => {//findig college name from college table
     try {
         return await prisma.college.findMany({//it's only checking retrieving college name
             select: {
-                Id: true,
+                Id:true,
                 name: true
             }
         });
@@ -279,7 +281,6 @@ const getStudnetNumber = async (collegeID: string, SubjectID: string) => {//get 
         throw new ApiError(500, `something went wrong while searching number ${error}`)
     }
 }
-
 export {
     createOp,
     findOp,
@@ -292,6 +293,6 @@ export {
     findStudnet,
     getQuestionPaper,
     getQuestionPaperForExaminer,
-    getStudnetNumber,
+    getStudnetNumber
 
 }

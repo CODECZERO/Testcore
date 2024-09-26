@@ -264,4 +264,4 @@ const getStudnetNumber = (collegeID, SubjectID) => __awaiter(void 0, void 0, voi
         throw new ApiError(500, `something went wrong while searching number ${error}`);
     }
 });
-export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer, getStudnetNumber, };
+export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer, getStudnetNumber };
