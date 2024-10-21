@@ -34,134 +34,24 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
 
-.read-the-docs {
-  color: #888;
-}
-
-
-.signup-container {
-  width: 300px;
-  height: 100px;
-  max-width: 400px;
-  margin: 40px auto;
-  padding: 30px;
-  border-radius: 12px;
- 
- 
-  font-family: 'Arial', sans-serif;
-}
-
-h2 {
-  margin-bottom: 20px;
-  font-size: 28px;
-  color: #343a40;
-  text-align: center;
-}
-
-.form-group {
-  margin-bottom: 10px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
- 
-}
-
-input {
+.app-container {
+  display: flex;
   width: 100%;
-  padding: 14px;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  box-sizing: border-box;
-  font-size: 16px;
-  transition: border-color 0.3s ease;
+  height: 100vh;
 }
 
-input:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(38, 143, 255, 0.25);
+.login-section, .create-account-section {
+  flex: 1; /* Equal width for both sections */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-button {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: black;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+.login-section {
+  background-color: #f2f2f2; /* Light background for login */
 }
 
-button:hover {
-  background-color: #0056b3;
-  color: #85a1be;
-  transform: translateY(-2px);
+.create-account-section {
+  background-color: #e9ecef; /* Slightly darker background for create account */
 }
-
-button:active {
-  background-color: #004085;
-  transform: translateY(0);
-}
-
-.error-message {
-  color: #dc3545;
-  font-size: 14px;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.success-message {
-  color: #28a745;
-  font-size: 14px;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-button{
-  color: whitesmoke;
-}
-
-
-/* App.css */
-.front-page {
-  text-align: center;
-  padding: 20px;
-}
-
-.button-container {
-  margin-top: 20px;
-}
-
-.button {
-  display: inline-block;
-  margin: 10px;
-  padding: 10px 20px;
-  font-size: 16px;
-  color: white;
-  background-color: #007bff;
-  text-decoration: none;
-  border-radius: 4px;
-}
-
-.button:hover {
-  background-color: #0056b3;
-}
-
-.error-message {
-  color: red;
-}
-
-.success-message {
-  color: green;
-}
-
-/* Add more styles as needed */

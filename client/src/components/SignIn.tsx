@@ -1,6 +1,6 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
-import './CreateAccount.css';
+import { Box, Button, Typography,Divider, TextField, FormControl, MenuItem, Select, InputLabel, Card, SelectChangeEvent } from '@mui/material'; // Import SelectChangeEvent
 
 type UserRole = 'Student' | 'College' | 'Examiner';
 
@@ -12,12 +12,11 @@ interface FormData {
   address: string;
   role: UserRole;
   password: string;
-  collegeID?: string; // Optional field for 'Student' role
+  collegeID?: string;
 }
 
-const CreateAccount:React.FC = () => {
-
-  const Backend_URL="http://localhost:4008/api/v1/user/signup";
+const CreateAccount: React.FC = () => {
+  const Backend_URL = "http://localhost:4008/api/v1/user/signup";
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -33,40 +32,32 @@ const CreateAccount:React.FC = () => {
   const [collegeID, setCollegeID] = useState<any[]>([]);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-  const [clikc, setClick] = useState(false);
-  
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
+  const [click, setClick] = useState(false);
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData(prevFormData => ({
       ...prevFormData,
       [name]: name === 'age' ? parseInt(value) : value
     }));
   };
-  const getCollegeID = (e: ChangeEvent<HTMLSelectElement>) => {
+
+  // Use SelectChangeEvent<string> for Material UI Select
+  const getCollegeID = (e: SelectChangeEvent<string>) => {
     const selectedCollegeID = e.target.value;
-    
-    const selectedCollege = collegeID.find(college => college.Id === selectedCollegeID);
-    if (selectedCollege) {
-      setFormData(prevFormData => ({
-        ...prevFormData,
-        collegeID: selectedCollegeID // Assuming college.id is what you're looking for
-      }));
-       }   else {
-        setFormData(prevFormData => ({
-          ...prevFormData,
-          collegeID: undefined // Handle the case where the college is not found
-        }));
-      }
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      collegeID: selectedCollegeID || undefined
+    }));
   };
 
-
-  const handleRoleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  // Use SelectChangeEvent<string> for role change
+  const handleRoleChange = (e: SelectChangeEvent<string>) => {
     const newRole = e.target.value as UserRole;
     setFormData(prevFormData => ({
       ...prevFormData,
       role: newRole,
-      collegeID: newRole === 'Student' ? prevFormData.collegeID : '' // Clear collegeId if role is not 'Student'
+      collegeID: newRole === 'Student' ? prevFormData.collegeID : ''
     }));
   };
 
@@ -74,153 +65,284 @@ const CreateAccount:React.FC = () => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    console.log(formData);
-
     try {
-      console.log(formData)
       const response = await axios.post(`${Backend_URL}`, formData);
       setSuccess('Account created successfully!');
-      console.log(response.data);
     } catch (err) {
       setError('An error occurred while creating the account.');
-      console.error(err);
     }
   };
 
   const getCollege = async () => {
-
-    if (clikc) {
-      return;
-    }
+    if (click) return;
     try {
-      console.log(formData)
-      const res = await axios.get(`${Backend_URL}`)
-      console.log("Fetched College Data:", res.data); // Log the entire response to inspect its structure
-      setCollegeID(res.data.data)
+      const res = await axios.get(`${Backend_URL}`);
+      setCollegeID(res.data.data);
       setClick(true);
-
+    } catch (err) {
+      setError(`An error occurred while fetching colleges: ${err}`);
     }
-    catch (err) {
-      setError('An error occurred while creating the account.${err}');
+  };
 
-    }
-  }
-  
   return (
-    <div className="create-account-page">
-      <div className="create-account-container">
-        <h2>Create Account</h2>
-        {error && <p className="error-message">{error}</p>}
-        {success && <p className="success-message">{success}</p>}
+    <><Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        padding: 4,
+        background: 'linear-gradient(135deg, #1f1f1f, #3b3b3b)',
+      }}
+    >
+      <Card
+        sx={{
+          padding: 4,
+          maxWidth: 500,
+          width: '100%',
+          borderRadius: '16px',
+          boxShadow: '0px 8px 16px rgba(0,0,0,0.4)',
+          backgroundColor: 'rgba(255, 255, 255, 0.2)',
+          backdropFilter: 'blur(10px)',
+        }}
+      >
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{
+            marginBottom: 2,
+            textAlign: 'center',
+            fontWeight: 'bold',
+            color: '#fff',
+          }}
+        >
+          Create Account
+        </Typography>
+
+        {error && <Typography color="error" sx={{ marginBottom: 2 }}>{error}</Typography>}
+        {success && <Typography color="primary" sx={{ marginBottom: 2 }}>{success}</Typography>}
+
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="role">Role</label>
-            <select
+          <FormControl fullWidth sx={{ marginBottom: 2 }}>
+            <InputLabel id="role-label" sx={{ color: '#fff' }}>Role</InputLabel>
+            <Select
+              labelId="role-label"
               id="role"
               name="role"
               value={formData.role}
               onChange={handleRoleChange}
               required
+              label="Role"
+              sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: '#fff',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#fff',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#f57c00',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#f57c00',
+                },
+              }}
             >
-              <option value="Student">Student</option>
-              <option value="College">College</option>
-              <option value="Examiner">Examiner</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="phoneNumber">Phone Number</label>
-            <input
-              type="tel"
-              id="phoneNumber"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="age">Age</label>
-            <input
-              type="number"
-              id="age"
-              name="age"
-              value={formData.age}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="address">Address</label>
-            <input
-              type="text"
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              required
-            />
-          </div>
+              <MenuItem value="Student">Student</MenuItem>
+              <MenuItem value="College">College</MenuItem>
+              <MenuItem value="Examiner">Examiner</MenuItem>
+            </Select>
+          </FormControl>
+
+          <TextField
+            type="text"
+            name="name"
+            label="Name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            fullWidth
+            sx={{
+              marginBottom: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'grey',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'orange',
+              },
+            }} />
+
+          <TextField
+            type="email"
+            name="email"
+            label="Email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            fullWidth
+            sx={{
+              marginBottom: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'grey',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'orange',
+              },
+            }} />
+
+          <TextField
+            type="tel"
+            name="phoneNumber"
+            label="Phone Number"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            required
+            fullWidth
+            sx={{
+              marginBottom: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'grey',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'orange',
+              },
+            }} />
+
+          <TextField
+            type="number"
+            name="age"
+            label="Age"
+            value={formData.age}
+            onChange={handleChange}
+            required
+            fullWidth
+            sx={{
+              marginBottom: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'grey',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'orange',
+              },
+            }} />
+
+          <TextField
+            type="text"
+            name="address"
+            label="Address"
+            value={formData.address}
+            onChange={handleChange}
+            required
+            fullWidth
+            sx={{
+              marginBottom: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'grey',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'orange',
+              },
+            }} />
+
 
           {formData.role === 'Student' && (
-            <div className="form-group">
-              <label htmlFor="role">College Name</label>
-              <select
+            <FormControl fullWidth sx={{ marginBottom: 2 }}>
+              <InputLabel id="collegeID-label" sx={{ color: '#fff' }}>College Name</InputLabel>
+              <Select
+                labelId="collegeID-label"
                 id="collegeID"
-                name="collegeName"
+                name="collegeID"
                 value={formData.collegeID}
                 onClick={getCollege}
                 onChange={getCollegeID}
                 required
+                label="College Name"
+                sx={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  color: '#fff',
+                  '& .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#fff',
+                  },
+                  '&:hover .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#f57c00',
+                  },
+                  '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                    borderColor: '#f57c00',
+                  },
+                }}
               >
-                <option value="" disabled>Select your college</option>
+                <MenuItem value="" disabled>Select your college</MenuItem>
                 {collegeID.map((college, index) => (
-                  <option key={index} value={college.Id}>
-                    
+                  <MenuItem key={index} value={college.Id}>
                     {college.name}
-                    </option>
+                  </MenuItem>
                 ))}
-              </select>
-            </div>
+              </Select>
+            </FormControl>
           )}
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <button type="submit">Create Account</button>
+
+          <TextField
+            type="password"
+            name="password"
+            label="Password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            fullWidth
+            sx={{
+              marginBottom: 2,
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'grey',
+              },
+              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: 'orange',
+              },
+            }} />
+
+
+        
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              backgroundColor: 'orange',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: 'darkorange',
+              },
+              width: '100%',
+              padding: '10px',
+              marginTop: 2,
+            }}
+          >
+            Create Account
+          </Button>
         </form>
-      </div>  
-      
-    </div>
-  );
-}
+        <Divider sx={{ my: 2, color: 'white' }}>or</Divider>
+        <Button fullWidth variant="outlined" color="primary">
+          Sign in with Google
+        </Button>
+        <Button fullWidth variant="outlined" color="primary" sx={{ marginTop: 2 }}>
+          Sign in with Facebook
+        </Button>
+
+      </Card>
+    </Box>
+    <Card />
+    </>
+    );
+
+};
 
 export default CreateAccount;

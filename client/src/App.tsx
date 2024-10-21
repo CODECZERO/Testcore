@@ -1,16 +1,16 @@
 // App.tsx
-import React, { useState, ChangeEvent, FormEvent } from 'react';
-import axios from 'axios';
-import "./App.css";
+import React from 'react';
+import { BrowserRouter as Router,  Routes } from 'react-router-dom';
 
 
 const App: React.FC = () => {
-  return(
-    <>
-      
-    </>
-  )
-  
+  return (
+    <Router>
+      <Routes>
+    
+      </Routes>
+    </Router>
+  );
 };
 
 export default App;
