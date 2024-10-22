@@ -15,6 +15,10 @@ type examdata = {
     QuestionPapaerData: string
 }
 
+type user = {
+    Id: string
+}
+
 interface Requestany extends Request {
     examData?: any
     user?: any
@@ -42,12 +46,16 @@ const giveExam = AsyncHandler(async (req: Requestany, res: Response) => {//this 
 })
 
 const getExam = AsyncHandler(async (req: Requestany, res: Response) => {//get exam data
-    const examdata: examdata = req.examData;//takes parameters from user
-    if (!examdata || !examdata.examID) throw new ApiError(401, "exam data is not provied");//throw error if not provided
+    const user: user = req.user;//takes parameters from user
+    if (!user.Id) throw new ApiError(401, "exam data is not provied");//throw error if not provided
     //@ts-ignore
     const findexam = prisma.exam.findFirst({//find first data which matchs examID
         where: {
-            Id: examdata.examID
+            students:{
+                some:{
+                    Id:user?.Id,
+                }
+            }
         },
         select: {
             Id: true,
