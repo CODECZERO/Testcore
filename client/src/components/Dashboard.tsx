@@ -36,6 +36,7 @@ const Dashboard: React.FC = () => {
         <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
           <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
           <MenuItem onClick={handleClose}>Add Account</MenuItem>
+          <MenuItem>{userInfo?.email}</MenuItem>
         </Menu>
       </Box>
 
