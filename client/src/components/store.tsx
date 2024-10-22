@@ -1,7 +1,7 @@
 // store.ts
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface UserState {
+interface UserState {//slice init data define
   isAuthenticated: boolean;
   userInfo: {
     name: string;
@@ -32,6 +32,8 @@ const userSlice = createSlice({
 
 export const { login, logout } = userSlice.actions;
 
+
+//exporting stores
 export const store = configureStore({
   reducer: {
     user: userSlice.reducer,
