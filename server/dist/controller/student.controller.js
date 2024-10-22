@@ -29,13 +29,17 @@ const giveExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, fu
     return res.status(201).json(new ApiResponse(201, answerQuestion, "answer saved")); //else return successfuly message
 }));
 const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const examdata = req.examData; //takes parameters from user
-    if (!examdata || !examdata.examID)
+    const user = req.user; //takes parameters from user
+    if (!user.Id)
         throw new ApiError(401, "exam data is not provied"); //throw error if not provided
     //@ts-ignore
     const findexam = prisma.exam.findFirst({
         where: {
-            Id: examdata.examID
+            students: {
+                some: {
+                    Id: user === null || user === void 0 ? void 0 : user.Id,
+                }
+            }
         },
         select: {
             Id: true,
