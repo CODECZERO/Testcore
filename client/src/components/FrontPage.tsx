@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Button, Typography, Grow } from '@mui/material';
-import  './frontpage.css';
 
 
 
