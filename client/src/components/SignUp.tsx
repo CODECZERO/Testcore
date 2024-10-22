@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Box, Button, Typography, TextField, FormControl, MenuItem, Select, InputLabel, Card, Divider, CircularProgress } from '@mui/material';
-import { setAuthenticated } from './authSlice';  // Your action to set user authenticated state
+import { login,store } from './store';
 
 type Role = 'Student' | 'College' | 'Examiner';
 
@@ -17,7 +17,7 @@ const Login: React.FC = () => {
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -45,10 +45,16 @@ const Login: React.FC = () => {
       if (response.data) {
         setSuccess('Login successful!');
         setLoading(false);
-        console.log(response.data);
+        //creating object to store userdata and send it to state
+        console.log(response.data.data.userData);
+        const userdata = {
+          name: response.data.data.userData.name,
+          email: response.data.data.userData.email,
+          image:"https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3407.jpg"
+        }
+        // Dispatch the action to set the login state
+        dispatch(login(userdata));
 
-        // Dispatch the action to set the authenticated state
-        dispatch(setAuthenticated(true));
 
         // Redirect to dashboard or desired page after login
         navigate('/Dash-Board');
@@ -56,11 +62,12 @@ const Login: React.FC = () => {
     } catch (err: any) {
       setLoading(false);
       setError(err.response?.data?.message || 'An error occurred during login.');
+      console.log(err)
     }
   };
 
   return (
-    <Box 
+    <Box
       sx={{
         display: 'flex',
         justifyContent: 'center',
@@ -70,7 +77,7 @@ const Login: React.FC = () => {
         background: 'linear-gradient(135deg, #1f1f1f, #3b3b3b)', // Dark gradient background
       }}
     >
-      <Card 
+      <Card
         sx={{
           padding: 4,
           maxWidth: 400,
@@ -78,18 +85,18 @@ const Login: React.FC = () => {
           borderRadius: '16px', // Rounded corners
           boxShadow: '0px 8px 16px rgba(0,0,0,0.4)', // Deep shadow
           backgroundColor: 'rgba(255, 255, 255, 0.1)', // Semi-transparent background for glass effect
-          variant:"elevation=12",
+          variant: "elevation=12",
           border: '1px solid rgba(255, 255, 255, 0.2)', // Optional border for glass effect
           transition: 'transform 0.3s ease-in-out',
           '&:hover': { transform: 'scale(1.01)' }, // Scale on hover
         }}
       >
-        <Typography 
-          variant="h4" 
-          component="h2" 
-          sx={{ 
-            marginBottom: 2, 
-            textAlign: 'center', 
+        <Typography
+          variant="h4"
+          component="h2"
+          sx={{
+            marginBottom: 2,
+            textAlign: 'center',
             fontWeight: 'bold',
             color: '#fff', // Adjusted text color for contrast
           }}
@@ -102,7 +109,7 @@ const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit}>
           <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel id="role-label" sx={{  }}>Role</InputLabel>
+            <InputLabel id="role-label" sx={{}}>Role</InputLabel>
             <Select
               labelId="role-label"
               id="role"
@@ -114,7 +121,7 @@ const Login: React.FC = () => {
                 color: "black",
                 backgroundColor: '#fff',
                 '& .MuiOutlinedInput-notchedOutline': {
-                  
+
                 },
                 '&:hover .MuiOutlinedInput-notchedOutline': {
                   borderColor: '#f57c00',
@@ -122,7 +129,7 @@ const Login: React.FC = () => {
                 },
                 '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                   borderColor: '#f57c00',
-                   // Orange focus color
+                  // Orange focus color
                 },
               }}
             >
@@ -140,9 +147,9 @@ const Login: React.FC = () => {
               variant="outlined"
               required
               fullWidth
-              sx={{ 
+              sx={{
                 '& .MuiOutlinedInput-root': {
-                  color:"black",
+                  color: "black",
                   backgroundColor: '#fff',
                   '& fieldset': {
                     borderColor: 'black',
@@ -184,13 +191,13 @@ const Login: React.FC = () => {
             />
           </FormControl>
 
-          <Button 
-            type="submit" 
-            variant="contained" 
-            fullWidth 
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
             sx={{
-              backgroundColor: '#f57c00', 
-              color: '#fff', 
+              backgroundColor: '#f57c00',
+              color: '#fff',
               fontWeight: 'bold',
               '&:hover': { backgroundColor: '#fb8c00' }, // Lighter orange on hover
               py: 1.5, // Increase padding for button
@@ -201,14 +208,14 @@ const Login: React.FC = () => {
           </Button>
         </form>
 
-        <Divider sx={{ color:"white", my: 2 }}>or</Divider>
+        <Divider sx={{ color: "white", my: 2 }}>or</Divider>
 
-        <Button 
-          fullWidth 
-          variant="outlined" 
+        <Button
+          fullWidth
+          variant="outlined"
           sx={{
             color: '#f57c00',
-            borderColor: '#f57c00', 
+            borderColor: '#f57c00',
             '&:hover': {
               backgroundColor: 'rgba(245, 124, 0, 0.1)',
               borderColor: '#f57c00',
@@ -220,12 +227,12 @@ const Login: React.FC = () => {
           Sign in with Google
         </Button>
 
-        <Button 
-          fullWidth 
-          variant="outlined" 
+        <Button
+          fullWidth
+          variant="outlined"
           sx={{
-            color: '#3b5998', 
-            borderColor: '#3b5998', 
+            color: '#3b5998',
+            borderColor: '#3b5998',
             '&:hover': {
               backgroundColor: 'rgba(59, 89, 152, 0.1)',
               borderColor: '#3b5998',
