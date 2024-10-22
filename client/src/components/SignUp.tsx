@@ -46,7 +46,6 @@ const Login: React.FC = () => {
         setSuccess('Login successful!');
         setLoading(false);
         //creating object to store userdata and send it to state
-        console.log(response.data.data.userData);
         const userdata = {
           name: response.data.data.userData.name,
           email: response.data.data.userData.email,
