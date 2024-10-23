@@ -162,6 +162,25 @@ const findCollege = () => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError(500, error);
     }
 });
+const findSingleCollegeForStudent = (studentID) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield prisma.student.findUnique({
+            where: {
+                Id: studentID,
+            },
+            select: {
+                college: {
+                    select: {
+                        name: true,
+                    }
+                }
+            }
+        });
+    }
+    catch (error) {
+        throw new ApiError(500, `something went while finding college ${error}`);
+    }
+});
 //find single subject for college,examiner and student
 const getSubject = (subjectCode, subjectName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -283,4 +302,4 @@ const getExam = (examID) => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError(500, `something went wrong while finding exam ${error}`);
     }
 });
-export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer, getStudnetNumber, getExam, };
+export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, findSingleCollegeForStudent, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer, getStudnetNumber, getExam, };
