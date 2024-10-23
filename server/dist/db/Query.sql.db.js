@@ -264,4 +264,23 @@ const getStudnetNumber = (collegeID, SubjectID) => __awaiter(void 0, void 0, voi
         throw new ApiError(500, `something went wrong while searching number ${error}`);
     }
 });
-export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer, getStudnetNumber, };
+const getExam = (examID) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        return yield prisma.exam.findUnique({
+            where: {
+                Id: examID,
+            },
+            select: {
+                Id: true,
+                subjectID: true,
+                examName: true,
+                examinerID: true,
+                date: true,
+            }
+        });
+    }
+    catch (error) {
+        throw new ApiError(500, `something went wrong while finding exam ${error}`);
+    }
+});
+export { createOp, findOp, updateOp, deleteOp, deletMOp, updatePasswordInDB, findCollege, getSubject, findStudnet, getQuestionPaper, getQuestionPaperForExaminer, getStudnetNumber, getExam, };

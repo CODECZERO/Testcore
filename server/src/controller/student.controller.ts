@@ -6,6 +6,8 @@ import { Request, Response } from "express";
 import { TimeTable } from "../models/timetable.model.nosql.js";
 import { getQuestionPaper } from "../db/Query.sql.db.js";
 
+
+//here change logic , of exam data or make function for examdata with token intergation with other user id and college id , exam-college - college will check student and add data on student table which is sql id of exam or can take unqiue exam from user as input then find that exam
 type examdata = {
     examID: string
     QuestionPaperId: string
@@ -30,13 +32,14 @@ type classData = {
 
 const giveExam = AsyncHandler(async (req: Requestany, res: Response) => {//this function saves question data in database
     const examdata: examdata = req.examData;//takes data from user
+    const {Answer,QuestionPapaerData}=req.body;
     const answerQuestion = await prisma.questionPaper.create({//updates question paper answer col
         data: {
             SubjectID: examdata.SubjectID,
             studentID: examdata.StudentId,
             examID: examdata.examID,
-            answer: examdata.Answer,
-            question: JSON.stringify(examdata.QuestionPapaerData)
+            answer: Answer,
+            question: JSON.stringify(QuestionPapaerData)
         }
     });
     if (!answerQuestion) throw new ApiError(421, "answer was not updated");//if unable to update then throw error
@@ -46,16 +49,12 @@ const giveExam = AsyncHandler(async (req: Requestany, res: Response) => {//this 
 })
 
 const getExam = AsyncHandler(async (req: Requestany, res: Response) => {//get exam data
-    const user: user = req.user;//takes parameters from user
-    if (!user.Id) throw new ApiError(401, "exam data is not provied");//throw error if not provided
+    const examData: examdata = req.examData;//takes parameters from user
+    if (!examData.examID) throw new ApiError(401, "exam data is not provied");//throw error if not provided
     //@ts-ignore
     const findexam = prisma.exam.findFirst({//find first data which matchs examID
         where: {
-            students:{
-                some:{
-                    Id:user?.Id,
-                }
-            }
+            Id:examData.examID,
         },
         select: {
             Id: true,

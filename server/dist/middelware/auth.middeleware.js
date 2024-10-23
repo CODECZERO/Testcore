@@ -8,9 +8,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import jwt from "jsonwebtoken";
-import { findOp } from "../db/Query.sql.db.js";
+import { findOp, getExam } from "../db/Query.sql.db.js";
 import { ApiError } from "../util/apiError.js";
 import AsyncHandler from "../util/ayscHandler.js";
+import { searchMongodb } from "../db/database.MongoDb.js";
 const verifyData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -36,6 +37,23 @@ const verifyData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, vo
         next(new ApiError(401, "Unauthorized: Invalid token or role is missing"));
     }
 }));
-const examData = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const verifyexamData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    try { //write user verify logic here
+        const token = ((_b = req.cookies) === null || _b === void 0 ? void 0 : _b.ExamToken) || req.body;
+        if (!token)
+            throw new ApiError(400, "Token not provided");
+        const findTokenInMonogoDb = yield searchMongodb(token);
+        if (!findTokenInMonogoDb)
+            throw new ApiError(404, "Token data not found");
+        const findTokenInDb = yield getExam(findTokenInMonogoDb === null || findTokenInMonogoDb === void 0 ? void 0 : findTokenInMonogoDb.examID);
+        if (!findTokenInDb)
+            throw new ApiError(404, "exam data not found");
+        req.examData = findTokenInDb;
+        next();
+    }
+    catch (error) {
+        next(new ApiError(401, "Unauthorized: Invalid token"));
+    }
 }));
-export { verifyData };
+export { verifyData, verifyexamData };

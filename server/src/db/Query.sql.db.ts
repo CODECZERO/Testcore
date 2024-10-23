@@ -280,6 +280,27 @@ const getStudnetNumber = async (collegeID: string, SubjectID: string) => {//get 
     }
 }
 
+const getExam = async (examID: string) => {
+
+    try {
+        return await prisma.exam.findUnique({
+            where: {
+                Id: examID,
+            },
+            select: {
+                Id: true,
+                subjectID: true,
+                examName: true,
+                examinerID: true,
+                date: true,
+            }
+        });
+
+    } catch (error) {
+        throw new ApiError(500, `something went wrong while finding exam ${error}`);
+    }
+}
+
 export {
     createOp,
     findOp,
@@ -293,5 +314,6 @@ export {
     getQuestionPaper,
     getQuestionPaperForExaminer,
     getStudnetNumber,
+    getExam,
 
 }
