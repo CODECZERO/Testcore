@@ -223,7 +223,7 @@ const getExam = AsyncHandler(async (req: Requestany, res: Response) => {//this f
 
 
     if (!findExams) throw new ApiError(404, "Exam not found");
-    return res.status(200).json(new ApiResponse(200, { examdata: findExams}, "Exam Found"));//returing data
+    return res.status(200).json(new ApiResponse(200, { examdata: findExams }, "Exam Found"));//returing data
 
 })
 

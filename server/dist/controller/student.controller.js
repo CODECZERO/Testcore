@@ -7,20 +7,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 import prisma from "../db/database.Postgres.js";
 import { ApiError } from "../util/apiError.js";
 import { ApiResponse } from "../util/apiResponse.js";
 import AsyncHandler from "../util/ayscHandler.js";
 import { TimeTable } from "../models/timetable.model.nosql.js";
-import { getQuestionPaper } from "../db/Query.sql.db.js";
+import { findSingleCollegeForStudent, getQuestionPaper } from "../db/Query.sql.db.js";
 const giveExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examdata = req.examData; //takes data from user
     const { Answer, QuestionPapaerData } = req.body;
     const answerQuestion = yield prisma.questionPaper.create({
         data: {
-            SubjectID: examdata.SubjectID,
-            studentID: examdata.StudentId,
-            examID: examdata.examID,
+            SubjectID: examdata.findTokenInDb.SubjectID,
+            studentID: examdata.userData.Id,
+            examID: examdata.findTokenInDb.Id,
             answer: Answer,
             question: JSON.stringify(QuestionPapaerData)
         }
@@ -31,12 +42,12 @@ const giveExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, fu
 }));
 const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examData = req.examData; //takes parameters from user
-    if (!examData.examID)
+    if (!examData.findTokenInDb.Id)
         throw new ApiError(401, "exam data is not provied"); //throw error if not provided
     //@ts-ignore
     const findexam = prisma.exam.findFirst({
         where: {
-            Id: examData.examID,
+            Id: examData.findTokenInDb.Id,
         },
         select: {
             Id: true,
@@ -62,26 +73,28 @@ const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, fun
     return res.status(200).json(new ApiResponse(200, findexam, "Exam Found")); //else return response
 }));
 const getTimeTable = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const classdata = req.body; //takes data from user
-    if (!classdata || !classdata.Class || !classdata.CollegeName)
+    const user = req.user; //takes data from user
+    const { Class } = req.body; //takes dat from user
+    const name = __rest(yield findSingleCollegeForStudent(user === null || user === void 0 ? void 0 : user.Id), []); //finds user college using his id;
+    if (!Class || !name)
         throw new ApiError(400, "Invalid data"); //if not provided then throw error
     const findtimetable = yield TimeTable.findOne({
-        Class: classdata.Class,
-        CollegeName: classdata.CollegeName
+        Class: Class,
+        CollegeName: name
     });
     if (!findtimetable)
         throw new ApiError(404, "time table not found"); //not found throw error
-    return res.status(200).json(new ApiResponse(200, findtimetable, `time table of class ${classdata.Class} of ${classdata.CollegeName}`)); //else return data
+    return res.status(200).json(new ApiResponse(200, findtimetable, `time table of class ${Class} of ${name}`)); //else return data
 }));
 const getResult = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const resultdata = req.examData; //takes parameters from user
-    if (!resultdata)
+    if (!resultdata || !resultdata.userData.Id)
         throw new ApiError(401, "no data is provied"); //if not provided then throw error
     const findresult = yield prisma.result.findMany({
         where: {
             OR: [
-                { questionPaperID: resultdata.QuestionPaperId },
-                { StudentId: resultdata.StudentId }
+                { questionPaperID: resultdata.findTokenInDb.QuestionPaperId },
+                { StudentId: resultdata.userData.Id }
             ]
         },
         select: {
@@ -101,11 +114,11 @@ const getResult = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, f
 }));
 const getQuestionPaperForStundet = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examdata = req.examData; //take parameters from studnet
-    if (!examdata.examID)
-        throw new ApiError(400, "exmaid is not provided");
-    const findexam = yield getQuestionPaper(examdata.examID); //find in database
+    if (!examdata.findTokenInDb.Id)
+        throw new ApiError(400, "examid is not provided");
+    const findexam = yield getQuestionPaper(examdata.findTokenInDb.Id); //find in database
     if (!findexam)
         throw new ApiError(400, "no exam found"); //if not found throw error
-    return res.status(200).json(new ApiResponse(200, findexam, "Question papre data")); //if found then return data
+    return res.status(200).json(new ApiResponse(200, findexam, "Question paper data")); //if found then return data
 }));
 export { getExam, getResult, getTimeTable, getQuestionPaperForStundet, giveExam };
