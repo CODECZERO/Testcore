@@ -27,6 +27,7 @@ import { uploadFile } from '../util/fileUploder.util.js';
 import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
 import Tracker from './loginTracker.controller.js';
+import { ClassModel } from '../models/class.model.nosql.js';
 //all error retunr/out format
 // {
 //     "statusCode": error status code,
@@ -158,4 +159,22 @@ const SessionActive = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 
         throw new ApiError(401, "user is not auth"); //if user is not verify
     return res.status(200).json(new ApiResponse(200, verify, "user is auth")); //return res and verfiy data
 }));
-export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen, SessionActive, options };
+const getClass = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    //it may be used futher
+    const UserClass = yield ClassModel.find({}).select('name _id'); //taking name and id from the schema
+    if (!UserClass)
+        throw new ApiError(404, "Class not fount");
+    return res.status(200).json(new ApiResponse(200, UserClass, "user class"));
+}));
+const createClass = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { Classname } = req.body; //taking class name from user, takes class name from user and make class using it
+    if (!Classname)
+        throw new ApiError(400, "class name is not provided");
+    const createClassForuser = yield ClassModel.create({
+        name: Classname //create class
+    });
+    if (!createClassForuser)
+        throw new ApiError(406, "unable to create class or class existe");
+    return res.status(200).json(new ApiResponse(200, createClassForuser, "class created successfuly")); //return if successfuly
+}));
+export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen, SessionActive, options, getClass, createClass, };
