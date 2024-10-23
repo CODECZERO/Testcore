@@ -170,6 +170,26 @@ const findCollege = async () => {//findig college name from college table
     }
 }
 
+const findSingleCollegeForStudent=async(studentID:string)=>{//find college name using user id or student id
+    try {
+        return await prisma.student.findUnique({
+            where:{
+                Id:studentID,//takes unique student id
+            },
+            select:{
+                college:{//find college names and returns it
+                    select:{
+                        name:true,
+                    }
+                }
+            }
+            
+        });
+    } catch (error) {
+        throw new ApiError(500,`something went while finding college ${error}`);
+    }
+}
+
 //find single subject for college,examiner and student
 
 
@@ -280,6 +300,27 @@ const getStudnetNumber = async (collegeID: string, SubjectID: string) => {//get 
     }
 }
 
+const getExam = async (examID: string) => {//this find exam in databases
+
+    try {
+        return await prisma.exam.findUnique({
+            where: {
+                Id: examID,//it takes unique exam id using those abstraction of process
+            },
+            select: {//and later return this type of data
+                Id: true,
+                subjectID: true,
+                examName: true,
+                examinerID: true,
+                date: true,
+            }
+        });
+
+    } catch (error) {
+        throw new ApiError(500, `something went wrong while finding exam ${error}`);
+    }
+}
+
 export {
     createOp,
     findOp,
@@ -288,10 +329,12 @@ export {
     deletMOp,
     updatePasswordInDB,
     findCollege,
+    findSingleCollegeForStudent,
     getSubject,
     findStudnet,
     getQuestionPaper,
     getQuestionPaperForExaminer,
     getStudnetNumber,
+    getExam,
 
 }
