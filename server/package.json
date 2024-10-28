@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "npm install && prisma generate && node ./dist/index.js",
-    "dev": "nodemon ./dist/index.js"
+    "dev": "nodemon ./dist/index.js",
+    "stressTest":"artillery run ./testing/streesTesting/test.yml"
   },
   "keywords": [],
   "author": "",

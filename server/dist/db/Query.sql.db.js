@@ -166,7 +166,7 @@ const findSingleCollegeForStudent = (studentID) => __awaiter(void 0, void 0, voi
     try {
         return yield prisma.student.findUnique({
             where: {
-                Id: studentID,
+                Id: studentID, //takes unique student id
             },
             select: {
                 college: {
@@ -287,7 +287,7 @@ const getExam = (examID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield prisma.exam.findUnique({
             where: {
-                Id: examID,
+                Id: examID, //it takes unique exam id using those abstraction of process
             },
             select: {
                 Id: true,
