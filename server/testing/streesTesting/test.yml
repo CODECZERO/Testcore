@@ -1,0 +1,49 @@
+config:
+  target: "http://localhost:4008"  # Your backend server URL
+  phases:
+    - duration: 60  # Run for 30 minutes
+      arrivalRate: 50  # Number of new virtual users per second
+      rampTo: 100      # Gradually increase to 100 users per second
+      name: "Initial Ramp-Up"
+
+scenarios:
+  # Scenario 1: User Login
+  - name: "User Login"
+    flow:
+      - post:
+          url: "/api/v1/user/login"            # Endpoint for logging in
+          json:
+            email: "RaisodDni@gaffmil.com"  # Use data from users.json
+            password: "RaisonDi23"
+            role: "College"
+          capture:
+            - json: "$.token"           # Capture JWT token for authenticated requests
+              as: "authToken"
+
+  # # Scenario 2: Fetch User Data
+  # - name: "Fetch User Data"
+  #   flow:
+  #     - get:
+  #         url: "/api/v1/user/signup"         # Endpoint to fetch user-specific data
+  #         headers:
+  #           Authorization: "Bearer {{ authToken }}"  # Use token from login
+
+  # # Scenario 3: Add New Item
+  # - name: "Add New Item"
+  #   flow:
+  #     - post:
+  #         url: "/api/items"            # Endpoint to create a new item
+  #         headers:
+  #           Authorization: "Bearer {{ authToken }}"  # Authenticated request
+  #         json:
+  #           name: "Sample Item"
+  #           description: "This is a sample item description."
+  #           price: 9.99
+
+  # Optional: Keep Adding Load
+  - name: "Continuous Load"
+    flow:
+      - post:
+          url: "/api/load-test"        # An endpoint that simulates load
+          json:
+            payload: "heavy load"       # Adjust as necessary
