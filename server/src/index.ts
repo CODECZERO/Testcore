@@ -1,5 +1,6 @@
 import { config } from "dotenv";
 config();
+
 import app from "./app.js";
 import connectAll from "./util/appStarupt.util.js";
 

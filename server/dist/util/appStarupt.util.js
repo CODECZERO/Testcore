@@ -12,7 +12,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { ApiError } from "./apiError.js";
 import { runWebSocket } from "../services/chat/chatServer.service.js"; //this function make sure that rabbitmq is start
-import prisma from "../db/database.Postgres.js";
 import { connectDb } from "../db/database.MongoDb.js";
 import { connectReids } from "../db/database.redis.query.js";
 import { runVideoServer } from "../services/videostream/videoMain.services.js";
@@ -21,11 +20,12 @@ const connectAll = () => __awaiter(void 0, void 0, void 0, function* () {
         //@ts-ignore
         yield runWebSocket();
         console.log("Websocket is Runing");
-        yield prisma.$connect();
-        console.log("Postgres sql is Runing");
+        // await prisma.$connect();
+        // console.log("Postgres sql is Runing");
         yield connectDb();
         console.log("Mongodb is Runing");
         yield connectReids();
+        console.log("Redis is Runing");
         yield runVideoServer();
         console.log("runing video server");
     }
