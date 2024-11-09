@@ -63,4 +63,12 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
         });
     });
 }));
-export { runWebSocket, clients, rooms }; //exoprt the function so you can start the server at the beging
+const closeChatSocket = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        wss.close();
+    }
+    catch (error) {
+        return error;
+    }
+});
+export { runWebSocket, clients, rooms, closeChatSocket }; //exoprt the function so you can start the server at the beging

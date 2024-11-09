@@ -12,7 +12,7 @@ import { examDataStore } from '../models/examDatamanage.model.nosql.js';
 const connectDb = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const connectionInstance = yield mongoose.connect(`${process.env.MONGODB_URL}`);
-        return "connected";
+        return connectionInstance;
     }
     catch (error) {
         console.log(`There is error while connecting to db \n \t ${error} `);
@@ -31,4 +31,14 @@ const searchMongodb = (tokenID) => __awaiter(void 0, void 0, void 0, function* (
         throw new Error("Error while searching in MongoDB");
     }
 });
-export { connectDb, searchMongodb };
+const closeDb = (client) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        yield client.close();
+        console.log("Disconnected from MongoDB");
+        process.exit(0);
+    }
+    catch (error) {
+        console.log(`something went wrong while closeing mongodb connection ${error}`);
+    }
+});
+export { connectDb, searchMongodb, closeDb };
