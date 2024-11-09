@@ -124,4 +124,12 @@ const runVideoServer = async () => {
 
 }
 
-export { runVideoServer, userTransport };
+
+const closeVideoServer=async()=>{//close video server
+    try {
+        wss.close();
+    } catch (error) {
+        return error;
+    }
+}
+export { runVideoServer, userTransport,closeVideoServer };

@@ -126,6 +126,14 @@ const removeVideoServerTranspor=async(Id:string)=>{//remove video server data af
         throw new ApiError(500,`something went wrong while removeing data ${error}`)
     }
 }
+
+const closeRedis=async()=>{//this function close redis connection
+    try {
+        client.disconnect();
+    } catch (error) {
+        throw new ApiError(500,`something went while closeing redis connection`);
+    }
+}
 export {
     cacheSearch,
     cacheUpdate,
@@ -134,6 +142,7 @@ export {
     cacheUpdateForChatRoom,
     getVideoServerTransport,
     setVideoServerTransport,
-    removeVideoServerTranspor
+    removeVideoServerTranspor,
+    closeRedis
     
 }

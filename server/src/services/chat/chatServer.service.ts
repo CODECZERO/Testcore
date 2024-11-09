@@ -100,10 +100,19 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
   });
 });
 
+const closeChatSocket=async ()=>{//close websokcet for chat service
+  try {
+    wss.close();
+  } catch (error) {
+    return error;
+  }
+}
+
 export {
   runWebSocket,
   MessageData,
   CustomWebSocket,
   clients,
-  rooms
+  rooms,
+  closeChatSocket
 }//exoprt the function so you can start the server at the beging

@@ -75,7 +75,8 @@ const verifyexamData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0
         if (!findTokenInDb)
             throw new ApiError(404, "exam data not found");
         const { password: _ } = findUser, userData = __rest(findUser, ["password"]);
-        req.examData = { findTokenInDb, userData };
+        req.examData = { findTokenInDb, userData }; //returning two different object in two different way , as it can be accessed according to use not all at a time
+        //as it makes hard to understand but it's may be good 
         next();
     }
     catch (error) {

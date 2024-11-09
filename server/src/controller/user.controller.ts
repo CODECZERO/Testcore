@@ -9,7 +9,6 @@ import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
 import Tracker from './loginTracker.controller.js';
 import { ClassModel } from '../models/class.model.nosql.js';
-import { error } from 'console';
 
 
 //all error retunr/out format
@@ -54,6 +53,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
         ...findUser,
         refreshToken
     }
+    
     await updateOp(data, role);//pass the role to user it's necessary
     const trackerUpdate = await Tracker(findUser.Id, req);
     const { password: _, ...userData } = findUser;//removing user password form find user
