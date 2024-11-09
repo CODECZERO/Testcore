@@ -140,4 +140,12 @@ const removeVideoServerTranspor = (Id) => __awaiter(void 0, void 0, void 0, func
         throw new ApiError(500, `something went wrong while removeing data ${error}`);
     }
 });
-export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom, getVideoServerTransport, setVideoServerTransport, removeVideoServerTranspor };
+const closeRedis = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        client.disconnect();
+    }
+    catch (error) {
+        throw new ApiError(500, `something went while closeing redis connection`);
+    }
+});
+export { cacheSearch, cacheUpdate, connectReids, cacheSearchForChatRoom, cacheUpdateForChatRoom, getVideoServerTransport, setVideoServerTransport, removeVideoServerTranspor, closeRedis };
