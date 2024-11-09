@@ -78,4 +78,12 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
         });
     });
 });
-export { runVideoServer };
+const closeVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        wss.close();
+    }
+    catch (error) {
+        return error;
+    }
+});
+export { runVideoServer, closeVideoServer };
