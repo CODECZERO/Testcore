@@ -61,7 +61,6 @@ const Login: React.FC = () => {
     } catch (err: any) {
       setLoading(false);
       setError(err.response?.data?.message || 'An error occurred during login.');
-      console.log(err)
     }
   };
 

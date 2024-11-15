@@ -37,7 +37,8 @@ const tokenGen = async (user: {
     const refreshToken = await genReffToken(user);//calling genReffToken function to genrate refersh token for server
     return { accesToken, refreshToken };//returing both of theme
 }
-//
+
+//give access to data and other stuff aka login logic
 const login = AsyncHandler(async (req: Request, res: Response) => {
     const { email, password, role } = req.body;
     if (!(email && password && role)) throw new ApiError(400, "Invaild email id,role or password");
@@ -47,6 +48,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
     const passwordCheck = await bcrypt.compare(password, findUser.password);
 
     if (!passwordCheck) throw new ApiError(400, "Invalid password")
+
     const findAndRole = { ...findUser, role }
     const { refreshToken, accesToken } = await tokenGen(findAndRole);//genereating token for the user
     const data = {//passing refersh token to the database
@@ -55,7 +57,8 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
     }
     
     await updateOp(data, role);//pass the role to user it's necessary
-    const trackerUpdate = await Tracker(findUser.Id, req);
+
+    const trackerUpdate = await Tracker(findUser.Id, req);//save's user ip adrress in database  ;
     const { password: _, ...userData } = findUser;//removing user password form find user
 
     return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(
