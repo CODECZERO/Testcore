@@ -1,0 +1,28 @@
+import React from 'react'
+import { RootState, logout } from './store';
+import { useDispatch, useSelector } from 'react-redux';
+import {BiSearch,BiNotification} from 'react-icons/bi'
+
+const ContentHeader = () => {
+    const userInfo = useSelector((state: RootState) => state.user.userInfo);
+    
+  return (
+    <div className='content-header'>
+        <h1 className="header--title">Welcome {userInfo?.name}</h1>
+        <div className="header--activity">
+        <input type="text" 
+        placeholder='search anything here....'
+        />
+        <BiSearch className='icon'/>
+        </div>
+        <div className="notify">
+<BiNotification className='icon'/>
+ 
+        </div>
+
+     
+    </div>
+  )
+}
+
+export default ContentHeader

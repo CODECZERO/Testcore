@@ -31,7 +31,7 @@ const darkTheme = createTheme({
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <FrontPage />,
+    element: <Dashboard />,
   },
   {
     path: "/sessioncheck",
