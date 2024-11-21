@@ -32,7 +32,6 @@ RUN npm install -g typescript
 RUN npx prisma generate
 
 # Copy Prisma folder (including migrations and schema)
-COPY prisma ./prisma
 
 # Copy TypeScript source code (e.g., the 'src' folder and other necessary files)
 COPY src ./src
