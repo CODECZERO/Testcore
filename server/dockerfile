@@ -1,16 +1,18 @@
 FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies
+# Install system dependencies including Python and pip
 RUN apt-get update && apt-get install -y \
     curl \
     gnupg \
     build-essential \
     bash \
     software-properties-common \
+    python3 \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Add Node.js 22.x repository and install Node.js and npm
+# Install Node.js 22.x repository and install Node.js and npm
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs
 
