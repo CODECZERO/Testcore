@@ -1,39 +1,27 @@
-
 # Use an official Node.js image as the base
 FROM node:18
 
-# Install Nginx
-RUN apt-get update && apt-get install -y nginx && \
-    rm -rf /var/lib/apt/lists/*
+# Install Nginx (or any other necessary system dependencies)
+RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy only necessary files
-COPY package*.json tsconfig.json ./
+# Copy package.json and package-lock.json to install dependencies
+COPY package*.json ./
 
-# Install dependencies (lincluding dev dependencies for TypeScript)
-RUN npm install
+# Install dependencies (production dependencies only)
+RUN npm install --production
 
-# Copy application files for TypeScript compilation
-COPY . .
-
-# Compile TypeScript code
-RUN npm run build && rm -rf src tsconfig.json
-
-# Copy the Nginx configuration file
+# Copy precompiled code (dist folder and any other necessary files)
+COPY dist ./dist
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose ports
-EXPOSE 10000
-
-# Set environment variables (can also use Docker Compose or Render environment settings)
+# Set environment variables (you can define more in Render’s environment settings)
 ENV NODE_ENV=production
 
-# Install only production dependencies after removing dev files
+# Expose the port (assuming the app runs on PORT defined in Render)
+EXPOSE 10000
 
-
-RUN npm prune --production
-
-# Start both Nginx and the Node.js app
+# Start the app and Nginx
 CMD ["sh", "-c", "service nginx start && node dist/app.js"]
