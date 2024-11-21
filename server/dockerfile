@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies
@@ -7,22 +7,15 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     build-essential \
     bash \
-    software-properties-common
+    software-properties-common \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install NVM (Node Version Manager)
-ENV NVM_DIR=/root/.nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-
-# Install Node.js and npm via NVM
-RUN /bin/bash -c "source $NVM_DIR/nvm.sh && nvm install 22 && nvm alias default 22"
-
-# Set environment variables for Node.js and npm
-ENV NODE_VERSION=22
-ENV NODE_PATH=$NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
-ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+# Add Node.js 22.x repository and install Node.js and npm
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs
 
 # Verify Node.js and npm installation
-RUN /bin/bash -c "node -v && npm -v"
+RUN node -v && npm -v
 
 # Set the working directory
 WORKDIR /app
@@ -31,10 +24,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install npm dependencies
-RUN /bin/bash -c "npm install"
+RUN npm install
 
 # Generate Prisma Client (this ensures Prisma client is generated)
-RUN /bin/bash -c "npx prisma generate"
+RUN npx prisma generate
 
 # Copy Prisma folder (including migrations and schema)
 COPY prisma ./prisma
