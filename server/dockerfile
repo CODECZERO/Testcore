@@ -41,7 +41,6 @@ COPY tsconfig.json ./
 RUN tsc && rm -rf src tsconfig.json
 
 # Copy precompiled code (dist folder) and Nginx configuration
-COPY dist ./dist
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Set environment variables
