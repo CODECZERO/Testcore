@@ -10,12 +10,14 @@ RUN apt-get update && apt-get install -y \
     software-properties-common \
     python3 \
     python3-pip \
+    nginx \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Node.js 22.x repository and install Node.js and npm
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
-    && apt-get install -y nodejs
 
+# Install Node.js (Using NodeSource)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
+    RUN apt-get install -y nodejs
+    
 # Verify Node.js and npm installation
 RUN node -v && npm -v
 
@@ -24,15 +26,12 @@ WORKDIR /app
 
 # Copy application dependencies
 COPY package*.json ./
-
-# Install npm dependencies
-RUN npm install
-
-# Copy Prisma folder (including migrations and schema)
 COPY prisma ./prisma
 
-# Generate Prisma Client (this ensures Prisma client is generated)
-RUN npx prisma generate
+#installing packages
+RUN npm install
+#running prisma to create schema and skiping yes otpions
+RUN echo "yes" | npx prisma generate
 
 
 # Copy application files
@@ -49,3 +48,4 @@ EXPOSE 10000
 
 # Start Nginx and the Node.js app
 CMD ["sh", "-c", "service nginx start && node dist/app.js"]
+
