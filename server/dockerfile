@@ -28,15 +28,15 @@ COPY package*.json ./
 # Install npm dependencies
 RUN npm install
 
-# Generate Prisma Client (this ensures Prisma client is generated)
-RUN npx prisma generate
-
 # Copy Prisma folder (including migrations and schema)
 COPY prisma ./prisma
 
+# Generate Prisma Client (this ensures Prisma client is generated)
+RUN npx prisma generate
+
+
 # Copy application files
 COPY dist ./dist
-RUN npm prisma generate
 
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
