@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "prisma generate",
+    "build": "tsc && prisma generate",
     "dev": "nodemon ./dist/index.js",
     "stressTest": "artillery run ./testing/stressTesting/load-testing.yml -o ./testing/stressTesting/results.json",
     "startScale": "npx pm2 start ./dist/index.js -i 4 --name my-app --watch && npx pm2 scale my-app 3  && npx pm2 monit ",
