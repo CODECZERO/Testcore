@@ -31,8 +31,7 @@ COPY prisma ./prisma
 #installing packages
 RUN npm install
 #running prisma to create schema and skiping yes otpions
-RUN echo "yes" | npx prisma generate
-
+RUN yes | npx prisma generate
 
 # Copy application files
 COPY dist ./dist
