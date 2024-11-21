@@ -1,34 +1,53 @@
-# Use an official Node.js image as the base
-FROM node:18
+FROM ubuntu
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies (e.g., Nginx)
-RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+#install nodejs in the ubuntu
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    build-essential
 
-# Set the working directory inside the container
+
+
+
+#tells the path to container
+ENV NVM_DIR=/root/.nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+RUN /bin/bash -c "source $NVM_DIR/nvm.sh && nvm install 22 && nvm use 22 && nvm alias default 22"
+
+ENV NODE_VERSION=22
+ENV NODE_PATH=$NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
+ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+
+RUN /bin/bash -c "source $NVM_DIR/nvm.sh && node -v"
+RUN /bin/bash -c "source $NVM_DIR/nvm.sh && npm -v"
+
+# Set the working directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
 
-# Install all dependencies (including Prisma)
+# Install npm dependencies
 RUN npm install
 
-# Generate Prisma Client (this step ensures Prisma client is generated)
-RUN npx prisma generated
-# Copy the Prisma folder (including migrations and schema)
+# Generate Prisma Client (this ensures Prisma client is generated)
+RUN npx prisma generate
+
+# Copy Prisma folder (including migrations and schema)
 COPY prisma ./prisma
 
-# Copy precompiled code (dist folder)
+# Copy the precompiled code (dist folder)
 COPY dist ./dist
 
-# Copy the Nginx configuration
+# Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Set environment variables (you can define more in Render’s environment settings)
+# Set environment variables
 ENV NODE_ENV=production
 
-# Expose the port (assuming the app runs on PORT defined in Render)
+# Expose the application port
 EXPOSE 10000
 
-# Start the app and Nginx
+# Start Nginx and the Node.js app
 CMD ["sh", "-c", "service nginx start && node dist/app.js"]
