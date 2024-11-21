@@ -1,33 +1,55 @@
-# Use an official Node.js image as the base
-FROM node:18
+# Use Debian (or Ubuntu) as the base image
+FROM debian:bullseye-slim
 
-# Install system dependencies (e.g., Nginx)
-RUN apt-get update && apt-get install -y nginx && rm -rf /var/lib/apt/lists/*
+# Install necessary system dependencies for Node.js, Prisma, TypeScript, and Nginx
+RUN apt-get update && apt-get install -y \
+    curl \
+    bash \
+    nginx \
+    git \
+    build-essential \
+    ca-certificates \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Set the working directory inside the container
+# Install Node.js (LTS version)
+RUN curl -sL https://deb.nodesource.com/setup_18.x | bash \
+    && apt-get install -y nodejs
+
+# Set the working directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
 
-# Install all dependencies (including Prisma)
+# Install npm dependencies
 RUN npm install
 
+# Install TypeScript globally to compile your code
+RUN npm install -g typescript
 
-# Copy the Prisma folder (including migrations and schema)
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Copy Prisma folder (including migrations and schema)
 COPY prisma ./prisma
 
-# Copy precompiled code (dist folder)
-COPY dist ./dist
+# Copy TypeScript source code (e.g., the 'src' folder and other necessary files)
+COPY src ./src
+COPY tsconfig.json ./
 
-# Copy the Nginx configuration
+# Compile TypeScript code to JavaScript (dist folder)
+RUN tsc && rm -rf src tsconfig.json
+
+# Copy precompiled code (dist folder) and Nginx configuration
+COPY dist ./dist
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Set environment variables (you can define more in Render’s environment settings)
+# Set environment variables
 ENV NODE_ENV=production
 
-# Expose the port (assuming the app runs on PORT defined in Render)
+# Expose the application port
 EXPOSE 10000
 
-# Start the app and Nginx
+# Start Nginx and the Node.js app
 CMD ["sh", "-c", "service nginx start && node dist/app.js"]
