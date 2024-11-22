@@ -49,5 +49,4 @@ EXPOSE 9022
 
 
 # Start Nginx and the Node.js app
-CMD ["sh", "-c", "node dist/app.js "]
-
+CMD ["sh", "-c", "nginx -g 'daemon off;' && node dist/app.js"]
