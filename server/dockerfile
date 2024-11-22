@@ -36,7 +36,36 @@ RUN yes | npx prisma generate
 # Copy application files
 COPY dist ./dist
 
-
+ENV MONGODB_URL="mongodb+srv://devteam:gHuK9QO38qjPFD2Q@cluster0.q9nlhnn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" \
+    CROS_ORGIN="*" \
+    PORT=10000 \
+    POSTGRES_URL="postgres://avnadmin:AVNS_AX_aYeL7j74WiJsUuji@pg-1f3098d9-as8857981-204b.h.aivencloud.com:16430/defaultdb?sslmode=require" \
+    POSTGRES_PRISMA_URL="postgres://avnadmin:AVNS_AX_aYeL7j74WiJsUuji@pg-1f3098d9-as8857981-204b.h.aivencloud.com:16430/defaultdb?sslmode=require" \
+    POSTGRES_USER="avnadmin" \
+    POSTGRES_HOST="pg-1f3098d9-as8857981-204b.h.aivencloud.com" \
+    POSTGRES_PASSWORD="AVNS_AX_aYeL7j74WiJsUuji" \
+    POSTGRES_DATABASE="defaultdb" \
+    UNIHASH="sdfsdafe24r43sdf" \
+    ATS="390jdosijo09iwrjiof" \
+    ATE="1h" \
+    RTS="JKLJLJKL" \
+    RTE="1d" \
+    ChatSecretAccessToken="390jdosijo09iwrjiof" \
+    ChatSecretExpirToken="1h" \
+    CLOUDNAME="dm28eqrek" \
+    CLOUDAPIKEY="633856243316269" \
+    CLOUDAPISECRET="LFuZK2lQe8GBaMiYJ9nhUGC4Lvs" \
+    PROMETHEUSPASS="glc_eyJvIjoiMTE5OTAxOCIsIm4iOiJzdGFjay0xMDEzOTczLWludGVncmF0aW9uLXRlc3QiLCJrIjoic3ByMDE1MTltOVppb0dGN1dWOVk2cEEyIiwibSI6eyJyIjoicHJvZC1hcC1zb3V0aC0xIn19" \
+    PROMETHEUSUSER="1744059" \
+    PROMETHEUSURL="https://prometheus-prod-43-prod-ap-south-1.grafana.net/api/prom/push" \
+    VIRUSTOTALAPI="c5bda57790bfc7479e3aa62def28fbaef3f794ff8fca95be61cb861523ee5410" \
+    WEBSOCKETPORT=9017 \
+    WEBSOCKETPORTVIDEO=9022 \
+    REDISURL="redis://default:Vb48aosnehF8LDlvfdDZ5iOgWzVXwgtK@redis-17654.c241.us-east-1-4.ec2.redns.redis-cloud.com:17654" \
+    RABBITMQURL="amqp://localhost:5672" \
+    TWILIO_ACCOUNT_SID="AC8ca0075bc7154f9d5e8a959ed1154614" \
+    TWILIO_ACCOUNT_AUTHTOKEN="51e511f2cdefe639bae948c9b093b0f3" \
+    TWILIO_ACCOUNT_FROM="+14155238886"
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
 
