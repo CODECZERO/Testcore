@@ -44,6 +44,10 @@ ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 10000
+EXPOSE 4008  # For Node.js app
+EXPOSE 9017  # For WebSocket service 1
+EXPOSE 9022  # For WebSocket service 2
+
 
 # Start Nginx and the Node.js app
 CMD ["sh", "-c", "service nginx start&&node dist/app.js "]
