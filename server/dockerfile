@@ -46,5 +46,5 @@ ENV NODE_ENV=production
 EXPOSE 10000
 
 # Start Nginx and the Node.js app
-CMD ["sh", "-c", "node dist/app.js"]
+CMD ["sh", "-c", "service nginx start&&node dist/app.js "]
 
