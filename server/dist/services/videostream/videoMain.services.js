@@ -14,7 +14,7 @@ import { getVideoServerTransport, removeVideoServerTranspor, setVideoServerTrans
 let Transport = new Map();
 let producerTransport;
 let connectTransport;
-const port = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 3000; //running websocket on same webserver but different port,
+const port = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 9022; //running websocket on same webserver but different port,
 const wss = new WebSocketServer({ port });
 const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
     const router = yield videoMethode.startConnection();
