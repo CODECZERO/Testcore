@@ -45,7 +45,7 @@ let producerTransport: mediasoup.types.Producer;
 let connectTransport: mediasoup.types.WebRtcTransport;
 
 
-const port: number = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 3000;//running websocket on same webserver but different port,
+const port: number = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 9022;//running websocket on same webserver but different port,
 const wss = new WebSocketServer({ port });
 
 

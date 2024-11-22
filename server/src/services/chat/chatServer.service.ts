@@ -31,7 +31,7 @@ interface CustomWebSocket extends WebSocket {//custom interface for websocket so
 }
 
 const rooms: any = {};//a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
-const port: number = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000;//running websocket on same webserver but different port,
+const port: number = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 9017;//running websocket on same webserver but different port,
 //i won't recommend that , as websocket it should be run on different server
 //and it's better for scablity of the application 
 const wss = new WebSocketServer({ port });//creating websocket server on the port 9001 or 3000 or any other port diffene by the user
