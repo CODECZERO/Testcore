@@ -43,9 +43,7 @@ ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 10000
-EXPOSE 4008  
-EXPOSE 9017  
-EXPOSE 9022 
+
 
 
 # Start Nginx and the Node.js app
