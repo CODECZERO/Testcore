@@ -12,7 +12,8 @@ import FrontPage from './components/FrontPage.tsx';
 import Login from './components/SignUp.tsx';
 import SessionCheck from './components/SessionCheck.tsx';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
+import './App.css'
+import Chat from './components/Chat.tsx';
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -31,7 +32,7 @@ const darkTheme = createTheme({
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Dashboard />,
+    element: <FrontPage/>,
   },
   {
     path: "/sessioncheck",
@@ -48,6 +49,10 @@ const router = createBrowserRouter([
   {
     path: "/sign-up",
     element: <Login />,
+  },
+  {
+    path: "/messages",
+    element: <Chat />,
   },
 ]);
 

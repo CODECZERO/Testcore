@@ -2,6 +2,9 @@ import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import { Box, Button, Typography,Divider, TextField, FormControl, MenuItem, Select, InputLabel, Card, SelectChangeEvent } from '@mui/material'; // Import SelectChangeEvent
 
+const Backend_URL=`https://testcore-qmyu.onrender.com`;
+
+
 type UserRole = 'Student' | 'College' | 'Examiner';
 
 interface FormData {
@@ -16,7 +19,6 @@ interface FormData {
 }
 
 const CreateAccount: React.FC = () => {
-  const Backend_URL = "http://localhost:4008/api/v1/user/signup";
 
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -66,7 +68,7 @@ const CreateAccount: React.FC = () => {
     setError('');
     setSuccess('');
     try {
-      const response = await axios.post(`${Backend_URL}`, formData);
+      const response = await axios.post(`${Backend_URL}/api/v1/user/signup`, formData);
       setSuccess('Account created successfully!');
     } catch (err) {
       setError('An error occurred while creating the account.');
@@ -76,8 +78,9 @@ const CreateAccount: React.FC = () => {
   const getCollege = async () => {
     if (click) return;
     try {
-      const res = await axios.get(`${Backend_URL}`);
+      const res = await axios.get(`${Backend_URL}/api/v1/user/signup`);
       setCollegeID(res.data.data);
+      console.log('college list:',res.data.data);
       setClick(true);
     } catch (err) {
       setError(`An error occurred while fetching colleges: ${err}`);
