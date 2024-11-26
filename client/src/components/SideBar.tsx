@@ -8,6 +8,7 @@ import {
    BiHelpCircle
 } from 'react-icons/bi'
 import "../styles/sidebar.css"
+import { Link } from "react-router-dom";
 
 
 const Sidebar = () => {
@@ -35,10 +36,10 @@ const Sidebar = () => {
         </a>
       </div>
       <div className="menu--list">
-        <a href="#" className="item">
+        <Link to="/messages" className="item">
             <BiMessage className="icon"/>
          Message
-        </a>
+        </Link>
       </div>
       <div className="menu--list">
         <a href="#" className="item">
