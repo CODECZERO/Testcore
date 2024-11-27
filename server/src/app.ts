@@ -25,6 +25,7 @@ const limiter = rateLimit({
     max: 100, // limit each IP to 100 requests per windowMs
     message: 'Too many connections from this IP, please try again later',
 });
+
 //applying to whole server
 app.use(limiter);
 //config the app to use/send/recive json,url,cookie data 
@@ -39,10 +40,10 @@ app.use("/api/v1/chat",ChatRouter);
 app.use("/api/v1/notification",NotificationRouter);
 app.use("/api/v1/college",collegeRouter);
 app.use("/api/v1/student",studnetRouter);
+
 //confing the loging service
 app.use("/api/v1/superuser", logingRouter);
 app.use(MiddlewareCount);
 
-//routes in
 //exporting app
 export default app;

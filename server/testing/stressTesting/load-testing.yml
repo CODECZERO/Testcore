@@ -1,0 +1,26 @@
+config:
+  target: 'http://localhost:4008'
+  phases:
+    - duration: 100     # Duration of the test in seconds
+      arrivalRate: 100  # Requests per second
+  payload:
+    path: 'data.csv'    # Optional: Use if you want to test with multiple user data.
+    fields:
+      - email
+      - password
+      - role
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+
+scenarios:
+  - flow:
+      - post:
+          url: '/api/v1/user/login'
+          json:
+            email: 'RaisodDni@gaffmil.com'
+            password: 'RaisonDi23'
+            role: 'College'
+          capture:
+            - json: '$.message'  # Example of capturing a response field
+              as: message
