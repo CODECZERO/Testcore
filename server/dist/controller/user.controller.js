@@ -44,7 +44,7 @@ const tokenGen = (user) => __awaiter(void 0, void 0, void 0, function* () {
     const refreshToken = yield genReffToken(user); //calling genReffToken function to genrate refersh token for server
     return { accesToken, refreshToken }; //returing both of theme
 });
-//
+//give access to data and other stuff aka login logic
 const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, role } = req.body;
     if (!(email && password && role))
@@ -59,7 +59,7 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     const { refreshToken, accesToken } = yield tokenGen(findAndRole); //genereating token for the user
     const data = Object.assign(Object.assign({}, findUser), { refreshToken });
     yield updateOp(data, role); //pass the role to user it's necessary
-    const trackerUpdate = yield Tracker(findUser.Id, req);
+    const trackerUpdate = yield Tracker(findUser.Id, req); //save's user ip adrress in database  ;
     const { password: _ } = findUser, userData = __rest(findUser, ["password"]); //removing user password form find user
     return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, { userData, trackerUpdate }, "Login in successfully"));
 }));

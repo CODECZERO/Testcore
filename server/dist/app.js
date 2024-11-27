@@ -37,6 +37,5 @@ app.use("/api/v1/student", studnetRouter);
 //confing the loging service
 app.use("/api/v1/superuser", logingRouter);
 app.use(MiddlewareCount);
-//routes in
 //exporting app
 export default app;

@@ -11,7 +11,7 @@ import { WebSocketServer } from "ws";
 import { sendMessage, reciveMEssage, closeSocket, tokenExtractr } from "./chatMethodes.services.js";
 import AsyncHandler from "../../util/ayscHandler.js";
 const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
-const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000; //running websocket on same webserver but different port,
+const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 9017; //running websocket on same webserver but different port,
 //i won't recommend that , as websocket it should be run on different server
 //and it's better for scablity of the application 
 const wss = new WebSocketServer({ port }); //creating websocket server on the port 9001 or 3000 or any other port diffene by the user
@@ -63,4 +63,12 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
         });
     });
 }));
-export { runWebSocket, clients, rooms }; //exoprt the function so you can start the server at the beging
+const closeChatSocket = () => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        wss.close();
+    }
+    catch (error) {
+        return error;
+    }
+});
+export { runWebSocket, clients, rooms, closeChatSocket }; //exoprt the function so you can start the server at the beging
