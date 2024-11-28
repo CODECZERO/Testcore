@@ -1,0 +1,36 @@
+/* Stats.css */
+.stats-container {
+  width: 100%; /* Full width of the container */
+  max-width: 1200px; /* Limit max width */
+  margin: 20px auto; /* Center the component */
+  padding: 20px;
+  background-color: white; /* Background color of the Stats section */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center the content horizontally */
+}
+
+.pie-chart-container {
+  width: 100%;
+  max-width: 500px; /* Limit the size of the pie chart */
+  margin: 20px 0; /* Space between chart and text */
+}
+
+h2 {
+  text-align: center; /* Center align the heading */
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px; /* Space between heading and chart */
+}
+
+@media (max-width: 768px) {
+  .stats-container {
+    width: 90%; /* Allow the container to use more width on smaller screens */
+  }
+
+  .pie-chart-container {
+    max-width: 100%; /* Let the pie chart take full width on mobile */
+  }
+}
