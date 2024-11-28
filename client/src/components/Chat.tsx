@@ -1,94 +1,110 @@
-import SideBar from "./SideBar";
-import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // For API calls, if using REST
+import React, { useState, useEffect, useRef } from 'react';
+import '../styles/Chat.css'
+import SideBar from './SideBar';
 
-
-// Interface for message structure
 interface Message {
   id: string;
   sender: string;
   content: string;
   timestamp: Date;
+  isGroupMessage: boolean; // Indicates if it's a one-to-many message
 }
 
 const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState<string>('');
-
-  const userId = "user123"; // Replace with dynamic user ID if needed.
-
-  // Function to fetch messages from the backend
-
-
-  const fetchMessages = async () => {
-    try {
-      const response = await axios.get<Message[]>('https://testcore-qmyu.onrender.com/ws1'); // Adjust endpoint
-      setMessages(response.data);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-    }
-  };
+  const [isGroupChat, setIsGroupChat] = useState<boolean>(false); // Toggle between one-to-one and one-to-many
+  const userId = 'user123'; // Replace with actual user ID
+  const socket = useRef<WebSocket | null>(null);
 
   useEffect(() => {
-    fetchMessages();
+    // Initialize WebSocket connection
+    socket.current = new WebSocket('https://testcore-qmyu.onrender.com/ws1'); // Replace with your WebSocket server URL
+
+    socket.current.onopen = () => {
+      console.log('WebSocket connected');
+    };
+
+    socket.current.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Received message:', data);
+      setMessages((prev) => [...prev, data]);
+    };
+
+    socket.current.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
+
+    socket.current.onclose = () => {
+      console.log('WebSocket disconnected');
+    };
+
+    return () => {
+      socket.current?.close();
+    };
   }, []);
 
-  // Function to send a message to the backend
-  const sendMessage = async () => {
-    if (input.trim()) {
+  const sendMessage = () => {
+    if (input.trim() && socket.current) {
       const newMessage = {
-          sender: userId,
-          content: input,
-          timestamp: new Date(),
-        };
+        id: Date.now().toString(),
+        sender: userId,
+        content: input,
+        timestamp: new Date(),
+        isGroupMessage: isGroupChat,
+      };
 
-      try {
-        const response = await axios.post<Message>('/api/messages', newMessage); // Adjust endpoint
-        setMessages((prev) => [...prev, response.data]);
-        setInput('');
-      } catch (error) {
-        console.error('Error sending message:', error);
-      }
+      // Send message through WebSocket
+      socket.current.send(JSON.stringify(newMessage));
+
+      // Optimistically update the message list
+      setMessages((prev) => [...prev, newMessage]);
+      setInput('');
     }
   };
-
+  
   return (
-       
-          <>
-        <SideBar />
+    <>
+    <SideBar />
     <div className="chat-container">
- 
-      <div className="messages">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`message ${
-              msg.sender === userId ? 'message-user' : 'message-bot'
-            }`}
-          >
-            <p className="message-content">{msg.content}</p>
-            <small className="message-timestamp">
-              {new Date(msg.timestamp).toLocaleTimeString()}
-            </small>
-          </div>
-        ))}
+      {/* Chat header with toggle for one-to-one or one-to-many */}
+      <div className="chat-header">
+        <h2>{isGroupChat ? 'Group Chat' : 'Private Chat'}</h2>
+        <button onClick={() => setIsGroupChat(!isGroupChat)}>
+          Switch to {isGroupChat ? 'Private Chat' : 'Group Chat'}
+        </button>
       </div>
-      {/* Input Section */}
+
+      {/* Render messages */}
+      <div className="messages">
+        {messages.length > 0 ? (
+          messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`message ${msg.sender === userId ? 'message-user' : 'message-bot'}`}
+            >
+              <p className="message-content">{msg.content}</p>
+              <small className="message-timestamp">
+                {new Date(msg.timestamp).toLocaleTimeString()}
+              </small>
+            </div>
+          ))
+        ) : (
+          <p>No messages yet. Start the conversation!</p>
+        )}
+      </div>
+
+      {/* Input area */}
       <div className="chat-input">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Type a message..."
-        />
+          placeholder="Type a message..." />
         <button onClick={sendMessage}>Send</button>
       </div>
-    </div>
-
-
-
-  </>
-  )
+    </div></>
+  );
 };
 
 export default Chat;

@@ -62,7 +62,7 @@ const FrontPage: React.FC = () => {
               '&:hover': { backgroundColor: '#fb8c00' },
             }}
           >
-            Sign Up
+           Log In
           </Button>
 
           <Button
@@ -82,7 +82,7 @@ const FrontPage: React.FC = () => {
               },
             }}
           >
-            Log In
+           Sign Up
           </Button>
         </Box>
       </Box>
