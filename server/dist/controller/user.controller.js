@@ -61,7 +61,7 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     yield updateOp(data, role); //pass the role to user it's necessary
     const trackerUpdate = yield Tracker(findUser.Id, req); //save's user ip adrress in database  ;
     const { password: _ } = findUser, userData = __rest(findUser, ["password"]); //removing user password form find user
-    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, { userData, trackerUpdate }, "Login in successfully"));
+    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, { userData, trackerUpdate, accesToken }, "Login in successfully"));
 }));
 //registering user on the site and store data on sql/postgresSql
 //
