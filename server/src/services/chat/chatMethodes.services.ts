@@ -74,13 +74,13 @@ const closeConnection = async () => {
     }
 }
 
-const tokenExtractr = (req: Request) => {//takes requset object from websocket extract token from it.
+const tokenExtractr = async (req: Request) => {//takes requset object from websocket extract token from it.
     try {
         const parsedUrl = parse(req.url || " ", true);//it parse query as string
         const queryParams: ParsedUrlQuery = parsedUrl.query;//takes query from parsedUrl and  
         const tokenFromUser: string = queryParams?.token as string;
         if (!tokenFromUser) throw new ApiError(400, "bad request data is not provided");
-        const chatToken = ChatTokenDec(tokenFromUser);
+        const chatToken = await ChatTokenDec(tokenFromUser);
         if (chatToken instanceof ApiError) throw new ApiError(500, "something went wrong while decodeing token");
         return chatToken;
     } catch (error) {
