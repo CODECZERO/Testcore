@@ -27,6 +27,7 @@ const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket
         await clients.forEach(client => {//send message to user, who are the member of the group 
             if (message && client != ws && client.readyState === ws.OPEN) {//checks, if webscoket and message exist,if the set of websocket or websocket is ready
                 //or open,then send message 
+                message=message?.content.toString() as any;
                 client.send(JSON.stringify(message));//takes message from rabbitmq queue
             }
         });
@@ -41,7 +42,6 @@ const reciveMEssage = async (roomName: string, ws: CustomWebSocket) => {//recive
         const messageEnc = await rabbitmq.subData(roomName);//subscribe to the queue, the queue name is same as roomName 
         await rabbitmq.channel.consume(rabbitmq.queue.queue, (message: ConsumeMessage | null) => {//consume the message from queue and uses a call back where it the message exitst
             //send it to user 
-
             if (message) sendMessageToReciver(message, ws);
 
 
