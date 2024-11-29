@@ -46,7 +46,7 @@ const createOp = async (user: User, password: string) => {
                         phoneNumber: user.phoneNumber ?? "",
                         address: user.address ?? "",
                         collegeID: user.collegeID ?? "",
-                        refreshToken: "",
+                        refreshToken: " ",
                         studentVerify: true
                     },
                 });
@@ -58,7 +58,7 @@ const createOp = async (user: User, password: string) => {
                         name: user.name ?? "",
                         phoneNumber: user.phoneNumber ?? "",
                         address: user.address ?? "",
-                        refreshToken: "",
+                        refreshToken: " ",
                         examinerVerify: true,
                     },
                 });
