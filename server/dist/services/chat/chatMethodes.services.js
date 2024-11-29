@@ -72,14 +72,14 @@ const closeConnection = () => __awaiter(void 0, void 0, void 0, function* () {
         throw new ApiError(500, "error while closeing connection"); //throw error if any thing went wrong, so later the dev can debug it 
     }
 });
-const tokenExtractr = (req) => {
+const tokenExtractr = (req) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const parsedUrl = parse(req.url || " ", true); //it parse query as string
         const queryParams = parsedUrl.query; //takes query from parsedUrl and  
         const tokenFromUser = queryParams === null || queryParams === void 0 ? void 0 : queryParams.token;
         if (!tokenFromUser)
             throw new ApiError(400, "bad request data is not provided");
-        const chatToken = ChatTokenDec(tokenFromUser);
+        const chatToken = yield ChatTokenDec(tokenFromUser);
         if (chatToken instanceof ApiError)
             throw new ApiError(500, "something went wrong while decodeing token");
         return chatToken;
@@ -87,5 +87,5 @@ const tokenExtractr = (req) => {
     catch (error) {
         throw new ApiError(500, `Someting went wrong while extracing token error: ${error}`);
     }
-};
+});
 export { sendMessage, reciveMEssage, closeSocket, closeConnection, tokenExtractr, };
