@@ -41,7 +41,7 @@ const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function*
                         phoneNumber: (_g = user.phoneNumber) !== null && _g !== void 0 ? _g : "",
                         address: (_h = user.address) !== null && _h !== void 0 ? _h : "",
                         collegeID: (_j = user.collegeID) !== null && _j !== void 0 ? _j : "",
-                        refreshToken: "",
+                        refreshToken: " ",
                         studentVerify: true
                     },
                 });
@@ -53,7 +53,7 @@ const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function*
                         name: (_l = user.name) !== null && _l !== void 0 ? _l : "",
                         phoneNumber: (_m = user.phoneNumber) !== null && _m !== void 0 ? _m : "",
                         address: (_o = user.address) !== null && _o !== void 0 ? _o : "",
-                        refreshToken: "",
+                        refreshToken: " ",
                         examinerVerify: true,
                     },
                 });
