@@ -29,6 +29,7 @@ const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, 
         yield clients.forEach(client => {
             if (message && client != ws && client.readyState === ws.OPEN) { //checks, if webscoket and message exist,if the set of websocket or websocket is ready
                 //or open,then send message 
+                message = message === null || message === void 0 ? void 0 : message.content.toString();
                 client.send(JSON.stringify(message)); //takes message from rabbitmq queue
             }
         });
