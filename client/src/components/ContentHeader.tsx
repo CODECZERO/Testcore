@@ -1,7 +1,6 @@
-import React from 'react'
-import { RootState, logout } from './store';
-import { useDispatch, useSelector } from 'react-redux';
-import { BiSearch, BiNotification } from 'react-icons/bi'
+import { RootState } from './store';
+import {  useSelector } from 'react-redux';
+import { BiSearch } from 'react-icons/bi'
 
 const ContentHeader = () => {
   const userInfo = useSelector((state: RootState) => state.user.userInfo);

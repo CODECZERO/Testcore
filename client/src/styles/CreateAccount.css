@@ -1,0 +1,177 @@
+/* Container Styles */
+.create-account-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    background: #2a2929f2;
+  }
+  
+  /* Form Container */
+  .form-container {
+    flex: 1;
+    max-width: 400px;
+    padding: 20px;
+    margin: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .form-container h2 {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  .success-message {
+    color: green;
+    font-size: 14px;
+    margin-bottom: 10px;
+  }
+  
+  /* Form Group */
+  .form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  select {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: #c7b5b5;
+    font-size: 16px;
+    transition: all 0.3s ease;
+  }
+  
+  select:focus {
+    border-color: #928e86;
+    outline: none;
+    background: #f5e8e8;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  }
+  
+  /* Cards Container */
+  .cards-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #ede7dd;
+  }
+  
+  .card-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 10px;
+  }
+  
+  .card-description {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  /* Form group styling */
+.form-group {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 20px 0;
+  }
+  
+  /* Select field */
+  .select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 16px;
+    color: #a1a0a0;
+    border: 1px solid #747171;
+    border-radius: 4px;
+    background: transparent;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    appearance: none;
+  }
+  
+  /* Focused select */
+  .select:focus {
+    border-color: #adafb0;
+    box-shadow: 0 0 5px rgba(72, 72, 72, 0.8);
+  }
+  
+  /* Label styling */
+  .animated-label {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #aaa;
+    pointer-events: none;
+    display: flex;
+    gap: 2px;
+    transition: top 0.3s, font-size 0.3s, color 0.3s;
+  }
+  
+  /* Animated spans */
+  .animated-label span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s;
+  }
+  
+  /* Show label animation on focus or selection */
+  .select:focus ~ .animated-label span,
+  .select:not([value=""]) ~ .animated-label span {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Move label up when focused or filled */
+  .select:focus ~ .animated-label,
+  .select:not([value=""]) ~ .animated-label {
+    top: -10px;
+    font-size: 12px;
+    color: #00aaff;
+  }
+  
