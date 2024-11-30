@@ -1,81 +1,117 @@
-# imp
+# **Testcore**
 
-    # rate limit the user/examiner
-    # proct from dos/ddos
-    # limit user from accessing other's data like chat,file,exam etc
-    # look for code/sql/etc injection
-    # run a seprate server for checking paper like docker , in container the answer will compare and it will return  a unique/token unique(JWT token), which contains result and user info for that exam it which
-    #  the server will decrpty the token and find user , map result to theme and the exam
-    #  encrypt you connection,etc
-    # filter input for both the user and examiner
-    # answers will have it's own seprate mongoDb/nosql database
-    # use graphql for easy way to intercept and send data
-    # the hash will be decrypt in container only and other procces, the answers db should be called in the container
-    # the user/student exam token will contian object id of exam paper and it will search that exam paper answer in the database
+Testcore is a digital solution designed to replicate and enhance the traditional offline exam conduction process, transforming it into an efficient and scalable online system. It eliminates resource wastage, reduces logistical complexities, and saves time by enabling seamless online exam management.  
 
-# fetaures
+With Testcore, exams can be monitored remotely by a few individuals from anywhere in the world, and students can participate without geographical restrictions. This makes Testcore a cost-effective and resource-efficient platform for educational institutions.
 
-    # chat/group chat of particulre crouse and normal/gernal too
-    # live test giving stream
-    # can chat to admin or examiner in case of douts via chat 
-    # if examiner approver ,the client can video/voice call examiner
-    # dashboard for exmainer
-    # dashboard for student if , the student wish to make account on the service
-    # unique code for exam like object id of that quetion paper
-    # student can skip login and give exam via providing name,unique it of exame
-    # the student will be assingend a unique token during the exam to verfiy theme, the token should be valid till the exam end it's depends on the time condition of the exam
-    # a resource page for the student 
-    # exam givin by studnet, the paper should be seen to the examiner on the other side, who has create that exam
-    # the answer should be cheked using ai(optional, if we have budget for that)/ by exmainer to give marks to student, for mcq the exmainer can set answer to it and student can get result based on it.
-    # check if answer is wrong or right
-    # the exmainer can have recording/stream of the student, while the were giving the exam
-    # download options for that resource 
-    # student has record of given exam,pass/fail,marks etc detail related to it
-    # put a way where if examiner what to share result/paper/etc or want to put student unique it then he can just via a text/docx/pdf file
-    # if the unique id is not map then map ,it when user enterd it 
-    # cache data/exam paper so it doesn't make any load on database  
+---
 
-# if posible
+## **Features**
 
-    # we need someone who has knowldge about ai 
-    # he/she/etc can make an ai modle, which process the video and check if student is cheating or not
-    # if the sudent is cheating then the alert will be shown to examiner and examiner can take actions based on it,
-    # if examiner wants to infro higher auth then , examiner have to provide, email id of theme and email will be sent, to confrime/student realte details and what he did,
+### **Chat System**
+- Structured chat rooms based on institution and class name.
+- Enables group discussions to resolve exam-related queries quickly.
+- Chat rooms are automatically locked during exams to maintain integrity.
 
+### **Video Call and Streaming**
+- Supports one-to-many (1:M) and many-to-many (M:M) video conferencing.
+- Centralized monitoring dashboard for live exam supervision.
+- Allows invigilators to ensure compliance with examination guidelines remotely.
 
-    # include block option too in every like block from exam/block from group etc
+### **SMS Notification System**
+- Automated SMS notifications for exam schedules, subjects, and course registrations.
+- Ensures timely updates and minimizes communication gaps.
 
-# Backend
+### **Anti-Virus Scanner**
+- File upload scanner to detect and prevent malware.
+- Ensures a secure environment for file exchanges.
 
-    # limit the database search return or search by using take and skip in primsa and monogodb
-    # rewrite the status code arrcoding to the correct usage
-    # debug and and test code 
-    # do indexing of database table 
-    # use Caching
-    # put antivirus check for file upload
-    #comprase file
-    #write auth middelware for examdata verfiy
-    # add message to response 
-    # make loger and mointer activty of the user for data purose or handling servers
-    # put return message
-    #should set cookie or seesion token option
-    #implement token base verifaction methode
+### **System Monitoring, Logging, and Testing**
+- Comprehensive logging of all system activities for debugging and performance tracking.
+- Compatible with tools like **Grafana** and **Prometheus** for advanced monitoring, alerting, and proactive issue resolution.
 
-# imp
+---
 
-# rember to rewrite and check code working
-kafka is need in backend as there are many live action to be handle
-and radit mq
+## **Architecture Overview**
 
+### **Database Design**
+Testcore uses a hybrid database architecture for optimal performance and scalability:
+- **SQL Database (PostgreSQL)**: Handles structured and relational data like user details, exam results, and transactions.
+- **NoSQL Database (MongoDB)**: Manages unstructured and semi-structured data like dynamic timetables and exam configurations.
 
+This combination ensures reliability, scalability, and adaptability to diverse data requirements.
 
-# know handle why message is not to user in same group in backend;
-    add security feature in websocket , so that anybody can not connect , whithout access to it 
-    becaue if ther is no feature such as this , any body can connect to it and websocket server can be ddos,dos
+### **Folder Structure**
+- **Client**: Contains the frontend code for the platform, providing a responsive and intuitive user interface.
+- **Server**: Houses the backend logic, database operations, and API endpoints.
 
+Both client and server components are independent, enabling separate deployment for scalability and flexibility.
 
-# make a seprate file which, checks if all the services of you're app are running like rabbitmq,database,websocket ,etc 
-and then use or call file in index.ts/index.js file as it will ensure that all things are running and working propley.
-i'll give it a name , named pre-final stage
+### **Backend Design**
+The backend follows a **microservices architecture**:
+1. **Modularity**: Each service can operate independently.
+2. **Scalability**: Services can be scaled based on demand.
+3. **Fault Tolerance**: Failures in one service do not impact others.
+4. **Efficient Load Distribution**: Services can be deployed on separate servers for optimal performance.
 
-# try to integreat twilo api for notfication & other stuff
+### **Docker Integration**
+Testcore is fully containerized using Docker:
+- Services are built into containers for easy portability.
+- Multiple services can run on the same server using Docker containers.
+- Nginx is used for reverse proxying, load balancing, WebSocket handling, and caching.
+- Docker ensures consistent backend deployment across environments.
+
+---
+
+## **Deployment**
+
+### **Prerequisites**
+- Docker
+- Docker Compose (optional)
+- Node.js (for development)
+- PostgreSQL and MongoDB instances
+
+### **Steps**
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-repo/testcore.git
+   cd testcore
+   ```
+2. Build and run Docker containers:
+   ```bash
+   docker-compose up --build
+   ```
+3. Access the services:
+   - Frontend: `http://localhost:<frontend_port>`
+   - Backend: `http://localhost:<backend_port>`
+
+4. For production:
+   - Configure environment variables for `Dockerfile` and `docker-compose.yml`.
+   - Use Nginx for reverse proxy and SSL setup.
+
+---
+
+## **Technologies Used**
+- **Frontend**: React.js (or your frontend tech)
+- **Backend**: Node.js, Express.js
+- **Databases**: PostgreSQL, MongoDB
+- **Containerization**: Docker
+- **Monitoring**: Grafana, Prometheus
+- **Web Server**: Nginx
+
+---
+
+## **Contributing**
+We welcome contributions to Testcore. Follow these steps to contribute:
+1. Fork the repository.
+2. Create a new branch for your feature or bug fix:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Commit your changes and push to your forked repo.
+4. Create a pull request describing your changes.
+
+---
+
+## **License**
+Testcore is licensed under the [MIT License](LICENSE).
