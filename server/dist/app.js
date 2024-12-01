@@ -17,12 +17,14 @@ app.use(cors({
 }));
 //limiting the rate of the user per node
 const limiter = rateLimit({
-    windowMs: 10 * 60 * 1000,
+    windowMs: 15 * 60 * 1000,
     max: 100,
-    message: 'Too many connections from this IP, please try again later',
+    message: "Too many requests, please try again later.",
+    keyGenerator: (req) => req.ip // Use the IP address as the key
 });
 //applying to whole server
 app.use(limiter);
+app.set('trust proxy', 1);
 //config the app to use/send/recive json,url,cookie data 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
