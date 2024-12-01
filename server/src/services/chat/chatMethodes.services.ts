@@ -28,7 +28,7 @@ const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket
             if (message && client != ws && client.readyState === ws.OPEN) {//checks, if webscoket and message exist,if the set of websocket or websocket is ready
                 //or open,then send message 
                 message=message?.content.toString() as any;
-                client.send(JSON.stringify(message));//takes message from rabbitmq queue
+                 client.send(JSON.stringify(message));//takes message from rabbitmq queue
             }
         });
     } catch (error) {
