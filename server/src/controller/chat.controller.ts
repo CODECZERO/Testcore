@@ -64,12 +64,13 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   if (!Id || !roomData.roomName)
     throw new ApiError(400, 'group name or Admin id is not provided');//if not provided then throw error
-
+  
   const user = await User.findOne({//fiding user using client data
     sqlId: Id
   });
 
   if (!user) throw new ApiError(404, "No user Found");
+
 
   const createRoom = await chatModel.create({//making chat room in chatmodel 
     romeName: roomData.roomName,
