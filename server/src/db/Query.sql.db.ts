@@ -33,7 +33,7 @@ const createOp = async (user: User, password: string) => {
                         name: user.name ?? "",
                         phoneNumber: user.phoneNumber ?? "",
                         address: user.address ?? "",
-                        refreshToken: " ",
+                        refreshToken: user.refreshToken ?? "",
                         collegeVerify: true
                     },
                 });
@@ -46,7 +46,7 @@ const createOp = async (user: User, password: string) => {
                         phoneNumber: user.phoneNumber ?? "",
                         address: user.address ?? "",
                         collegeID: user.collegeID ?? "",
-                        refreshToken: " ",
+                        refreshToken: user.refreshToken ?? "",
                         studentVerify: true
                     },
                 });
@@ -58,7 +58,7 @@ const createOp = async (user: User, password: string) => {
                         name: user.name ?? "",
                         phoneNumber: user.phoneNumber ?? "",
                         address: user.address ?? "",
-                        refreshToken: " ",
+                        refreshToken: user.refreshToken ?? "",
                         examinerVerify: true,
                     },
                 });
@@ -170,23 +170,23 @@ const findCollege = async () => {//findig college name from college table
     }
 }
 
-const findSingleCollegeForStudent=async(studentID:string)=>{//find college name using user id or student id
+const findSingleCollegeForStudent = async (studentID: string) => {//find college name using user id or student id
     try {
         return await prisma.student.findUnique({
-            where:{
-                Id:studentID,//takes unique student id
+            where: {
+                Id: studentID,//takes unique student id
             },
-            select:{
-                college:{//find college names and returns it
-                    select:{
-                        name:true,
+            select: {
+                college: {//find college names and returns it
+                    select: {
+                        name: true,
                     }
                 }
             }
-            
+
         });
     } catch (error) {
-        throw new ApiError(500,`something went while finding college ${error}`);
+        throw new ApiError(500, `something went while finding college ${error}`);
     }
 }
 
