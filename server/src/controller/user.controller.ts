@@ -55,14 +55,14 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
         ...findUser,
         refreshToken
     }
-    
+
     await updateOp(data, role);//pass the role to user it's necessary
 
     const trackerUpdate = await Tracker(findUser.Id, req);//save's user ip adrress in database  ;
     const { password: _, ...userData } = findUser;//removing user password form find user
 
     return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(
-        new ApiResponse(200, { userData, trackerUpdate,accesToken }, "Login in successfully")
+        new ApiResponse(200, { userData, trackerUpdate, accesToken }, "Login in successfully")
     )
 
 });
@@ -85,15 +85,18 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     //     "errors": []
     // } 
     const hashedPassword = await bcrypt.hash(password, 10);//hashing the password
-    const userCreate = await createOp(req.body, hashedPassword);//passing req.body value to query function with hashed password
+    const findAndRole = { ...findUser, role };
+    const { refreshToken, accesToken } = await tokenGen(findAndRole);//genereating token for the user
+    const UserSingupData={...req.body,refreshToken};
+    const userCreate = await createOp(UserSingupData, hashedPassword);//passing req.body value to query function with hashed password
     const userData = { userCreate, password: "" };//replacing the password with empty string
 
     const saveUserInNosql = await User.create({
         sqlId: userCreate.Id,
     })
     if (!userData || !saveUserInNosql) throw new ApiError(500, "Something went wrong while registering the user");//if user isn't create then throw error
-    return res.status(201).json(//if create then return user data
-        new ApiResponse(201, userData, "User create successfuly")
+    return res.status(201).cookie('accessToken',accesToken,options).json(//if create then return user data
+        new ApiResponse(201, {userData,accesToken}, "User create successfuly")
     )
 }
 )
