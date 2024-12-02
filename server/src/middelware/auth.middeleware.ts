@@ -12,6 +12,7 @@ interface RequestWithCookies extends Request {
     user?: any;
     examData?: any;
     cookies: { [key: string]: string };
+    token?:any;
 
 }
 
