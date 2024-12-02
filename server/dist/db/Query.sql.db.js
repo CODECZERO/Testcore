@@ -17,7 +17,7 @@ import { ApiError } from "../util/apiError.js";
 //     Examiner: prisma.Examiner,
 // };
 const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
     try {
         switch (user.role) {
             case "College":
@@ -28,32 +28,32 @@ const createOp = (user, password) => __awaiter(void 0, void 0, void 0, function*
                         name: (_b = user.name) !== null && _b !== void 0 ? _b : "",
                         phoneNumber: (_c = user.phoneNumber) !== null && _c !== void 0 ? _c : "",
                         address: (_d = user.address) !== null && _d !== void 0 ? _d : "",
-                        refreshToken: " ",
+                        refreshToken: (_e = user.refreshToken) !== null && _e !== void 0 ? _e : "",
                         collegeVerify: true
                     },
                 });
             case "Student":
                 return yield roleToModel[user.role].create({
                     data: {
-                        email: (_e = user.email) !== null && _e !== void 0 ? _e : "",
+                        email: (_f = user.email) !== null && _f !== void 0 ? _f : "",
                         password,
-                        name: (_f = user.name) !== null && _f !== void 0 ? _f : "",
-                        phoneNumber: (_g = user.phoneNumber) !== null && _g !== void 0 ? _g : "",
-                        address: (_h = user.address) !== null && _h !== void 0 ? _h : "",
-                        collegeID: (_j = user.collegeID) !== null && _j !== void 0 ? _j : "",
-                        refreshToken: " ",
+                        name: (_g = user.name) !== null && _g !== void 0 ? _g : "",
+                        phoneNumber: (_h = user.phoneNumber) !== null && _h !== void 0 ? _h : "",
+                        address: (_j = user.address) !== null && _j !== void 0 ? _j : "",
+                        collegeID: (_k = user.collegeID) !== null && _k !== void 0 ? _k : "",
+                        refreshToken: (_l = user.refreshToken) !== null && _l !== void 0 ? _l : "",
                         studentVerify: true
                     },
                 });
             case "Examiner":
                 return yield roleToModel[user.role].create({
                     data: {
-                        email: (_k = user.email) !== null && _k !== void 0 ? _k : "",
+                        email: (_m = user.email) !== null && _m !== void 0 ? _m : "",
                         password,
-                        name: (_l = user.name) !== null && _l !== void 0 ? _l : "",
-                        phoneNumber: (_m = user.phoneNumber) !== null && _m !== void 0 ? _m : "",
-                        address: (_o = user.address) !== null && _o !== void 0 ? _o : "",
-                        refreshToken: " ",
+                        name: (_o = user.name) !== null && _o !== void 0 ? _o : "",
+                        phoneNumber: (_p = user.phoneNumber) !== null && _p !== void 0 ? _p : "",
+                        address: (_q = user.address) !== null && _q !== void 0 ? _q : "",
+                        refreshToken: (_r = user.refreshToken) !== null && _r !== void 0 ? _r : "",
                         examinerVerify: true,
                     },
                 });
