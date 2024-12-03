@@ -40,9 +40,11 @@ const options = {
     secure: true
 };
 const tokenGen = (user) => __awaiter(void 0, void 0, void 0, function* () {
-    const accesToken = yield genAccToken(user); //calling genAccToken function to genrate access token for user
-    const refreshToken = yield genReffToken(user); //calling genReffToken function to genrate refersh token for server
-    return { accesToken, refreshToken }; //returing both of theme
+    const [accessToken, refreshToken] = yield Promise.all([
+        genAccToken(user),
+        genReffToken(user), //calling genReffToken function to genrate refersh token for server
+    ]);
+    return { accessToken, refreshToken }; //returing both of theme
 });
 //give access to data and other stuff aka login logic
 const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -56,12 +58,15 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     if (!passwordCheck)
         throw new ApiError(400, "Invalid password");
     const findAndRole = Object.assign(Object.assign({}, findUser), { role });
-    const { refreshToken, accesToken } = yield tokenGen(findAndRole); //genereating token for the user
+    const [tokenResult, trackerUpdate] = yield Promise.all([
+        tokenGen(findAndRole),
+        Tracker(findUser.Id, req) //save's user ip adrress in database  ;
+    ]);
+    const { refreshToken, accessToken } = tokenResult; //genereating token for the user
     const data = Object.assign(Object.assign({}, findUser), { refreshToken });
     yield updateOp(data, role); //pass the role to user it's necessary
-    const trackerUpdate = yield Tracker(findUser.Id, req); //save's user ip adrress in database  ;
     const { password: _ } = findUser, userData = __rest(findUser, ["password"]); //removing user password form find user
-    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(new ApiResponse(200, { userData, trackerUpdate, accesToken }, "Login in successfully"));
+    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accessToken, options).json(new ApiResponse(200, { userData, trackerUpdate, accessToken }, "Login in successfully"));
 }));
 //registering user on the site and store data on sql/postgresSql
 //
@@ -70,7 +75,7 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
     //checking if values are provide or not if not provide throw error 
     if (!(email && password && phoneNumber && address && name && role))
         throw new ApiError(400, "All fields are required");
-    const findUser = yield findOp(req.body); //passing req.body value to query function
+    const findUser = yield findOp({ email, role }); //passing req.body value to query function
     if (findUser)
         return res.status(409).json(new ApiError(409, "user exists"));
     //if it exist throw error in this formate
@@ -80,9 +85,12 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
     //     "success": false,
     //     "errors": []
     // } 
-    const hashedPassword = yield bcrypt.hash(password, 10); //hashing the password
     const findAndRole = Object.assign(Object.assign({}, findUser), { role });
-    const { refreshToken, accesToken } = yield tokenGen(findAndRole); //genereating token for the user
+    const [tokenResult, hashedPassword] = yield Promise.all([
+        tokenGen(findAndRole),
+        bcrypt.hash(password, 10)
+    ]);
+    const { refreshToken, accessToken } = tokenResult; //genereating token for the user
     const UserSingupData = Object.assign(Object.assign({}, req.body), { refreshToken });
     const userCreate = yield createOp(UserSingupData, hashedPassword); //passing req.body value to query function with hashed password
     const userData = { userCreate, password: "" }; //replacing the password with empty string
@@ -91,8 +99,8 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
     });
     if (!userData || !saveUserInNosql)
         throw new ApiError(500, "Something went wrong while registering the user"); //if user isn't create then throw error
-    return res.status(201).cookie('accessToken', accesToken, options).json(//if create then return user data
-    new ApiResponse(201, { userData, accesToken }, "User create successfuly"));
+    return res.status(201).cookie('accessToken', accessToken, options).json(//if create then return user data
+    new ApiResponse(201, { userData, accessToken }, "User create successfuly"));
 }));
 //
 const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
