@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { chatModel } from "../models/chatRoomData.model.nosql.js";
 import mongoose from "mongoose";
+import { User } from "../models/user.model.nosql.js";
 const findUsers = (roomID, AdminId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield chatModel.aggregate([
@@ -45,4 +46,37 @@ const findUsers = (roomID, AdminId, userId) => __awaiter(void 0, void 0, void 0,
         return error;
     }
 });
-export { findUsers };
+//this function help us to find the number of chat per user and data realted to chat 
+const findChats = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const chat = yield User.aggregate([
+            {
+                $match: {
+                    sqlId: userId
+                }
+            },
+            {
+                $lookup: {
+                    from: "chatmodels",
+                    localField: "chatRoomIDs",
+                    foreignField: "_id",
+                    as: "chatData"
+                }
+            },
+            {
+                $project: {
+                    profile: 1,
+                    chatData: {
+                        roomName: 1,
+                        _id: 1
+                    }
+                }
+            }
+        ]);
+        return chat;
+    }
+    catch (error) {
+        return error;
+    }
+});
+export { findUsers, findChats };

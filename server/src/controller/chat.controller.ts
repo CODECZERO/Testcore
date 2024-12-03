@@ -4,7 +4,7 @@ import { cacheSearchForChatRoom, cacheUpdateForChatRoom, } from '../db/database.
 import { Response, Request } from 'express';
 import { chatModel } from '../models/chatRoomData.model.nosql.js';
 import { User } from '../models/user.model.nosql.js';
-import { findUsers } from '../db/Query.nosql.db.js';
+import { findChats, findUsers } from '../db/Query.nosql.db.js';
 import mongoose from 'mongoose';
 import { ApiError } from '../util/apiError.js';
 import { options } from './user.controller.js';
@@ -37,7 +37,7 @@ interface Requestany extends Request {
 
 
 const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//using this function a user can join chat
-  const roomdata: roomData = req.body;//takes data about room
+  const roomdata: roomData = req.chatRoomData;//takes data about room
   const user: user = req.user;//takes user id or uder data
 
   if (!roomdata.roomName || !user.Id) throw new ApiError(400, 'Inviad data provied');//if any of theme is not provided then throw error
@@ -49,8 +49,8 @@ const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//u
   if (!findChatID) throw new ApiError(404, 'room not found');
 
   const joinChat = await User.updateOne({//after finding room it will help user to join the room and update value in database
-    sqlId:user.Id
-  },{
+    sqlId: user.Id
+  }, {
     chatRoomIDs: findChatID._id,//taking chat id and puting here
   });
 
@@ -64,7 +64,7 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   if (!Id || !roomData.roomName)
     throw new ApiError(400, 'group name or Admin id is not provided');//if not provided then throw error
-  
+
   const user = await User.findOne({//fiding user using client data
     sqlId: Id
   });
@@ -119,7 +119,7 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
     romeName: roomData.roomName,
   });
   const removeUser = await User.updateOne(//after that remove user from chat group
-    { sqlId:user.Id},
+    { sqlId: user.Id },
     { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID?._id) } },
   );
   if (!removeUser) throw new ApiError(406, 'User unable to remove');
@@ -166,7 +166,7 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//if
   const user: user = req.user;
   if (!roomData) throw new ApiError(400, 'invalid request');//throw error if not provided
   const Checker = await checkUserAccess(user.Id, roomData.roomID);//check in database if user have access to the chat room
-  if(!Checker) throw new ApiError(409,"user don't have access to chat");//if fail then throw error
+  if (!Checker) throw new ApiError(409, "user don't have access to chat");//if fail then throw error
   //call token generater here
   const tokenGen = await ChatTokenGen(Checker[0]);//takes first value and gen token based on that data
   if (!tokenGen) throw new ApiError(500, "someting went wrong while making token");//if token not gen then throw error
@@ -174,6 +174,13 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//if
 
 })
 
+const getChats = AsyncHandler(async (req: Requestany, res: Response) => {//this function helps us to get chatroom and chat data
+  const user: user = req.user;
+  if (!user.Id) throw new ApiError(400, "user id not provied");
+  const ChatDatas = await findChats(user.Id);
+  if (!ChatDatas) throw new ApiError(404, "no chat room currently");
+  return res.status(200).json(new ApiResponse(200, ChatDatas, "chat rooms found"));
+})
 
 export {
   createChatRoom,
@@ -181,6 +188,6 @@ export {
   checkUserAccess,
   LeaveRoom,
   getUserInChat,
-  connectChat
-
+  connectChat,
+  getChats
 };
