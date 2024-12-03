@@ -10,6 +10,7 @@ import SignIn from './components/SignIn';
 import Dashboard from './components/Dashboard.tsx';
 import FrontPage from './components/FrontPage.tsx';
 import Login from './components/SignUp.tsx';
+import Help from './components/Help.tsx';
 import SessionCheck from './components/SessionCheck.tsx';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css'
@@ -53,6 +54,10 @@ const router = createBrowserRouter([
   {
     path: "/messages",
     element: <Chat />,
+  },
+  {
+    path: "/Help",
+    element: <Help />,
   },
 ]);
 

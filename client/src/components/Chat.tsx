@@ -1,121 +1,235 @@
 // import React, { useState, useEffect, useRef } from 'react';
-// import '../styles/Chat.css'
-// import SideBar from './SideBar';
+// import { useSelector } from 'react-redux';
+// import { RootState } from './store'; // Adjust the path to your store file
+// import "../styles/Chat.css";
 
-// interface Message {
-//   id: string;
-//   sender: string;
+// interface ChatMessage {
+//   MessageID: string;
 //   content: string;
-//   timestamp: Date;
-//   isGroupMessage: boolean; // Indicates if it's a one-to-many message
+//   typeOfMessage: 'SEND_MESSAGE' | 'LEAVE_ROOM';
+//   userId: string;
+//   username: string;
+//   roomName: string;
 // }
 
 // const Chat: React.FC = () => {
-//   const [messages, setMessages] = useState<Message[]>([]);
-//   const [input, setInput] = useState<string>('');
-//   const [isGroupChat, setIsGroupChat] = useState<boolean>(false); // Toggle between one-to-one and one-to-many
-//   const userId = 'user123'; // Replace with actual user ID
-//   const socket = useRef<WebSocket | null>(null);
+//   const [messages, setMessages] = useState<ChatMessage[]>([]);
+//   const [currentMessage, setCurrentMessage] = useState<string>('');
+//   const [socket, setSocket] = useState<WebSocket | null>(null);
+//   const [isConnected, setIsConnected] = useState<boolean>(false);
+//   const [roomName, setRoomName] = useState<string>('default_room');
+//   const [groups, setGroups] = useState<string[]>([]);
+//   const [friends, setFriends] = useState<string[]>([]);
 
+//   // Redux: Extract user information
+//   const userInfo = useSelector((state: RootState) => state.user.userInfo);
+//   const userId = localStorage.getItem('userId') || '';
+
+//   // Initialize WebSocket connection
 //   useEffect(() => {
-//     // Initialize WebSocket connection
-//     socket.current = new WebSocket('https://testcore-qmyu.onrender.com/ws1'); // Replace with your WebSocket server URL
+//     if (!userId) return;
 
-//     socket.current.onopen = () => {
-//       console.log('WebSocket connected');
+//     const token = localStorage.getItem('accesToken'); // Access token from localStorage
+//     if (!token) {
+//       console.error('Access token is missing. Cannot connect to WebSocket.');
+//       return;
+//     }
+
+//     console.log('Connecting to WebSocket with token:', token);
+//     const socketUrl = `wss://testcore-qmyu.onrender.com/ws1/?token=${token}`;
+//     const ws = new WebSocket(socketUrl);
+
+//     setSocket(ws);
+
+//     ws.onopen = () => {
+//       console.log('WebSocket connection established.');
+//       setIsConnected(true);
 //     };
 
-//     socket.current.onmessage = (event) => {
-//       const data = JSON.parse(event.data);
-//       console.log('Received message:', data);
-//       setMessages((prev) => [...prev, data]);
+//     ws.onmessage = (event) => {
+//       const incomingMessage: ChatMessage = JSON.parse(event.data);
+//       setMessages((prev) => [...prev, incomingMessage]);
 //     };
 
-//     socket.current.onerror = (error) => {
+//     ws.onclose = () => {
+//       console.log('WebSocket connection closed.');
+//       setIsConnected(false);
+//     };
+
+//     ws.onerror = (error) => {
 //       console.error('WebSocket error:', error);
 //     };
 
-//     socket.current.onclose = () => {
-//       console.log('WebSocket disconnected');
+//     return () => {
+//       ws.close();
+//     };
+//   }, [userId]);
+
+//   // Load groups and friends
+//   useEffect(() => {
+//     const fetchGroupsAndFriends = async () => {
+//       // Mock API calls to fetch groups and friends (replace with real API calls)
+//       setGroups(['Group 1', 'Group 2', 'Group 3']);
+//       setFriends(['Friend 1', 'Friend 2', 'Friend 3']);
 //     };
 
-//     return () => {
-//       socket.current?.close();
-//     };
+//     fetchGroupsAndFriends();
 //   }, []);
 
+//   // Send message through WebSocket
 //   const sendMessage = () => {
-//     if (input.trim() && socket.current) {
-//       const newMessage = {
-//         id: Date.now().toString(),
-//         sender: userId,
-//         content: input,
-//         timestamp: new Date(),
-//         isGroupMessage: isGroupChat,
-//       };
+//     if (!socket || socket.readyState !== WebSocket.OPEN || !currentMessage.trim()) {
+//       console.warn('Cannot send message: WebSocket not ready or message is empty.');
+//       return;
+//     }
 
-//       // Send message through WebSocket
-//       socket.current.send(JSON.stringify(newMessage));
+//     const message: ChatMessage = {
+//       MessageID: 'msg_' + new Date().getTime(),
+//       content: currentMessage,
+//       typeOfMessage: 'SEND_MESSAGE',
+//       userId,
+//       username: userInfo?.name || 'Unknown User',
+//       roomName,
+//     };
 
-//       // Optimistically update the message list
-//       setMessages((prev) => [...prev, newMessage]);
-//       setInput('');
+//     socket.send(JSON.stringify(message));
+//     setMessages((prev) => [...prev, message]);
+//     setCurrentMessage('');
+//   };
+
+//   // Auto-scroll to the latest message
+//   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+//   useEffect(() => {
+//     if (messagesEndRef.current) {
+//       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+//     }
+//   }, [messages]);
+
+//   const createRoom = async () => {
+//     try {
+//       const token = localStorage.getItem('accesToken'); // Retrieve the token from localStorage
+//       if (!token) {
+//         console.error('Access token is missing. Cannot create a room.');
+//         return;
+//       }
+  
+//       const roomName = `GR005/BE`; // Example room name, adjust dynamically as needed
+  
+//       const response = await fetch('https://testcore-qmyu.onrender.com/api/v1/chat/createChat', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//           Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+//         },
+//         body: JSON.stringify({
+//           roomName,
+//           userId: localStorage.getItem('userId'), // Replace with appropriate user ID
+//         }),
+//       });
+  
+//       if (!response.ok) {
+//         const errorText = await response.text();
+//         console.error('Error creating room:', errorText);
+//         alert('Failed to create room. Please try again.');
+//         return;
+//       }
+  
+//       const data = await response.json();
+//       console.log('Room creation response:', data);
+  
+//       // Properly handle the response
+//       if (data.statusCode === 200 && data.success) {
+//         const { romeName, AdminId } = data.data;
+//         setRoomName(romeName); // Update the UI with the created room name
+//         setGroups((prev) => [...prev, romeName]); // Add the new room to the groups list
+//         console.log(`Room "${romeName}" created successfully by Admin ${AdminId}!`);
+//       } else {
+//         console.error('Unexpected response format:', data);
+//         alert('Room creation failed. Please try again.');
+//       }
+//     } catch (error) {
+//       console.error('Error creating room:', error);
+//       alert('An unexpected error occurred while creating the room.');
 //     }
 //   };
   
+
 //   return (
-//     <>
-//     <SideBar />
 //     <div className="chat-container">
-//       {/* Chat header with toggle for one-to-one or one-to-many */}
-//       <div className="chat-header">
-//         <h2>{isGroupChat ? 'Group Chat' : 'Private Chat'}</h2>
-//         <button onClick={() => setIsGroupChat(!isGroupChat)}>
-//           Switch to {isGroupChat ? 'Private Chat' : 'Group Chat'}
-//         </button>
-//       </div>
-
-//       {/* Render messages */}
-//       <div className="messages">
-//         {messages.length > 0 ? (
-//           messages.map((msg) => (
+//       {/* Left Section: Groups and Friends */}
+//       <div className="chat-left">
+//         <h3>Groups</h3>
+//         <div className="group-list">
+//           <button className="create-room-button" onClick={createRoom}>
+//             Create Room
+//           </button>
+//           {groups.map((group) => (
 //             <div
-//               key={msg.id}
-//               className={`message ${msg.sender === userId ? 'message-user' : 'message-bot'}`}
+//               key={group}
+//               className="group-item"
+//               onClick={() => setRoomName(group)}
 //             >
-//               <p className="message-content">{msg.content}</p>
-//               <small className="message-timestamp">
-//                 {new Date(msg.timestamp).toLocaleTimeString()}
-//               </small>
+//               {group}
 //             </div>
-//           ))
-//         ) : (
-//           <p>No messages yet. Start the conversation!</p>
-//         )}
+//           ))}
+//         </div>
+
+//         <h3>Friends</h3>
+//         <div className="friend-list">
+//           {friends.map((friend) => (
+//             <div key={friend} className="friend-item">
+//               {friend}
+//             </div>
+//           ))}
+//         </div>
 //       </div>
 
-//       {/* Input area */}
-//       <div className="chat-input">
-//         <input
-//           type="text"
-//           value={input}
-//           onChange={(e) => setInput(e.target.value)}
-//           placeholder="Type a message..." />
-//         <button onClick={sendMessage}>Send</button>
+//       {/* Right Section: Chat */}
+//       <div className="chat-right">
+//         <h2 className="chat-title">Chat Room: {roomName}</h2>
+
+//         {/* Messages */}
+//         <div className="messages-container">
+//           {messages.map((message) => (
+//             <div
+//               key={message.MessageID}
+//               className={`message ${message.userId === userId ? 'outgoing' : 'incoming'}`}
+//             >
+//               <strong>{message.userId === userId ? 'You' : message.username}</strong>
+//               : {message.content}
+//             </div>
+//           ))}
+//           <div ref={messagesEndRef} />
+//         </div>
+
+//         {/* Message Input */}
+//         <div className="input-container">
+//           <input
+//             type="text"
+//             value={currentMessage}
+//             onChange={(e) => setCurrentMessage(e.target.value)}
+//             placeholder="Type a message..."
+//           />
+//           <button onClick={sendMessage}>Send</button>
+//         </div>
 //       </div>
-//     </div></>
+//     </div>
 //   );
 // };
 
 // export default Chat;
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from './store'; // Adjust the path to your store file
+import "../styles/Chat.css";
 
 interface ChatMessage {
   MessageID: string;
   content: string;
   typeOfMessage: 'SEND_MESSAGE' | 'LEAVE_ROOM';
   userId: string;
+  username: string;
   roomName: string;
 }
 
@@ -124,144 +238,214 @@ const Chat: React.FC = () => {
   const [currentMessage, setCurrentMessage] = useState<string>('');
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [roomName, setRoomName] = useState<string>('default_room');
+  const [groups, setGroups] = useState<string[]>([]);
+  const [friends, setFriends] = useState<string[]>([]);
+  const [newRoomName, setNewRoomName] = useState<string>(''); // State for new room name input
 
-  // Reference for auto-scrolling messages
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  // Redux: Extract user information
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+  const userId = localStorage.getItem('userId') || '';
 
-  // Extract JWT and User ID from localStorage
-  const token = localStorage.getItem('accesToken'); // Ensure this key matches the one used to store
-  const userId = localStorage.getItem('userId'); // Ensure this key matches the one used to store
-
-  // Check if JWT and UserID are present before trying to establish the WebSocket connection
+  // Initialize WebSocket connection
   useEffect(() => {
-    if (!token || !userId) {
-      console.error('JWT token or User ID is missing. Redirecting to login...');
+    if (!userId) return;
+
+    const token = localStorage.getItem('accesToken'); // Access token from localStorage
+    if (!token) {
+      console.error('Access token is missing. Cannot connect to WebSocket.');
       return;
     }
 
-    console.log('JWT Token:', token);
-    console.log('User ID:', userId);
+    console.log('Connecting to WebSocket with token:', token);
+    const socketUrl = `wss://testcore-qmyu.onrender.com/ws1/?token=${token}`;
+    const ws = new WebSocket(socketUrl);
 
-    
-    if (token && userId) {
-      const socketUrl = `wss://testcore-qmyu.onrender.com/ws1/`;
+    setSocket(ws);
 
-      // Create WebSocket connection
-      const ws = new WebSocket(socketUrl);
+    ws.onopen = () => {
+      console.log('WebSocket connection established.');
+      setIsConnected(true);
+    };
 
-      // Set the WebSocket instance to state
-      setSocket(ws);
+    ws.onmessage = (event) => {
+      const incomingMessage: ChatMessage = JSON.parse(event.data);
+      setMessages((prev) => [...prev, incomingMessage]);
+    };
 
-      // Handle incoming messages
-      ws.onmessage = (event) => {
-        const incomingMessage: ChatMessage = JSON.parse(event.data);
+    ws.onclose = () => {
+      console.log('WebSocket connection closed.');
+      setIsConnected(false);
+    };
 
-        // Handle different message types (if any)
-        if (incomingMessage.typeOfMessage === 'LEAVE_ROOM') {
-          alert(`${incomingMessage.userId} has left the room.`);
-        } else if (incomingMessage.typeOfMessage === 'SEND_MESSAGE') {
-          setMessages((prevMessages) => [...prevMessages, incomingMessage]);
-        }
-      };
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+    };
 
-      // Handle WebSocket open event
-      ws.onopen = () => {
-        console.log('WebSocket connection established');
-        setIsConnected(true);
-      };
+    return () => {
+      ws.close();
+    };
+  }, [userId]);
 
-      // Handle WebSocket close event
-      ws.onclose = () => {
-        console.log('WebSocket connection closed');
-        setIsConnected(false);
-      };
+  // Load groups and friends
+  useEffect(() => {
+    const fetchGroupsAndFriends = async () => {
+      // Mock API calls to fetch groups and friends (replace with real API calls)
+      setGroups(['Group 1', 'Group 2', 'Group 3']);
+      setFriends(['Friend 1', 'Friend 2', 'Friend 3']);
+    };
 
-      // Handle WebSocket error event
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        setIsConnected(false);
-      };
+    fetchGroupsAndFriends();
+  }, []);
 
-      // Clean up WebSocket connection on component unmount
-      return () => {
-        ws.close();
-      };
-    } else {
-      console.error('JWT token or User ID not found in localStorage');
-    }
-  }, [token, userId]);
-
-  // Send a message to the WebSocket server
+  // Send message through WebSocket
   const sendMessage = () => {
-    if (socket && currentMessage.trim()) {
-      if (socket.readyState === WebSocket.OPEN) {
-        const message: ChatMessage = {
-          MessageID: '12345' + new Date().getTime(), // Generate unique MessageID
-          content: "Hello everyone!!",
-          typeOfMessage: 'SEND_MESSAGE',
-          userId: "67890" , // Fallback if userId is not found
-          roomName: 'GeneralChatRoom', // You can make this dynamic if needed
-        };
-
-        // Send message to the WebSocket server
-        socket.send(JSON.stringify(message));
-
-        // Update UI with the sent message
-        setMessages((prevMessages) => [...prevMessages, message]);
-
-        // Clear the input field after sending
-        setCurrentMessage('');
-      } else {
-        console.warn('WebSocket is not open. Attempting to reconnect...');
-        // Optionally implement reconnection logic here
-      }
+    if (!socket || socket.readyState !== WebSocket.OPEN || !currentMessage.trim()) {
+      console.warn('Cannot send message: WebSocket not ready or message is empty.');
+      return;
     }
+
+    const message: ChatMessage = {
+      MessageID: 'msg_' + new Date().getTime(),
+      content: currentMessage,
+      typeOfMessage: 'SEND_MESSAGE',
+      userId,
+      username: userInfo?.name || 'Unknown User',
+      roomName,
+    };
+
+    socket.send(JSON.stringify(message));
+    setMessages((prev) => [...prev, message]);
+    setCurrentMessage('');
   };
 
-  // Auto-scroll the messages container when a new message is added
+  // Auto-scroll to the latest message
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
-  return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
-      <h2>Chat Room</h2>
+  const createRoom = async () => {
+    if (!newRoomName.trim()) {
+      alert('Room name cannot be empty.');
+      return;
+    }
 
-      {/* Display chat messages */}
-      <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }}>
-        {messages.map((message) => (
-          <div key={message.MessageID} style={{ marginBottom: '10px' }}>
-            <strong>{message.userId}</strong>: {message.content}
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+    try {
+      const token = localStorage.getItem('accesToken'); // Retrieve the token from localStorage
+        console.log("token :" ,token)
+      if (!token) {
+        console.error('Access token is missing. Cannot create a room.');
+        return;
+      }
+
+      const roomName = newRoomName; // Use the dynamic room name input
+
+      const response = await fetch('https://testcore-qmyu.onrender.com/api/v1/chat/createChat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, // Pass the token in the Authorization header
+        },
+        body: JSON.stringify({
+          roomName,
+          userId: localStorage.getItem('userId'), // Replace with appropriate user ID
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error creating room:', errorText);
+        alert('Failed to create room. Please try again.');
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Room creation response:', data);
+
+      if (data.statusCode === 200 && data.success) {
+        const { romeName, AdminId } = data.data;
+        setRoomName(romeName); // Update the UI with the created room name
+        setGroups((prev) => [...prev, romeName]); // Add the new room to the groups list
+        console.log(`Room "${romeName}" created successfully by Admin ${AdminId}!`);
+        setNewRoomName(''); // Clear the input field after room creation
+      } else {
+        console.error('Unexpected response format:', data);
+        alert('Room creation failed. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating room:', error);
+      alert('An unexpected error occurred while creating the room.');
+    }
+  };
+
+  return (
+    <div className="chat-container">
+      {/* Left Section: Groups and Friends */}
+      <div className="chat-left">
+        <h3>Groups</h3>
+        <div className="group-list">
+          <button className="create-room-button" onClick={createRoom}>
+            Create Room
+          </button>
+          {/* Input to create a dynamic room name */}
+          <input
+            type="text"
+            value={newRoomName}
+            onChange={(e) => setNewRoomName(e.target.value)}
+            placeholder="Enter room name"
+          />
+          {groups.map((group) => (
+            <div
+              key={group}
+              className="group-item"
+              onClick={() => setRoomName(group)}
+            >
+              {group}
+            </div>
+          ))}
+        </div>
+
+        <h3>Friends</h3>
+        <div className="friend-list">
+          {friends.map((friend) => (
+            <div key={friend} className="friend-item">
+              {friend}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Input field to send new message */}
-      <div style={{ marginTop: '10px' }}>
-        <input
-          type="text"
-          value={currentMessage}
-          onChange={(e) => setCurrentMessage(e.target.value)}
-          placeholder="Type a message..."
-          style={{ width: '100%', padding: '8px', marginBottom: '10px' }}
-        />
-        <button
-          onClick={sendMessage}
-          style={{
-            width: '100%',
-            padding: '10px',
-            backgroundColor: '#4CAF50',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-          }}
-        >
-          Send
-        </button>
+      {/* Right Section: Chat */}
+      <div className="chat-right">
+        <h2 className="chat-title">Chat Room: {roomName}</h2>
+
+        {/* Messages */}
+        <div className="messages-container">
+          {messages.map((message) => (
+            <div
+              key={message.MessageID}
+              className={`message ${message.userId === userId ? 'outgoing' : 'incoming'}`}
+            >
+              <strong>{message.userId === userId ? 'You' : message.username}</strong>
+              : {message.content}
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Message Input */}
+        <div className="input-container">
+          <input
+            type="text"
+            value={currentMessage}
+            onChange={(e) => setCurrentMessage(e.target.value)}
+            placeholder="Type a message..."
+          />
+          <button onClick={sendMessage}>Send</button>
+        </div>
       </div>
     </div>
   );
