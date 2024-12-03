@@ -25,6 +25,8 @@ model College {
   collegeVerify Boolean
   students      Student[]
   examiner      Examiner[]
+
+  @@index([email, Id])
 }
 
 model Examiner {
@@ -38,7 +40,8 @@ model Examiner {
   refreshToken   String?   @unique
   college        College[]
   exams          Exam[]
-  @@index([email])
+
+  @@index([email, Id])
 }
 
 model Student {
@@ -56,6 +59,8 @@ model Student {
   results        Result[]
   questionPapers QuestionPaper[]
   subject        Subject[]
+
+  @@index([email, Id])
 }
 
 model Exam {

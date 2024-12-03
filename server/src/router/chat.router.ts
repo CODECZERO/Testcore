@@ -7,7 +7,7 @@ import { Router } from "express";
 const router = Router();
 
 router.route("/createChat").post(verifyData, createChatRoom);
-router.route("/chat").get(verifyData,getChats);
+router.route("/getchat").get(verifyData,getChats);
 router.route("/ChatQuery/:College/:Branch").post(verifyData,SearchChatRoom ,joinChatRoom).
     put(verifyData, SearchChatRoom, LeaveRoom).get(verifyData, SearchChatRoom, getUserInChat);
 router.route("/connectChat/:College/:Branch").post(verifyData,SearchChatRoom,connectChat);
