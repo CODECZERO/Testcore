@@ -1,0 +1,193 @@
+@import url('https://fonts.googleapis.com/css2?family=Ga+Maamli&family=Playwrite+DE+Grund:wght@100..400&family=Rubik+Glitch&display=swap');
+
+
+/* Full page container */
+.full-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f0f0f0;
+    position: relative;
+    overflow: hidden;
+    flex-direction: column;
+    text-align: center;
+    z-index: 0; /* Ensure it’s behind the other content */
+  }
+  
+  /* Background container - position fixed to cover entire page */
+  .container{
+    position: fixed; /* Fix the background to the entire page */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    --s: 82px;
+    --c1: #b2b2b2;
+    --c2: #ffffff;
+    --c3: #d9d9d9;
+    
+    --_g: var(--c3) 0 120deg, #0000 0;
+    background: conic-gradient(from -60deg at 50% calc(100% / 3), var(--_g)),
+      conic-gradient(from 120deg at 50% calc(200% / 3), var(--_g)),
+      conic-gradient(
+        from 60deg at calc(200% / 3),
+        var(--c3) 60deg,
+        var(--c2) 0 120deg,
+        #0000 0
+      ),
+      conic-gradient(from 180deg at calc(100% / 3), var(--c1) 60deg, var(--_g)),
+      linear-gradient(
+        90deg,
+        var(--c1) calc(100% / 6),
+        var(--c2) 0 50%,
+        var(--c1) 0 calc(500% / 6),
+        var(--c2) 0
+      );
+    background-size: calc(1.732 * var(--s)) var(--s);
+    z-index: -1;
+  }
+  
+  /* Logo and text container */
+  .logo-animation {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: logoAnimation 3s ease-out forwards;
+    margin-bottom: 2rem;
+  }
+  
+  .logo {
+    position: relative;
+    z-index: 1;
+  }
+  
+ 
+  
+  .logo-bottom-text {
+    font-family: "Rubik Glitch" , system-ui;
+    font-size: 72px;
+    color: #08ec26f0;
+    padding-bottom: 15px;
+    z-index: 10;
+    opacity: 0;
+    margin-top: 10px;
+    text-shadow: 
+      0 0 5px rgba(65, 135, 45, 0.761), /* soft glow */
+      0 0 10px rgba(38, 126, 30, 0.801), 
+      0 0 15px rgba(170, 235, 248, 0.479);  /* increase the intensity of glow */
+      animation: fadeIn 1s ease-out forwards ; 
+  }
+  
+  .bottom-text {
+    font-family: "Rubik Glitch" , system-ui;
+    font-size: 18px;
+    z-index: 10;
+    color: #bcb19b;
+    letter-spacing: 0.5px;
+    opacity: 0;
+    animation: fadeIn 1s ease-out forwards;
+    animation-delay: 1s;
+    background: linear-gradient(45deg, #f7ff7f, #ff7f50); /* Gradient color for shiny effect */
+    -webkit-background-clip: text; /* Clip gradient to text */
+    color: transparent; /* Make the text color transparent so gradient is visible */
+    position: relative;
+    display: inline-block;
+  
+  }
+    
+  .bottom-text::after {
+    content: attr(data-reflection); /* Create a reflection text */
+    position: absolute;
+    top: 100%; /* Place the reflection below the original text */
+    left: 0;
+    transform: scaleY(-1); /* Flip the reflection vertically */
+    opacity: 0.3; /* Make reflection subtle */
+    color: rgba(189, 159, 103, 0.5); /* Reflective color */
+    z-index: -1;
+    text-shadow: 
+      0 0 5px rgba(255, 255, 255, 0.8), 
+      0 0 10px rgba(255, 255, 255, 0.4); /* Slight shadow to enhance reflection */
+  }
+  
+  .button-container {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 30px;
+    z-index: 10;
+    opacity: 0;
+    transform: translateY(20px); /* Initial state for animation */
+    animation: fadeIn 1s ease-out forwards 1s; /* Delay animation after logo */
+  }
+  
+  .login-button, .signup-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #3e3a32da;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Add transform for hover scaling */
+  }
+  
+  .login-button:hover, .signup-button:hover {
+    background-color: #a78c5f;
+    transform: scale(1.05); /* Slightly scale on hover */
+  }
+  
+  /* Keyframe animations */
+  @keyframes logoAnimation {
+    0% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    25% {
+      opacity: 0;
+      transform: translateY(22.5px);
+    }
+    50% {
+      opacity: 0;
+      transform: translateY(15px);
+    }
+   
+    75% {
+      opacity: 0.5;
+      transform: translateY(7.5px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0); 
+    }
+  }
+  
+  @keyframes fadeInButtons {
+    0% {
+      opacity: 0;
+      transform: translateY(20px); /* Start from below */
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0); /* Move to final position */
+    }
+  }
+  
