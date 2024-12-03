@@ -38,6 +38,7 @@ model Examiner {
   refreshToken   String?   @unique
   college        College[]
   exams          Exam[]
+  @@index([email])
 }
 
 model Student {

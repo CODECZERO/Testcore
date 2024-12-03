@@ -12,13 +12,13 @@ import { ApiResponse } from '../util/apiResponse.js';
 import { cacheUpdateForChatRoom, } from '../db/database.redis.query.js';
 import { chatModel } from '../models/chatRoomData.model.nosql.js';
 import { User } from '../models/user.model.nosql.js';
-import { findUsers } from '../db/Query.nosql.db.js';
+import { findChats, findUsers } from '../db/Query.nosql.db.js';
 import mongoose from 'mongoose';
 import { ApiError } from '../util/apiError.js';
 import { options } from './user.controller.js';
 import { ChatTokenGen } from '../services/chat/chatToken.services.js';
 const joinChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const roomdata = req.body; //takes data about room
+    const roomdata = req.chatRoomData; //takes data about room
     const user = req.user; //takes user id or uder data
     if (!roomdata.roomName || !user.Id)
         throw new ApiError(400, 'Inviad data provied'); //if any of theme is not provided then throw error
@@ -136,4 +136,13 @@ const connectChat = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0,
         throw new ApiError(500, "someting went wrong while making token"); //if token not gen then throw error
     return res.status(200).cookie("UserChatToken", tokenGen, options).json(new ApiResponse(200, Checker, "Token create succesfuly")); //reutrn response
 }));
-export { createChatRoom, joinChatRoom, checkUserAccess, LeaveRoom, getUserInChat, connectChat };
+const getChats = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    if (!user.Id)
+        throw new ApiError(400, "user id not provied");
+    const ChatDatas = yield findChats(user.Id);
+    if (!ChatDatas)
+        throw new ApiError(404, "no chat room currently");
+    return res.status(200).json(new ApiResponse(200, ChatDatas, "chat rooms found"));
+}));
+export { createChatRoom, joinChatRoom, checkUserAccess, LeaveRoom, getUserInChat, connectChat, getChats };

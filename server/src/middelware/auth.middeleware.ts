@@ -46,6 +46,7 @@ const verifyData = AsyncHandler(async (req: RequestWithCookies, res: Response, n
             email,
             role,
         });//finding user using email
+
         if (!findUser) throw new ApiError(400, "Invalid Token");
         req.user = decoded; // Assuming `req.user` is where you store the decoded token
 
