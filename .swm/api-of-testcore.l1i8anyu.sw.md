@@ -57,6 +57,7 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   if (!user) throw new ApiError(404, "No user Found");
 
+
   const createRoom = await chatModel.create({//making chat room in chatmodel 
     romeName: roomData.roomName,
     AdminId: user?._id,
@@ -71,7 +72,6 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   return res.status(200).json(new ApiResponse(200, createRoom));//return data
 });
-
 ```
 
 ---
@@ -128,7 +128,7 @@ This endpoint provides three distinct methods (\`POST\`, `PUT`, `GET`) to manage
 
 &nbsp;
 
-**1. POST Method: Join a Chat Room** 
+**1. POST Method: Join a Chat Room**
 
 Purpose: Allows a user to join a specific chat room.&nbsp;&nbsp;
 
@@ -150,7 +150,7 @@ Workflow:&nbsp;&nbsp;
 
 ```typescript
 const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//using this function a user can join chat
-  const roomdata: roomData = req.body;//takes data about room
+  const roomdata: roomData = req.chatRoomData;//takes data about room
   const user: user = req.user;//takes user id or uder data
 
   if (!roomdata.roomName || !user.Id) throw new ApiError(400, 'Inviad data provied');//if any of theme is not provided then throw error
@@ -162,15 +162,14 @@ const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//u
   if (!findChatID) throw new ApiError(404, 'room not found');
 
   const joinChat = await User.updateOne({//after finding room it will help user to join the room and update value in database
-    sqlId:user.Id
-  },{
+    sqlId: user.Id
+  }, {
     chatRoomIDs: findChatID._id,//taking chat id and puting here
   });
 
   if (!joinChat) throw new ApiError(500, 'unable to join chat');//if unable to do so , then throw error
   return res.status(200).json(new ApiResponse(200, joinChat));//else return value
 });
-
 ```
 
 ---
@@ -191,7 +190,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;&nbsp;&nbsp;&nbsp;- Updates the `ChatModel` collection to reflect the removal of the user from the chat room.&nbsp;&nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="111">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="112">
 
 ---
 
@@ -208,7 +207,7 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
     romeName: roomData.roomName,
   });
   const removeUser = await User.updateOne(//after that remove user from chat group
-    { sqlId:user.Id},
+    { sqlId: user.Id },
     { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID?._id) } },
   );
   if (!removeUser) throw new ApiError(406, 'User unable to remove');
@@ -236,7 +235,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;&nbsp;&nbsp;&nbsp;-  Returns the total number of users in the chat room and their respective details.&nbsp;&nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="89">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="90">
 
 ---
 
@@ -262,7 +261,7 @@ const getUserInChat = AsyncHandler(async (req: Requestany, res: Response) => {//
 
 &nbsp;
 
-**Key Notes:**  
+**Key Notes:**
 
 \- All methods ensure efficient data retrieval and updates using MongoDB aggregation pipelines and optimized queries.&nbsp;&nbsp;
 
@@ -276,9 +275,9 @@ const getUserInChat = AsyncHandler(async (req: Requestany, res: Response) => {//
 
 #### **API Endpoint:** `/connectChat/:College/:Branch`
 
-**Method:** `POST`  
+**Method:** `POST`
 
-**Purpose: Establishes a connection to a chat room for a user, ensuring access is authorized and secure through token generation.**  
+**Purpose: Establishes a connection to a chat room for a user, ensuring access is authorized and secure through token generation.**
 
 &nbsp;
 
@@ -312,7 +311,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="163">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="164">
 
 ---
 
@@ -324,7 +323,7 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//if
   const user: user = req.user;
   if (!roomData) throw new ApiError(400, 'invalid request');//throw error if not provided
   const Checker = await checkUserAccess(user.Id, roomData.roomID);//check in database if user have access to the chat room
-  if(!Checker) throw new ApiError(409,"user don't have access to chat");//if fail then throw error
+  if (!Checker) throw new ApiError(409, "user don't have access to chat");//if fail then throw error
   //call token generater here
   const tokenGen = await ChatTokenGen(Checker[0]);//takes first value and gen token based on that data
   if (!tokenGen) throw new ApiError(500, "someting went wrong while making token");//if token not gen then throw error
@@ -372,6 +371,60 @@ Key Features:&nbsp;&nbsp;
 Note : Ensure that tokens are securely stored and managed on the frontend to prevent unauthorized access to chat rooms.
 
 &nbsp;
+
+&nbsp;
+
+### **4. GetChat**
+
+Endpoint: `/getchat`
+
+Method: `GET`
+
+This endpoint retrieves the chat room details (room ID and room name) for the authenticated user. It verifies the user's identity using the authentication middleware. Upon successful authentication, the endpoint will return the list of chat rooms the user is connected to or has joined. The data will include the chat room's unique identifier (`_id`) and the room's name (`roomName`).
+
+&nbsp;
+
+#### **Response**:
+
+- **Status 200**: Returns an array of chat rooms with their `id` and `roomName`.
+
+- **Status 401**: If the authentication fails or the user is not authorized, returns an authentication error.
+
+- **Status 404**: If no chat rooms are found for the user, returns a message indicating no chat rooms are available.
+
+### **Workflow**:
+
+1. The request is sent to the `/getchat` endpoint.
+
+2. The **authentication middleware** checks if the user is authenticated by verifying the token.
+
+3. Once verified, the system fetches the chat rooms that the user has joined, using their unique identifier.
+
+4. The response includes the `id` and `roomName` of each chat room.
+
+This endpoint is ideal for returning the chat room data the user has access to and can help in managing the list of active chats for the user in the system.
+
+&nbsp;
+
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="177">
+
+---
+
+&nbsp;
+
+```typescript
+const getChats = AsyncHandler(async (req: Requestany, res: Response) => {//this function helps us to get chatroom and chat data
+  const user: user = req.user;
+  if (!user.Id) throw new ApiError(400, "user id not provied");
+  const ChatDatas = await findChats(user.Id);
+  if (!ChatDatas) throw new ApiError(404, "no chat room currently");
+  return res.status(200).json(new ApiResponse(200, ChatDatas, "chat rooms found"));
+})
+```
+
+---
+
+</SwmSnippet>
 
 ## **Video API**
 
