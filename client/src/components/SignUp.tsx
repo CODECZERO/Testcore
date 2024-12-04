@@ -2,8 +2,8 @@ import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { Box, Button, Typography, TextField, FormControl, MenuItem, Select, InputLabel, Card, Divider, CircularProgress } from '@mui/material';
-import { login,store } from './store';
+import { login } from './store';
+import "../styles/Login.css"
 
 type Role = 'Student' | 'College' | 'Examiner';
 
@@ -20,6 +20,12 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,7 +42,7 @@ const Login: React.FC = () => {
     };
 
     try {
-      const response = await axios.post('https://testcore-qmyu.onrender.com/api/v1/user/Login', userData, {
+      const response = await axios.post('https://testcore-qmyu.onrender.com/api/v1/user/login', userData, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -45,17 +51,25 @@ const Login: React.FC = () => {
       if (response.data) {
         setSuccess('Login successful!');
         setLoading(false);
-        //creating object to store userdata and send it to state
+console.log(response.data);
+        // Extract and store the token and user ID
+        const { accessToken } = response.data.data;
+        const userId = response.data.data.userData.Id;
+
+        localStorage.setItem('accesToken', accessToken);
+        localStorage.setItem('userRole', userData.role); 
+        localStorage.setItem('userId', userId);
+ console.log(accessToken);
         const userdata = {
           name: response.data.data.userData.name,
           email: response.data.data.userData.email,
-          image:"https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3407.jpg"
-        }
-        // Dispatch the action to set the login state
+          image:
+            'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3407.jpg',
+        };
+
         dispatch(login(userdata));
 
-
-        // Redirect to dashboard or desired page after login
+        // Navigate to the dashboard
         navigate('/Dash-Board');
       }
     } catch (err: any) {
@@ -64,187 +78,142 @@ const Login: React.FC = () => {
     }
   };
 
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        padding: 4,
-        background: 'linear-gradient(135deg, #1f1f1f, #3b3b3b)', // Dark gradient background
-      }}
-    >
-      <Card
-        sx={{
-          padding: 4,
-          maxWidth: 400,
-          width: '100%',
-          borderRadius: '16px', // Rounded corners
-          boxShadow: '0px 8px 16px rgba(0,0,0,0.4)', // Deep shadow
-          backgroundColor: 'rgba(255, 255, 255, 0.1)', // Semi-transparent background for glass effect
-          variant: "elevation=12",
-          border: '1px solid rgba(255, 255, 255, 0.2)', // Optional border for glass effect
-          transition: 'transform 0.3s ease-in-out',
-          '&:hover': { transform: 'scale(1.01)' }, // Scale on hover
-        }}
-      >
-        <Typography
-          variant="h4"
-          component="h2"
-          sx={{
-            marginBottom: 2,
-            textAlign: 'center',
-            fontWeight: 'bold',
-            color: '#fff', // Adjusted text color for contrast
-          }}
-        >
-          Welcome Back
-        </Typography>
+      return (
+    <div className='container'>
+  
+      <div className="card2">
+        <form className="form" onSubmit={handleSubmit}>
+          <p id="heading">Welcome Back</p>
 
-        {error && <Typography color="error" sx={{ marginBottom: 2 }}>{error}</Typography>}
-        {success && <Typography color="primary" sx={{ marginBottom: 2 }}>{success}</Typography>}
+          {/* Error/Success Messages */}
+          {error && <p className="message-error">{error}</p>}
+          {success && <p className="message success">{success}</p>}
 
-        <form onSubmit={handleSubmit}>
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <InputLabel id="role-label" sx={{}}>Role</InputLabel>
-            <Select
-              labelId="role-label"
+          {/* Role Dropdown */}
+          <div className="field">
+            <svg
+              className="input-icon"
+              viewBox="0 0 16 16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M3 3l10 10M13 3L3 13"></path>
+            </svg>
+            <span>Role</span>
+            <select
               id="role"
               name="role"
+              className="input-field"
               defaultValue="Student"
               required
-              label="Role"
-              sx={{
-                color: "black",
-                backgroundColor: '#fff',
-                '& .MuiOutlinedInput-notchedOutline': {
+              >
+              <option value="Student">Student</option>
+              <option value="College">College</option>
+              <option value="Examiner">Examiner</option>
+            </select>
+          </div>
 
-                },
-                '&:hover .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#f57c00',
-                  // Orange hover color
-                },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                  borderColor: '#f57c00',
-                  // Orange focus color
-                },
-              }}
-            >
-              <MenuItem value="Student">Student</MenuItem>
-              <MenuItem value="College">College</MenuItem>
-              <MenuItem value="Examiner">Examiner</MenuItem>
-            </Select>
-          </FormControl>
+          {/* Email Input */}
+          <div className="field">
+          <svg
+  viewBox="0 0 24 24"
+  fill="currentColor"
+  height="16"
+  width="16"
+  xmlns="http://www.w3.org/2000/svg"
+  className="input-icon"
+>
+  <path
+    d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1 0.9 2 2 2h16c1.1 0 2-0.9 2-2V6c0-1.1-0.9-2-2-2zm0 2-8 5-8-5h16zm0 12H4V8l8 5 8-5v10z"
+  ></path>
+</svg>
 
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <TextField
+            <input
               type="email"
               name="email"
-              label="Email"
-              variant="outlined"
+              id="email"
+              placeholder="Email"
+              className="input-field"
               required
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  color: "black",
-                  backgroundColor: '#fff',
-                  '& fieldset': {
-                    borderColor: 'black',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#f57c00', // Orange hover color
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#f57c00',
-                  },
-                },
-              }}
             />
-          </FormControl>
+          </div>
 
-          <FormControl fullWidth sx={{ marginBottom: 2 }}>
-            <TextField
-              type="password"
-              name="password"
-              label="Password"
-              variant="outlined"
-              required
-              fullWidth
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: '#fff',
-                  color: 'black',
-                  '& fieldset': {
-                    borderColor: 'black',
-                  },
-                  '&:hover fieldset': {
-                    borderColor: '#f57c00', // Orange hover color
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: '#f57c00', // Orange focus color
-                  },
-                },
-              }}
-            />
-          </FormControl>
-
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            sx={{
-              backgroundColor: '#f57c00',
-              color: '#fff',
-              fontWeight: 'bold',
-              '&:hover': { backgroundColor: '#fb8c00' }, // Lighter orange on hover
-              py: 1.5, // Increase padding for button
-              borderRadius: '8px', // Rounded button corners
-            }}
+          {/* Password Input */}
+          <div className="field">
+      <svg
+        className="input-icon"
+        viewBox="0 0 16 16"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
+      </svg>
+      <input
+        type={showPassword ? "text" : "password"}
+        name="password"
+        id="password"
+        placeholder="Password"
+        className="input-field"
+        required
+      />
+      <button
+        type="button"
+        className="toggle-password-btn"
+        onClick={togglePasswordVisibility}
+      >
+        {showPassword ? (
+          <svg
+            className="eye-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            Login
-          </Button>
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        ) : (
+          <svg
+            className="eye-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M17.94 17.94A10.29 10.29 0 0 1 12 20c-7 0-11-8-11-8a20.21 20.21 0 0 1 5.4-5.4"></path>
+            <path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+          </svg>
+        )}
+      </button>
+    </div>
+
+          <div className="btn">
+            <button className="button1" type="submit" disabled={loading}>
+              {loading ? "Loading..." : "Login"}
+            </button>
+            <button
+              className="button2"
+              type="button"
+              onClick={() => navigate("/sign-in")}
+            >
+              Sign Up
+            </button>
+          </div>
+
+          {/* Submit and Sign-Up Buttons */}
+    
+<button className="button3">Forgot Password?</button>
         </form>
-
-        <Divider sx={{ color: "white", my: 2 }}>or</Divider>
-
-        <Button
-          fullWidth
-          variant="outlined"
-          sx={{
-            color: '#f57c00',
-            borderColor: '#f57c00',
-            '&:hover': {
-              backgroundColor: 'rgba(245, 124, 0, 0.1)',
-              borderColor: '#f57c00',
-            },
-            borderRadius: '8px',
-            py: 1.5,
-          }}
-        >
-          Sign in with Google
-        </Button>
-
-        <Button
-          fullWidth
-          variant="outlined"
-          sx={{
-            color: '#3b5998',
-            borderColor: '#3b5998',
-            '&:hover': {
-              backgroundColor: 'rgba(59, 89, 152, 0.1)',
-              borderColor: '#3b5998',
-            },
-            borderRadius: '8px',
-            py: 1.5,
-            mt: 2,
-          }}
-        >
-          Sign in with Facebook
-        </Button>
-      </Card>
-    </Box>
+      </div>
+    </div>
+  
   );
 };
 
-export default Login;
+  export default Login;
+  
