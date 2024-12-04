@@ -27,7 +27,7 @@ class rabbitMqFunction {
             this.exchangeName,
             roomName,
             Buffer.from(messageEnc),
-            { persistent: true },
+            { persistent: false },
         );
     };
 
