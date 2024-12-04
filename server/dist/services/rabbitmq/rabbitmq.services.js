@@ -27,7 +27,7 @@ class rabbitMqFunction {
             if (!this.channel) {
                 yield this.connectRabbitMq(roomName);
             }
-            yield this.channel.publish(this.exchangeName, roomName, Buffer.from(messageEnc), { persistent: true });
+            yield this.channel.publish(this.exchangeName, roomName, Buffer.from(messageEnc), { persistent: false });
         });
         this.subData = (roomName) => __awaiter(this, void 0, void 0, function* () {
             if (!this.channel) {
