@@ -23,7 +23,7 @@ const joinChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
     if (!roomdata.roomName || !user.Id)
         throw new ApiError(400, 'Inviad data provied'); //if any of theme is not provided then throw error
     const findChatID = yield chatModel.findOne({
-        romeName: roomdata.roomName,
+        roomName: roomdata.roomName,
     });
     if (!findChatID)
         throw new ApiError(404, 'room not found');
@@ -43,11 +43,11 @@ const createChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
         throw new ApiError(400, 'group name or Admin id is not provided'); //if not provided then throw error
     const user = yield User.findOne({
         sqlId: Id
-    });
+    }).lean();
     if (!user)
         throw new ApiError(404, "No user Found");
     const createRoom = yield chatModel.create({
-        romeName: roomData.roomName,
+        roomName: roomData.roomName,
         AdminId: user === null || user === void 0 ? void 0 : user._id,
     });
     if (!(createRoom))
@@ -80,7 +80,7 @@ const LeaveRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, f
     if (!(roomData || user))
         throw new ApiError(400, 'invalid data');
     const findChatID = yield chatModel.findOne({
-        romeName: roomData.roomName,
+        roomName: roomData.roomName,
     });
     const removeUser = yield User.updateOne(//after that remove user from chat group
     { sqlId: user.Id }, { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID === null || findChatID === void 0 ? void 0 : findChatID._id) } });

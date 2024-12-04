@@ -43,7 +43,7 @@ const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//u
   if (!roomdata.roomName || !user.Id) throw new ApiError(400, 'Inviad data provied');//if any of theme is not provided then throw error
 
   const findChatID = await chatModel.findOne({//find chat Id in chatmodel collection
-    romeName: roomdata.roomName,
+    roomName: roomdata.roomName,
   });
 
   if (!findChatID) throw new ApiError(404, 'room not found');
@@ -67,13 +67,13 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   const user = await User.findOne({//fiding user using client data
     sqlId: Id
-  });
+  }).lean();
 
   if (!user) throw new ApiError(404, "No user Found");
 
 
   const createRoom = await chatModel.create({//making chat room in chatmodel 
-    romeName: roomData.roomName,
+    roomName: roomData.roomName,
     AdminId: user?._id,
   });
 
@@ -116,7 +116,7 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
   if (!(roomData || user)) throw new ApiError(400, 'invalid data');
 
   const findChatID = await chatModel.findOne({//check if user is part of that chat
-    romeName: roomData.roomName,
+    roomName: roomData.roomName,
   });
   const removeUser = await User.updateOne(//after that remove user from chat group
     { sqlId: user.Id },
