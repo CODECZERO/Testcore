@@ -310,3 +310,47 @@ const joinRoom = async (room: string) => {
 export default Chat;
 
 
+
+
+
+
+//   // Connect Chat functionality
+// const connectChat = async (room: string) => {
+//   try {
+//     const token = localStorage.getItem('accesToken');
+//     if (!token) {
+//       alert('Access token is missing.');
+//       return;
+//     }
+   
+//     const response = await fetch(`https://testcore-qmyu.onrender.com/api/v1/chat/connectChat/${room}`, {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         Authorization: `Bearer ${token}`,
+//       },
+//       body: JSON.stringify({ userId: userId }),
+//     });
+
+//     if (!response.ok) {
+//       const errorText = await response.text();
+//       console.error('Error connecting to room:', errorText);
+//       alert('Failed to connect to the room');
+//       return;
+//     }
+
+//     const data = await response.json();
+//     console.log('Connection response:', data);
+
+//     if (data.statusCode === 200 && data.success) {
+//       const token = data.data.token; // Extract token from response
+//       localStorage.setItem('UserChatToken', token); // Store the token
+//       console.log(`Successfully connected to the room! : ${room}`);
+//     } else {
+//       alert('Failed to connect to room.');
+//     }
+//   } catch (error) {
+//     console.error('Error connecting to room:', error);
+//     alert('An error occurred while connecting to the room.');
+//   }
+// };
