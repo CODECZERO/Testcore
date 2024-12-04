@@ -2,7 +2,7 @@ import amqplib, { Channel, Connection } from 'amqplib';
 
 class rabbitMqFunction {
     private exchangeName = 'chat_exchagne';
-    private messageTTL = '';
+    private messageTTL = 2 * 24 * 60 * 60 * 1000; // 2 days in milliseconds
     public channel!: Channel;
     public queue: any;
     public connection!: Connection;
@@ -27,7 +27,7 @@ class rabbitMqFunction {
             this.exchangeName,
             roomName,
             Buffer.from(messageEnc),
-            { persistent: false },
+            { persistent: true },
         );
     };
 
@@ -35,7 +35,7 @@ class rabbitMqFunction {
         if (!this.channel) {
             await this.connectRabbitMq(roomName);
         }
-        this.queue = await this.channel.assertQueue(roomName, { exclusive: false });
+        this.queue = await this.channel.assertQueue(roomName, { exclusive: false, arguments: { 'x-message-ttl': this.messageTTL, } });
         const message = await this.channel.bindQueue(
             this.queue.queue,
             this.exchangeName,
@@ -43,7 +43,7 @@ class rabbitMqFunction {
         );
         return message;
     };
-    
+
     public closeConnection = async () => {
         await this.channel.close();
         await this.connection.close();
