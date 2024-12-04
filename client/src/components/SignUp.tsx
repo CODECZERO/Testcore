@@ -51,14 +51,15 @@ const Login: React.FC = () => {
       if (response.data) {
         setSuccess('Login successful!');
         setLoading(false);
-
+console.log(response.data);
         // Extract and store the token and user ID
-        const { accesToken } = response.data.data;
+        const { accessToken } = response.data.data;
         const userId = response.data.data.userData.Id;
 
-        localStorage.setItem('accesToken', accesToken);
+        localStorage.setItem('accesToken', accessToken);
+        localStorage.setItem('userRole', userData.role); 
         localStorage.setItem('userId', userId);
- console.log(accesToken);
+ console.log(accessToken);
         const userdata = {
           name: response.data.data.userData.name,
           email: response.data.data.userData.email,
