@@ -31,6 +31,7 @@ class rabbitMqFunction {
         );
     };
 
+
     public subData = async (roomName: string) => {
         if (!this.channel) {
             await this.connectRabbitMq(roomName);
@@ -47,7 +48,7 @@ class rabbitMqFunction {
     public closeConnection = async () => {
         await this.channel.close();
         await this.connection.close();
-    }
+    };
 }
 
 const rabbitmq = new rabbitMqFunction();
