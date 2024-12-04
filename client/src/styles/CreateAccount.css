@@ -1,0 +1,330 @@
+From Uiverse.io by ammarsaa
+/* Main background container */
+/* .container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #111111;
+  background-image: linear-gradient(32deg, rgba(8, 8, 8, 0.74) 30px, transparent);
+  background-size: 60px 60px;
+  background-position: -5px -5px;
+  overflow: hidden;
+}
+
+.create-account-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #121212;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 400px;
+  padding: 25px;
+  border-radius: 15px;
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 1px solid #333;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #00bfff;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.message,
+.signin {
+  font-size: 14px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.signin a {
+  color: #00bfff;
+  text-decoration: none;
+}
+
+.signin a:hover {
+  text-decoration: underline;
+}
+
+.flex {
+  display: flex;
+  gap: 10px;
+}
+
+.form label {
+  position: relative;
+  width: 100%;
+}
+
+.form .input {
+  width: 100%;
+  padding: 15px 10px 10px;
+  border: 1px solid #555;
+  border-radius: 10px;
+  background-color: #333;
+  color: #fff;
+  outline: none;
+  font-size: 14px;
+  transition: border-color 0.3s ease;
+}
+
+.form .input:focus {
+  border-color: #00bfff;
+}
+
+.form .input + span {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.form .input:focus + span,
+.form .input:valid + span {
+  top: -5px;
+  font-size: 12px;
+  color: #00bfff;
+}
+
+.form-group {
+  position: relative;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 12px 10px;
+  border: 1px solid #555;
+  border-radius: 10px;
+  background-color: #333;
+  color: #fff;
+  appearance: none;
+}
+
+.form-group select:focus {
+  border-color: #00bfff;
+}
+
+.form-group span {
+  position: absolute;
+  left: 12px;
+  top: -5px;
+  font-size: 12px;
+  color: #00bfff;
+}
+
+.submit {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #00bfff;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit:hover {
+  background-color: #0096cc;
+}
+
+.error-message {
+  color: #ff4d4d;
+  font-size: 14px;
+  text-align: center;
+}
+
+.success-message {
+  color: #4dff4d;
+  font-size: 14px;
+  text-align: center;
+} */
+
+/* Container styles */
+.container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #111111;
+  background-image: linear-gradient(32deg, rgba(8, 8, 8, 0.74) 30px, transparent);
+  background-size: 60px 60px;
+  background-position: -5px -5px;
+  padding: 1em;
+  box-sizing: border-box;
+}
+
+/* Create account container */
+.create-account-container {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Form styling */
+.form {
+  font-family: "Rubik Glitch", system-ui;
+  font-size: 0.9em;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 2em;
+  background-color: #171717;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Title styling */
+.title {
+  font-size: 1.5em;
+  color: #fff;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* Message styling */
+.message {
+  color: #8e8080d8;
+  font-size: 1em;
+  text-align: center;
+}
+
+/* Error and success messages */
+.error-message,
+.success-message {
+  text-align: center;
+  font-size: 14px;
+}
+
+.error-message {
+  color: #ff4d4d;
+}
+
+.success-message {
+  color: #4caf50;
+}
+
+/* Flex container for two fields per row */
+.flex {
+  display: flex;
+  gap: 20px;
+}
+
+/* Equal width for fields in a row */
+.flex > label {
+  flex: 1;
+}
+
+/* Label and input styling */
+label {
+  display: flex;
+  flex-direction: column;
+}
+
+label span {
+  color: #fff;
+  margin-bottom: 5px;
+  font-size: 0.85em;
+}
+
+.input,
+.select {
+  background-color: #171717;
+  border: none;
+  outline: none;
+  color: #8e8080d8;
+  padding: 0.7em;
+  border-radius: 10px;
+  font-size: 0.9em;
+  transition: color 0.3s ease-in-out;
+  box-shadow: inset 2px 5px 10px rgba(5, 5, 5, 0.8);
+}
+
+.input:focus,
+.select:focus {
+  color: #fff;
+  box-shadow: 0 0 10px 2px rgba(0, 255, 117, 0.7);
+}
+
+/* Role and dropdown styling */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group select {
+  background-color: #171717;
+  color: #8e8080d8;
+  padding: 0.7em;
+  border-radius: 10px;
+  font-size: 0.9em;
+  transition: color 0.3s ease-in-out;
+  box-shadow: inset 2px 5px 10px rgba(5, 5, 5, 0.8);
+}
+
+.form-group select:focus {
+  color: #fff;
+  box-shadow: 0 0 10px 2px rgba(0, 255, 117, 0.7);
+}
+
+/* Submit button */
+.submit {
+  background-color: #252525;
+  color: white;
+  padding: 0.8em;
+  border: none;
+  outline: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 1em;
+  transition: 0.3s ease-in-out;
+  width: 100%;
+}
+
+.submit:hover {
+  background-color: #3700ff;
+  color: white;
+  box-shadow: 0 0 10px 2px rgba(0, 255, 117, 0.7);
+}
+
+/* Sign-in link styling */
+.signin {
+  margin-top: 1em;
+  font-size: 0.9em;
+  text-align: center;
+}
+
+.signin a {
+  color: #00ff75;
+  text-decoration: none;
+}
+
+.signin a:hover {
+  color: #3700ff;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flex {
+    flex-direction: column;
+  }
+}

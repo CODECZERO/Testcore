@@ -48,10 +48,10 @@ const Sidebar = () => {
         </a>
       </div>
       <div className="menu--list">
-        <a href="#" className="item">
+        <Link to="/Help" className="item">
             <BiHelpCircle className="icon"/>
         Help
-        </a>
+        </Link>
       </div>
   
     </div>
