@@ -1,94 +1,43 @@
+
+
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Box, Button, Typography, Grow } from '@mui/material';
-
-
-
-
+import '../styles/Front.css';  // Import the CSS file for styles
+import { useNavigate } from 'react-router-dom';
 const FrontPage: React.FC = () => {
-  const [checked, setChecked] = useState(false);
-
-  // Trigger the grow effect after the component mounts
+  const [showButtons, setShowButtons] = useState(false);
+  const navigate = useNavigate(); 
+  // Trigger the animation and button visibility after the component mounts
   useEffect(() => {
-    setChecked(true);
+    setTimeout(() => setShowButtons(true), 2000);  // Show buttons after animation completes
   }, []);
 
+  const handleLoginClick = () => {
+    navigate('/sign-up');  // Navigate to the login page
+  };
 
-
+  const handleSignUpClick = () => {
+    navigate('/sign-in');  // Navigate to the sign-up page
+  };
   return (
-    <Grow in={checked} timeout={1000}>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          minHeight: '100vh',
-          background: 'linear-gradient(135deg, #1f1f1f, #3b3b3b)',
-          padding: 3,
-        }}
-      >
-        <Typography
-          variant="h2"
-          component="h1"
-          align="center"
-          gutterBottom
-          sx={{ color: '#fff', fontWeight: 'bold', mb: 4 }}
-        >
-          Welcome to Our Application
-        </Typography>
+    <div className="full-page">
+      <div className='container'></div>
+      <div className="logo-animation">
+      </div>
 
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 2, // Space between buttons
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            maxWidth: '300px', // Button container max width
-          }}
-        >
-          <Button
-            component={Link}
-            to="/sign-up"
-            variant="contained"
-            fullWidth
-            sx={{
-              backgroundColor: '#f57c00',
-              color: '#fff',
-              py: 1.5,
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              '&:hover': { backgroundColor: '#fb8c00' },
-            }}
-          >
-           Log In
-          </Button>
+      <span className="logo-bottom-text">AG</span>
+      <span className="bottom-text">Comes in with Some Glitches</span>
 
-          <Button
-            component={Link}
-            to="/sign-in"
-            variant="outlined"
-            fullWidth
-            sx={{
-              color: '#f57c00',
-              borderColor: '#f57c00',
-              py: 1.5,
-              borderRadius: '8px',
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: 'rgba(245, 124, 0, 0.1)',
-                borderColor: '#f57c00',
-              },
-            }}
-          >
-           Sign Up
-          </Button>
-        </Box>
-      </Box>
-    </Grow>
+      {showButtons && (
+        <div className="button-container">
+          <button className="login-button" onClick={handleLoginClick}>Log In</button>
+          <button className="signup-button" onClick={handleSignUpClick}>Sign Up</button>
+        </div>
+      )}
+    </div>
+    
+
+    
   );
 };
 
 export default FrontPage;
-

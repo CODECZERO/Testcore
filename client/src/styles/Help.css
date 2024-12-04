@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Ga+Maamli&family=Playwrite+DE+Grund:wght@100..400&family=Rubik+Glitch&display=swap');
+
+
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #111111;
+    background-image: linear-gradient(32deg, rgba(8, 8, 8, 0.74) 30px, transparent);
+    background-size: 60px 60px;
+    background-position: -5px -5px;
+    overflow: hidden;
+  }
+  
+
+.parent-container {
+    font-family: "Rubik Glitch" , system-ui;
+    letter-spacing: 1px;
+    background: transparent;
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center;    /* Center vertically */
+  }
+  
+  .forms {
+    position: relative;
+    word-spacing: 7px;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    width: 300px;
+    padding: 20px;
+    border-radius: 10px;
+    /* Glass effect */
+    background: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
+    backdrop-filter: blur(4px); /* Blurs background behind the card */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); /* Subtle shadow for depth */
+    border: 1px solid rgba(255, 255, 255, 0.18); /* Frosted border */
+  }
+  
+  .forms .titles {
+    color: royalblue;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -1px;
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    padding-left: 55px;
+    justify-content: center;
+  }
+  
+.inputs{
+    outline: 0;
+    font-family: "Rubik Glitch" , system-ui;
+    letter-spacing: 0.5px;
+    border: 1px solid rgb(93, 91, 91);
+    padding: 2px 10px;
+    border-radius: 10px;
+    width: 90%;
+    height: 40px;
+  }
+  
+  .forms textarea {
+    border-radius: 8px;
+    height: 100px;
+    width: 90%;
+    font-family: "Rubik Glitch" , system-ui;
+    resize: none;
+    outline: 0;
+    padding: 7px 12px;
+    border: 1px solid rgb(219, 213, 213);
+  }
+  
+  .forms button {
+    font-family: "Rubik Glitch" , system-ui;
+    align-self: center;
+    letter-spacing: 0.5px;
+    padding: 8px;
+    outline: 0;
+    border: 0;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    background-color: royalblue;
+    color: #fff;
+    cursor: pointer;
+    margin-top: 2px;
+    margin-right: 7px;
+  }
+  
+  .forms button:hover {
+    background-color: #003399; /* Darker blue on hover */
+  }
+  
