@@ -29,7 +29,7 @@ interface CardProps {
   buttonText?: string; // Optional button text, defaults to "Follow us"
 }
 
-const Card: React.FC<CardProps> = ({ title, description, icon, buttonText = "Follow us" }) => {
+const Card: React.FC<CardProps> = ({ title, description, icon}) => {
   return (
     <div className="card"> {/* Add your custom styles */}
       <div className="icon">{icon}</div> {/* Icon Section */}
