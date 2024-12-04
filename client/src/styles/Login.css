@@ -1,0 +1,262 @@
+@import url('https://fonts.googleapis.com/css2?family=Ga+Maamli&family=Playwrite+DE+Grund:wght@100..400&family=Rubik+Glitch&display=swap');
+
+
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #111111;
+    background-image: linear-gradient(32deg, rgba(8, 8, 8, 0.74) 30px, transparent);
+    background-size: 60px 60px;
+    background-position: -5px -5px;
+    overflow: hidden;
+  }
+  .form {
+    font-family: "Rubik Glitch" , system-ui;
+    font-size: small;
+    word-spacing: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Increased spacing for better readability */
+    padding: 2em;
+    background-color: #171717;
+    border-radius: 25px;
+    transition: 0.4s ease-in-out;
+  }
+  
+  
+  
+  .card {
+    width: 400px; /* Increased width */
+    max-width: 100%;
+    padding: 2em; /* Added padding for a spacious look */
+    background-image: linear-gradient(163deg, #00ff75 0%, #3700ff 100%);
+    border-radius: 22px;
+    transition: all 0.3s; /* Removed hover effect */
+  
+  }
+  
+  .card:hover {
+    box-shadow: 0px 0px 30px 1px rgba(0, 255, 117, 0.3);
+  }
+
+  .card2 {
+    border-radius: 0px; /* Consistent rounded corners */
+    transition: all 0.2s; /* Removed hover effect */
+  }
+  
+  
+.card2:hover {
+  transform: scale(0.98);
+  border-radius: 20px;
+}
+
+  #heading {
+    text-align: center;
+    margin: 1em;
+    color: rgb(255, 255, 255);
+    font-size: 1.5em; /* Slightly larger font for emphasis */
+  }
+  
+  .field {
+    
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    border-radius: 25px;
+    padding: 0.8em; /* Adjusted padding for larger fields */
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #171717;
+  box-shadow: inset 2px 5px 10px rgba(5, 5, 5, 0.8); /* Softer shadow */
+  transition: box-shadow 0.3s ease-in-out; 
+  }
+
+
+.field:focus-within {
+  box-shadow: 0 0 10px 2px rgba(0, 255, 117, 0.7); /* Greenish shadow effect */
+}
+  
+  .input-icon {
+    height: 1.5em; /* Slightly larger icon */
+    width: 1.5em;
+    fill: rgb(95, 91, 91);
+  }
+  
+  .input-field {
+    font-family: "Rubik Glitch" , system-ui;
+    letter-spacing: 1.5px;
+    font-size: small;
+    background: none;
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #8e8080d8;
+  transition: color 0.3s ease-in-out;
+  }
+  
+  .input-field:focus {
+    color: #8e8080d8; /* Brighten text color when focused */
+  }
+
+
+  .form .btn {
+    gap: 5px;
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin-top: 2em;
+  }
+  
+  .button1 {
+    font-family: "Rubik Glitch" , system-ui;
+    letter-spacing: 1px;
+    font-size: small;
+    padding: 0.6em;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    border-radius: 5px;
+    margin-right: 0.5em;
+    border: none;
+    outline: none;
+    transition: 0.3s ease-in-out;
+    background-color: #252525;
+    color: white;
+  }
+  
+  .button2 {
+    font-family: "Rubik Glitch" , system-ui;
+    letter-spacing: 1.5px;
+    font-size: samll;
+    padding: 0.6em;
+    padding-left: 2.5em;
+    padding-right: 2.5em;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    transition: 0.3s ease-in-out;
+    background-color: #252525;
+    color: white;
+  }
+  
+  .button3 {
+    font-family: "Rubik Glitch" , system-ui;
+    letter-spacing: 1.5px;
+    font-size: small;
+    margin-bottom: 2em;
+    padding: 0.6em;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    transition: 0.3s ease-in-out;
+    background-color: #252525;
+    color: white;
+    
+  }
+  
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Increased spacing for better readability */
+    padding: 2em;
+    background-color: #171717;
+    border-radius: 25px;
+    transition: 0.4s ease-in-out;
+  }
+  
+  
+  
+  #heading {
+    text-align: center;
+    margin: 1em;
+    color: rgb(255, 255, 255);
+    font-size: 1.5em; /* Slightly larger font for emphasis */
+  }
+  
+  .field {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    border-radius: 25px;
+    padding: 1.5em; /* Adjusted padding for larger fields */
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #171717;
+    box-shadow: inset 2px 5px 10px rgba(5, 5, 5, 0.8); /* Softer shadow */
+  }
+
+  
+  .input-icon {
+    height: 1.5em; /* Slightly larger icon */
+    width: 1.5em;
+    fill: rgb(95, 91, 91);
+  }
+  
+  .input-field {
+    font-family: "Rubik Glitch" , system-ui;
+    letter-spacing: 1px;
+    font-size: small;
+    background: none;
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #8e8080d8;
+  }
+  
+ 
+
+
+  .form .btn {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    margin-top: 2em;
+  }
+  
+  .button3:hover {
+
+    color: white;
+    box-shadow: 0 0 10px 2px rgba(0, 255, 117, 0.7);
+  }
+  .button2:hover {
+
+    color: white;
+    box-shadow: 0 0 10px 2px rgba(0, 255, 117, 0.7);
+  }
+  .button1:hover {
+
+    color: white;
+    box-shadow: 0 0 10px 2px rgba(0, 255, 117, 0.7);
+  }
+  
+
+  .message-error {
+  color: #ff4d4d;
+  font-size: 14px;
+  text-align: center;
+}
+
+
+.toggle-password-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-left: 8px;
+  padding: 0;
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+  color: #888;
+  transition: color 0.3s ease;
+}
+
+.toggle-password-btn:hover .eye-icon {
+  color: #007bff;
+}
+
