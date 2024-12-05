@@ -34,7 +34,7 @@ RUN npm install
 RUN yes | npx prisma generate
 
 # Copy application files
-COPY dist ./dist
+RUN npm build
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
 
