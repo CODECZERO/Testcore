@@ -44,9 +44,8 @@ const ChatTokenDec = async (token:string) => {//take data
 
         // Verify the token here
         const secert: any = process.env.ChatSecretAccessToken;
-
         const decoded = await jwt.verify(token, secert) as UserChatData;//decrypt data 
-
+       
         //finding user using email email
         return decoded
 

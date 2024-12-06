@@ -18,13 +18,15 @@ model College {
   Id            String     @id @default(uuid())
   name          String     @unique
   password      String
-  refreshToken  String     @unique
+  refreshToken  String?    @unique
   phoneNumber   String
   email         String     @unique
   address       String
   collegeVerify Boolean
   students      Student[]
   examiner      Examiner[]
+
+  @@index([email, Id])
 }
 
 model Examiner {
@@ -35,9 +37,11 @@ model Examiner {
   password       String
   address        String
   examinerVerify Boolean
-  refreshToken   String    @unique
+  refreshToken   String?   @unique
   college        College[]
   exams          Exam[]
+
+  @@index([email, Id])
 }
 
 model Student {
@@ -48,13 +52,15 @@ model Student {
   password       String
   address        String
   studentVerify  Boolean
-  refreshToken   String          @unique
+  refreshToken   String?         @unique
   collegeID      String
   college        College         @relation(fields: [collegeID], references: [Id])
   exams          Exam[]
   results        Result[]
   questionPapers QuestionPaper[]
   subject        Subject[]
+
+  @@index([email, Id])
 }
 
 model Exam {

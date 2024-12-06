@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { WebSocketServer } from "ws";
-import { sendMessage, reciveMEssage, closeSocket, tokenExtractr } from "./chatMethodes.services.js";
+import { sendMessage, reciveMEssage, closeSocket } from "./chatMethodes.services.js";
 import AsyncHandler from "../../util/ayscHandler.js";
 const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
 const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 9017; //running websocket on same webserver but different port,
@@ -28,11 +28,11 @@ const actions = {
 };
 const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, function* () {
     wss.on('connection', (ws, req) => {
-        const token = tokenExtractr(req); //this function extract the token from req objcet in starting and verify's it
-        if (!token) { //for some reason , i am feeling that it can lead to vulnerability
-            ws.close(4000, "Invalid request,User not have access to this group");
-            return;
-        }
+        // const token = tokenExtractr(req);//this function extract the token from req objcet in starting and verify's it
+        // if(!token){//for some reason , i am feeling that it can lead to vulnerability
+        //   ws.close(4000,"Invalid request,User not have access to this group");
+        //   return;
+        // }
         ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
             const MessageData = JSON.parse(message); //take data or message in message pattern from user first time as they join
             //beter use onconnection  or connection      
