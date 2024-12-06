@@ -56,7 +56,7 @@ console.log(response.data);
         const { accessToken } = response.data.data;
         const userId = response.data.data.userData.Id;
 
-        localStorage.setItem('accesToken', accessToken);
+        localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userRole', userData.role); 
         localStorage.setItem('userId', userId);
  console.log(accessToken);
