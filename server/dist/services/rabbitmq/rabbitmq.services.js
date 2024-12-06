@@ -11,7 +11,7 @@ import amqplib from 'amqplib';
 class rabbitMqFunction {
     constructor() {
         this.exchangeName = 'chat_exchagne';
-        this.messageTTL = '';
+        this.messageTTL = 2 * 24 * 60 * 60 * 1000; // 2 days in milliseconds
         // private queueName = "MessageStore"
         this.connectRabbitMq = (roomName) => __awaiter(this, void 0, void 0, function* () {
             if (!this.connection)
@@ -33,7 +33,7 @@ class rabbitMqFunction {
             if (!this.channel) {
                 yield this.connectRabbitMq(roomName);
             }
-            this.queue = yield this.channel.assertQueue(roomName, { exclusive: false });
+            this.queue = yield this.channel.assertQueue(roomName, { exclusive: false, arguments: { 'x-message-ttl': this.messageTTL, } });
             const message = yield this.channel.bindQueue(this.queue.queue, this.exchangeName, roomName);
             return message;
         });

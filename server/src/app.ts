@@ -9,7 +9,7 @@ import { MiddlewareCount } from "./services/logging and monitoring/Grafana/grafa
 import rateLimit from "express-rate-limit";
 import collegeRouter from "./router/college.router.js";
 import studnetRouter from "./router/student.router.js";
-
+import { Request } from "express";
 const app = express();
 
 // allowing data from specifie site to this backend
@@ -21,13 +21,15 @@ app.use(cors({
 
 //limiting the rate of the user per node
 const limiter = rateLimit({
-    windowMs: 10 * 60 * 1000, // 10 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many connections from this IP, please try again later',
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: "Too many requests, please try again later.",
+    keyGenerator: (req: Request): string => req.ip as string // Use the IP address as the key
 });
 
 //applying to whole server
 app.use(limiter);
+app.set('trust proxy', 1);
 //config the app to use/send/recive json,url,cookie data 
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));

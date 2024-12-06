@@ -33,9 +33,11 @@ const tokenGen = async (user: {
     phoneNumber?: string;
     address?: string;
 }) => {//creating token
-    const accesToken = await genAccToken(user);//calling genAccToken function to genrate access token for user
-    const refreshToken = await genReffToken(user);//calling genReffToken function to genrate refersh token for server
-    return { accesToken, refreshToken };//returing both of theme
+   const[accessToken,refreshToken]=await Promise.all([
+     genAccToken(user),//calling genAccToken function to genrate access token for user
+     genReffToken(user),//calling genReffToken function to genrate refersh token for server
+   ])
+    return { accessToken, refreshToken };//returing both of theme
 }
 
 //give access to data and other stuff aka login logic
@@ -50,19 +52,24 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
     if (!passwordCheck) throw new ApiError(400, "Invalid password")
 
     const findAndRole = { ...findUser, role }
-    const { refreshToken, accesToken } = await tokenGen(findAndRole);//genereating token for the user
+
+    const [tokenResult, trackerUpdate] = await Promise.all([
+        tokenGen(findAndRole),
+        Tracker(findUser.Id, req)//save's user ip adrress in database  ;
+    ]);
+
+    const { refreshToken, accessToken } = tokenResult //genereating token for the user
+
     const data = {//passing refersh token to the database
         ...findUser,
         refreshToken
     }
-    
-    await updateOp(data, role);//pass the role to user it's necessary
 
-    const trackerUpdate = await Tracker(findUser.Id, req);//save's user ip adrress in database  ;
+    await updateOp(data, role);//pass the role to user it's necessary
     const { password: _, ...userData } = findUser;//removing user password form find user
 
-    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accesToken, options).json(
-        new ApiResponse(200, { userData, trackerUpdate,accesToken }, "Login in successfully")
+    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accessToken, options).json(
+        new ApiResponse(200, { userData, trackerUpdate, accessToken }, "Login in successfully")
     )
 
 });
@@ -75,7 +82,7 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     if (!(email && password && phoneNumber && address && name && role)) throw new ApiError(400, "All fields are required");
 
 
-    const findUser = await findOp(req.body);//passing req.body value to query function
+    const findUser = await findOp({email,role});//passing req.body value to query function
     if (findUser) return res.status(409).json(new ApiError(409, "user exists"));
     //if it exist throw error in this formate
     // {
@@ -84,19 +91,24 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     //     "success": false,
     //     "errors": []
     // } 
-    const hashedPassword = await bcrypt.hash(password, 10);//hashing the password
-    const userCreate = await createOp(req.body, hashedPassword);//passing req.body value to query function with hashed password
+    const findAndRole = { ...findUser, role };
+    const [tokenResult,hashedPassword]=await Promise.all([
+        tokenGen(findAndRole),
+        bcrypt.hash(password, 10)
+    ])
+    const { refreshToken, accessToken } =tokenResult;//genereating token for the user
+    const UserSingupData = { ...req.body, refreshToken };
+    const userCreate = await createOp(UserSingupData, hashedPassword);//passing req.body value to query function with hashed password
     const userData = { userCreate, password: "" };//replacing the password with empty string
 
     const saveUserInNosql = await User.create({
         sqlId: userCreate.Id,
     })
     if (!userData || !saveUserInNosql) throw new ApiError(500, "Something went wrong while registering the user");//if user isn't create then throw error
-    return res.status(201).json(//if create then return user data
-        new ApiResponse(201, userData, "User create successfuly")
+    return res.status(201).cookie('accessToken', accessToken, options).json(//if create then return user data
+        new ApiResponse(201, { userData, accessToken }, "User create successfuly")
     )
-}
-)
+})
 
 //
 interface Requestany extends Request {

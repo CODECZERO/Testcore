@@ -27,7 +27,8 @@ const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket
         await clients.forEach(client => {//send message to user, who are the member of the group 
             if (message && client != ws && client.readyState === ws.OPEN) {//checks, if webscoket and message exist,if the set of websocket or websocket is ready
                 //or open,then send message 
-                client.send(JSON.stringify(message));//takes message from rabbitmq queue
+                message=message?.content.toString() as any;
+                 client.send(JSON.stringify(message));//takes message from rabbitmq queue
             }
         });
     } catch (error) {
@@ -41,7 +42,6 @@ const reciveMEssage = async (roomName: string, ws: CustomWebSocket) => {//recive
         const messageEnc = await rabbitmq.subData(roomName);//subscribe to the queue, the queue name is same as roomName 
         await rabbitmq.channel.consume(rabbitmq.queue.queue, (message: ConsumeMessage | null) => {//consume the message from queue and uses a call back where it the message exitst
             //send it to user 
-
             if (message) sendMessageToReciver(message, ws);
 
 
@@ -74,13 +74,13 @@ const closeConnection = async () => {
     }
 }
 
-const tokenExtractr = (req: Request) => {//takes requset object from websocket extract token from it.
+const tokenExtractr = async (req: Request) => {//takes requset object from websocket extract token from it.
     try {
         const parsedUrl = parse(req.url || " ", true);//it parse query as string
         const queryParams: ParsedUrlQuery = parsedUrl.query;//takes query from parsedUrl and  
         const tokenFromUser: string = queryParams?.token as string;
         if (!tokenFromUser) throw new ApiError(400, "bad request data is not provided");
-        const chatToken = ChatTokenDec(tokenFromUser);
+        const chatToken = await ChatTokenDec(tokenFromUser);
         if (chatToken instanceof ApiError) throw new ApiError(500, "something went wrong while decodeing token");
         return chatToken;
     } catch (error) {
