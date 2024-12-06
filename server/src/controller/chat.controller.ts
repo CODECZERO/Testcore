@@ -50,9 +50,8 @@ const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//u
 
   const joinChat = await User.updateOne({//after finding room it will help user to join the room and update value in database
     sqlId: user.Id
-  }, {
-    chatRoomIDs: findChatID._id,//taking chat id and puting here
-  });
+  }, { $addToSet: { chatRoomIDs: findChatID._id } }
+  );
 
   if (!joinChat) throw new ApiError(500, 'unable to join chat');//if unable to do so , then throw error
   return res.status(200).json(new ApiResponse(200, joinChat));//else return value
@@ -79,11 +78,11 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   if (!(createRoom)) throw new ApiError(500, 'unable to create chat group');
 
- await cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
+  await cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
     roomData.roomName,
     JSON.stringify(createRoom?._id),
   );
-  
+
 
   return res.status(200).json(new ApiResponse(200, createRoom));//return data
 });

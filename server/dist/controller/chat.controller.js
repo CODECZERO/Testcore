@@ -29,9 +29,7 @@ const joinChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
         throw new ApiError(404, 'room not found');
     const joinChat = yield User.updateOne({
         sqlId: user.Id
-    }, {
-        chatRoomIDs: findChatID._id, //taking chat id and puting here
-    });
+    }, { $addToSet: { chatRoomIDs: findChatID._id } });
     if (!joinChat)
         throw new ApiError(500, 'unable to join chat'); //if unable to do so , then throw error
     return res.status(200).json(new ApiResponse(200, joinChat)); //else return value
