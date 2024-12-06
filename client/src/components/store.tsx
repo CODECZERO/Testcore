@@ -1,6 +1,6 @@
 // store.ts
 import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
-
+import ChatData from "./chatFiles/store/chatData.Store"
 interface UserState {//slice init data define
   isAuthenticated: boolean;
   userInfo: {
@@ -37,6 +37,8 @@ export const { login, logout } = userSlice.actions;
 export const store = configureStore({
   reducer: {
     user: userSlice.reducer,
+    Chat: ChatData,
+
   },
 });
 
