@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 
 import { RootState } from './store'; // Adjust the path to your store file
 import "../styles/Chat.css";
+import Groups from "./chatFiles/group"
 
 interface ChatMessage {
   MessageID: string;
@@ -28,48 +29,57 @@ const Chat: React.FC = () => {
   // Redux: Extract user information
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
   const userId = localStorage.getItem('userId') || '';
+  const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
 
-  // Initialize WebSocket connection
-  useEffect(() => {
-    if (!userId) return;
+  // const MessageData={
+  //   MessageId:"01",
+  //   roomName:`${}`,
+  //   content:`${'intia message'}`,
+  //   typeOfMessage:"SEND_MESSAGE",
+  //   userId:`${userId}`
+  // }
 
-    const token = localStorage.getItem('accessToken'); // Access token from localStorage
-    if (!token) {
-      console.error('Access token is missing. Cannot connect to WebSocket.');
-      return;
-    }
 
-    console.log('Connecting to WebSocket with token:', token);
-    const socketUrl = `wss://testcore-qmyu.onrender.com/ws1/?token=${token}`;
-    const ws = new WebSocket(socketUrl);
-
-    setSocket(ws);
-
-    ws.onopen = () => {
-      console.log('WebSocket connection established.');
-      setIsConnected(true);
-    };
-
-    ws.onmessage = (event) => {
-      const incomingMessage: ChatMessage = JSON.parse(event.data);
-      setMessages((prev) => [...prev, incomingMessage]);
-      console.log('Incoming message:', event.data);
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket connection closed.');
-      setIsConnected(false);
-    };
-
-    ws.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, [userId]);
-
+  // // Initialize WebSocket connection
+    useEffect(() => {
+      if (!userId) return;
+  
+      if (!token) {
+        console.error('Access token is missing. Cannot connect to WebSocket.');
+        return;
+      }
+  
+      console.log('Connecting to WebSocket with token:', token);
+      const socketUrl = `wss://testcore-qmyu.onrender.com/ws1/?token=${token}`;
+      const ws = new WebSocket(socketUrl);
+  
+      setSocket(ws);
+  
+      ws.onopen = () => {
+        console.log('WebSocket connection established.');
+        setIsConnected(true);
+      };
+  
+      ws.onmessage = (event) => {
+        const incomingMessage: ChatMessage = JSON.parse(event.data);
+        setMessages((prev) => [...prev, incomingMessage]);
+        console.log('Incoming message:', event.data);
+      };
+  
+      ws.onclose = () => {
+        console.log('WebSocket connection closed.');
+        setIsConnected(false);
+      };
+  
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+  
+      return () => {
+        ws.close();
+      };
+    }, [userId]);
+  
   // Create Room functionality
   const createRoom = async () => {
     if (!createRoomName.trim()) {
@@ -78,7 +88,7 @@ const Chat: React.FC = () => {
     }
 
     try {
-      const token = localStorage.getItem('accessToken'); // Retrieve the token from localStorage
+      const token = localStorage.getItem('accesToken'); // Retrieve the token from localStorage
       if (!token) {
         console.error('Access token is missing. Cannot create a room.');
         return;
@@ -95,7 +105,9 @@ const Chat: React.FC = () => {
           userId: localStorage.getItem('userId'),
         }),
       });
+
 console.log("The Auth token is ", token)
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error creating room:', errorText);
@@ -206,46 +218,42 @@ const sendMessage = () => {
 
 
   return (
-     <div id="container">
-      {/* Sidebar Section */}
-      <aside>
-        <header>
-          <h2>Chat Application</h2>
-        </header>
-        <input
-          type="text"
-          placeholder="Search rooms..."
-          value={joinRoomName}
-          onChange={(e) => setJoinRoomName(e.target.value)}
-        />
-        <ul>
-          <li>
-            <div className="group-list">
-              <button onClick={() => joinRoom(joinRoomName)}>Join Room</button>
-              {joinStatus && <div>{joinStatus}</div>}
-            </div>
-          </li>
-          <li>
-            <div>
-             
-              <input
-                type="text"
-                placeholder="Create Room"
-                value={createRoomName}
-                onChange={(e) => setCreateRoomName(e.target.value)}
-              />
-              <button onClick={createRoom}>Create Room</button>
-            </div>
-          </li>
+    <div className="chat-container">
+      {/* Left Section: Groups and Friends */}
+      <div className="chat-left">
+        <h3>Groups</h3>
+        <div className="group-list">
+          <div>
+            <h3>Join a Room</h3>
+            <input
+              type="text"
+              value={joinRoomName}
+              onChange={(e) => setJoinRoomName(e.target.value)}
+              placeholder="Enter room name to join"
+            />
+            <button onClick={() => joinRoom(joinRoomName)}>Join Room</button>
+            {joinStatus && <div>{joinStatus}</div>}
+          </div>
+
+          <input
+            type="text"
+            value={createRoomName}
+            onChange={(e) => setCreateRoomName(e.target.value)}
+            placeholder="Enter new room name"
+          />
+          <button onClick={createRoom}>Create Room</button>
+
           {groups.map((group) => (
-            <li key={group}>
-              <div onClick={() => setRoomName(group)}>
-                <span className="status green"></span>
-                <h2>{group}</h2>
-              </div>
-            </li>
+            <div
+              key={group}
+              className="group-item"
+              onClick={() => setRoomName(group)}
+            >
+              {group}
+            </div>
           ))}
-        </ul>
+        </div>
+
         <h3>Friends</h3>
         <ul>
           {friends.map((friend) => (
