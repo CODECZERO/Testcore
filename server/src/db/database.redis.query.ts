@@ -90,48 +90,49 @@ const cacheUpdateForChatRoom = async (roomName: string, roomID: string) => {//th
                 "BranchName3":"MongodbId Of that chat room",
             }
         */
-        if (!roomSearch) return null;//if data is not present return null as the further error handling can be implemented
+        if (!roomSearch) throw new ApiError(500, "Room not found");
+        ;//if data is not present return null as the further error handling can be implemented
         return roomSearch;//retunr the hashset or id of the chatroom and futher operation can be performed on it.
     } catch (error) {
         throw new ApiError(500, error);
     }
 }
 
-const getVideoServerTransport=async(Id:string)=>{//this function helps video server to get transport from cache 
+const getVideoServerTransport = async (Id: string) => {//this function helps video server to get transport from cache 
     try {
-        const data= await client.hGet("Video",Id);//finds through unique id of video call server
-        if(!data) return new ApiResponse(404,"data not found");
+        const data = await client.hGet("Video", Id);//finds through unique id of video call server
+        if (!data) return new ApiResponse(404, "data not found");
         return data;
     } catch (error) {
-        throw new ApiError(500,`Something went wrong, while searching data ${error}`)
+        throw new ApiError(500, `Something went wrong, while searching data ${error}`)
     }
 }
 
-const setVideoServerTransport=async(Id:string,Transport:any)=>{//this function helps video server to set transport from cache
+const setVideoServerTransport = async (Id: string, Transport: any) => {//this function helps video server to set transport from cache
     try {
-        const data= await client.hSet("Video",Id,Transport);//takes unique id and transport data
-        if(!data) return new ApiResponse(404,"data not found");
+        const data = await client.hSet("Video", Id, Transport);//takes unique id and transport data
+        if (!data) return new ApiResponse(404, "data not found");
         return data;
     } catch (error) {
-        throw new ApiError(500,`something went Wrong while saving data ${error}`);
+        throw new ApiError(500, `something went Wrong while saving data ${error}`);
     }
 }
 
-const removeVideoServerTranspor=async(Id:string)=>{//remove video server data after the meeting is ended
+const removeVideoServerTranspor = async (Id: string) => {//remove video server data after the meeting is ended
     try {
-        const data=await client.hDel("Video",Id);
-        if (!data) throw new ApiError(404,"data not found");
+        const data = await client.hDel("Video", Id);
+        if (!data) throw new ApiError(404, "data not found");
         return data;
     } catch (error) {
-        throw new ApiError(500,`something went wrong while removeing data ${error}`)
+        throw new ApiError(500, `something went wrong while removeing data ${error}`)
     }
 }
 
-const closeRedis=async()=>{//this function close redis connection
+const closeRedis = async () => {//this function close redis connection
     try {
         client.disconnect();
     } catch (error) {
-        throw new ApiError(500,`something went while closeing redis connection`);
+        throw new ApiError(500, `something went while closeing redis connection`);
     }
 }
 export {
@@ -144,5 +145,5 @@ export {
     setVideoServerTransport,
     removeVideoServerTranspor,
     closeRedis
-    
+
 }
