@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const chatSchema = new mongoose.Schema({
-    romeName: {
+    roomName: {
         type: String,
         require: true,
         unique: true,

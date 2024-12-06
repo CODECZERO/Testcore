@@ -16,9 +16,12 @@ import prisma from "../db/database.Postgres.js";
 import { closeDb, connectDb } from "../db/database.MongoDb.js";
 import { closeRedis, connectReids } from "../db/database.redis.query.js";
 import { closeVideoServer, runVideoServer } from "../services/videostream/videoMain.services.js";
+import rabbitmq from "../services/rabbitmq/rabbitmq.services.js";
 let mongodbConenction;
 const connectAll = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        yield rabbitmq.connectRabbitMq("StartRoom");
+        console.log("queue is connected");
         //@ts-ignore
         yield runWebSocket();
         console.log("Websocket is Runing");

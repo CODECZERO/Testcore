@@ -78,7 +78,7 @@ const Chat: React.FC = () => {
     }
 
     try {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('accesToken'); // Retrieve the token from localStorage
       if (!token) {
         console.error('Access token is missing. Cannot create a room.');
         return;
