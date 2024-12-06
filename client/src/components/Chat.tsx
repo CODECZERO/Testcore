@@ -206,79 +206,88 @@ const sendMessage = () => {
 
 
   return (
-    <div className="chat-container">
-      {/* Left Section: Groups and Friends */}
-      <div className="chat-left">
-        <h3>Groups</h3>
-        <div className="group-list">
-          <div>
-            <h3>Join a Room</h3>
-            <input
-              type="text"
-              value={joinRoomName}
-              onChange={(e) => setJoinRoomName(e.target.value)}
-              placeholder="Enter room name to join"
-            />
-            <button onClick={() => joinRoom(joinRoomName)}>Join Room</button>
-            {joinStatus && <div>{joinStatus}</div>}
-          </div>
-
-          <input
-            type="text"
-            value={createRoomName}
-            onChange={(e) => setCreateRoomName(e.target.value)}
-            placeholder="Enter new room name"
-          />
-          <button onClick={createRoom}>Create Room</button>
-
+     <div id="container">
+      {/* Sidebar Section */}
+      <aside>
+        <header>
+          <h2>Chat Application</h2>
+        </header>
+        <input
+          type="text"
+          placeholder="Search rooms..."
+          value={joinRoomName}
+          onChange={(e) => setJoinRoomName(e.target.value)}
+        />
+        <ul>
+          <li>
+            <div className="group-list">
+              <button onClick={() => joinRoom(joinRoomName)}>Join Room</button>
+              {joinStatus && <div>{joinStatus}</div>}
+            </div>
+          </li>
+          <li>
+            <div>
+             
+              <input
+                type="text"
+                placeholder="Create Room"
+                value={createRoomName}
+                onChange={(e) => setCreateRoomName(e.target.value)}
+              />
+              <button onClick={createRoom}>Create Room</button>
+            </div>
+          </li>
           {groups.map((group) => (
-            <div
-              key={group}
-              className="group-item"
-              onClick={() => setRoomName(group)}
-            >
-              {group}
-            </div>
+            <li key={group}>
+              <div onClick={() => setRoomName(group)}>
+                <span className="status green"></span>
+                <h2>{group}</h2>
+              </div>
+            </li>
           ))}
-        </div>
-
+        </ul>
         <h3>Friends</h3>
-        <div className="friend-list">
+        <ul>
           {friends.map((friend) => (
-            <div key={friend} className="friend-item">
-              {friend}
-            </div>
+            <li key={friend}>
+              <div>
+                <span className="status blue"></span>
+                <h2>{friend}</h2>
+              </div>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </aside>
 
-      {/* Right Section: Chat */}
-      <div className="chat-right">
-        <h2 className="chat-title">Chat Room: {roomName}</h2>
-
-        <div className="messages-container">
+      {/* Chat Section */}
+      <main>
+        <header>
+          <div>
+            <h2>Chat Room: {roomName}</h2>
+            <h3>Connected as User {userId}</h3>
+          </div>
+        </header>
+        <ul id="chat">
           {messages.map((message) => (
-            <div
-              key={message.MessageID}
-              className={`message ${message.userId === userId ? 'outgoing' : 'incoming'}`}
-            >
-              <strong>{message.userId === userId ? 'You' : message.username}</strong>
-              : {message.content}
-            </div>
+            <li key={message.MessageID} className={message.userId === userId ? "me" : "you"}>
+              <div className="entete">
+                <h2>{message.userId === userId ? "You" : message.username}</h2>
+              </div>
+              <div className="message">{message.content}</div>
+              <span className="triangle"></span>
+            </li>
           ))}
           <div ref={messagesEndRef} />
-        </div>
-
-        <div className="input-container">
-          <input
-            type="text"
+        </ul>
+        <footer>
+          <textarea
+            placeholder="Type your message here..."
             value={currentMessage}
             onChange={(e) => setCurrentMessage(e.target.value)}
-            placeholder="Type a message..."
           />
           <button onClick={sendMessage}>Send</button>
-        </div>
-      </div>
+        </footer>
+      </main>
     </div>
   );
 };
