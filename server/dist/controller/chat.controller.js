@@ -12,18 +12,18 @@ import { ApiResponse } from '../util/apiResponse.js';
 import { cacheUpdateForChatRoom, } from '../db/database.redis.query.js';
 import { chatModel } from '../models/chatRoomData.model.nosql.js';
 import { User } from '../models/user.model.nosql.js';
-import { findUsers } from '../db/Query.nosql.db.js';
+import { findChats, findUsers } from '../db/Query.nosql.db.js';
 import mongoose from 'mongoose';
 import { ApiError } from '../util/apiError.js';
 import { options } from './user.controller.js';
 import { ChatTokenGen } from '../services/chat/chatToken.services.js';
 const joinChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const roomdata = req.body; //takes data about room
+    const roomdata = req.chatRoomData; //takes data about room
     const user = req.user; //takes user id or uder data
     if (!roomdata.roomName || !user.Id)
         throw new ApiError(400, 'Inviad data provied'); //if any of theme is not provided then throw error
     const findChatID = yield chatModel.findOne({
-        romeName: roomdata.roomName,
+        roomName: roomdata.roomName,
     });
     if (!findChatID)
         throw new ApiError(404, 'room not found');
@@ -43,16 +43,16 @@ const createChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
         throw new ApiError(400, 'group name or Admin id is not provided'); //if not provided then throw error
     const user = yield User.findOne({
         sqlId: Id
-    });
+    }).lean();
     if (!user)
         throw new ApiError(404, "No user Found");
     const createRoom = yield chatModel.create({
-        romeName: roomData.roomName,
+        roomName: roomData.roomName,
         AdminId: user === null || user === void 0 ? void 0 : user._id,
     });
     if (!(createRoom))
         throw new ApiError(500, 'unable to create chat group');
-    const data = yield cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
+    yield cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
     roomData.roomName, JSON.stringify(createRoom === null || createRoom === void 0 ? void 0 : createRoom._id));
     return res.status(200).json(new ApiResponse(200, createRoom)); //return data
 }));
@@ -80,7 +80,7 @@ const LeaveRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, f
     if (!(roomData || user))
         throw new ApiError(400, 'invalid data');
     const findChatID = yield chatModel.findOne({
-        romeName: roomData.roomName,
+        roomName: roomData.roomName,
     });
     const removeUser = yield User.updateOne(//after that remove user from chat group
     { sqlId: user.Id }, { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID === null || findChatID === void 0 ? void 0 : findChatID._id) } });
@@ -136,4 +136,13 @@ const connectChat = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0,
         throw new ApiError(500, "someting went wrong while making token"); //if token not gen then throw error
     return res.status(200).cookie("UserChatToken", tokenGen, options).json(new ApiResponse(200, Checker, "Token create succesfuly")); //reutrn response
 }));
-export { createChatRoom, joinChatRoom, checkUserAccess, LeaveRoom, getUserInChat, connectChat };
+const getChats = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    if (!user.Id)
+        throw new ApiError(400, "user id not provied");
+    const ChatDatas = yield findChats(user.Id);
+    if (!ChatDatas)
+        throw new ApiError(404, "no chat room currently");
+    return res.status(200).json(new ApiResponse(200, ChatDatas, "chat rooms found"));
+}));
+export { createChatRoom, joinChatRoom, checkUserAccess, LeaveRoom, getUserInChat, connectChat, getChats };
