@@ -88,6 +88,7 @@ const Chat: React.FC = () => {
     }
 
     try {
+      const token = localStorage.getItem('accesToken'); // Retrieve the token from localStorage
       if (!token) {
         console.error('Access token is missing. Cannot create a room.');
         return;
@@ -242,46 +243,59 @@ const sendMessage = () => {
           />
           <button onClick={createRoom}>Create Room</button>
 
-          <Groups/>
+          {groups.map((group) => (
+            <div
+              key={group}
+              className="group-item"
+              onClick={() => setRoomName(group)}
+            >
+              {group}
+            </div>
+          ))}
         </div>
 
         <h3>Friends</h3>
-        <div className="friend-list">
+        <ul>
           {friends.map((friend) => (
-            <div key={friend} className="friend-item">
-              {friend}
-            </div>
+            <li key={friend}>
+              <div>
+                <span className="status blue"></span>
+                <h2>{friend}</h2>
+              </div>
+            </li>
           ))}
-        </div>
-      </div>
+        </ul>
+      </aside>
 
-      {/* Right Section: Chat */}
-      <div className="chat-right">
-        <h2 className="chat-title">Chat Room: {roomName}</h2>
-
-        <div className="messages-container">
+      {/* Chat Section */}
+      <main>
+        <header>
+          <div>
+            <h2>Chat Room: {roomName}</h2>
+            <h3>Connected as User {userId}</h3>
+          </div>
+        </header>
+        <ul id="chat">
           {messages.map((message) => (
-            <div
-              key={message.MessageID}
-              className={`message ${message.userId === userId ? 'outgoing' : 'incoming'}`}
-            >
-              <strong>{message.userId === userId ? 'You' : message.username}</strong>
-              : {message.content}
-            </div>
+            <li key={message.MessageID} className={message.userId === userId ? "me" : "you"}>
+              <div className="entete">
+                <h2>{message.userId === userId ? "You" : message.username}</h2>
+              </div>
+              <div className="message">{message.content}</div>
+              <span className="triangle"></span>
+            </li>
           ))}
           <div ref={messagesEndRef} />
-        </div>
-
-        <div className="input-container">
-          <input
-            type="text"
+        </ul>
+        <footer>
+          <textarea
+            placeholder="Type your message here..."
             value={currentMessage}
             onChange={(e) => setCurrentMessage(e.target.value)}
-            placeholder="Type a message..."
           />
           <button onClick={sendMessage}>Send</button>
-        </div>
-      </div>
+        </footer>
+      </main>
     </div>
   );
 };
