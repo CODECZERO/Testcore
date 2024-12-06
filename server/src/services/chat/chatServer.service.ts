@@ -91,7 +91,6 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
         return;
       }
       await reciveMEssage(MessageData.roomName, ws);//call the function and wait, if user send message the send to the websocket or wait for the message to come or send
-      console.log(rooms.roomName);
     })
     
     ws.on('close', () => {
