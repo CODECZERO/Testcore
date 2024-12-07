@@ -82,7 +82,7 @@ const getExam = AsyncHandler(async (req: Requestany, res: Response) => {//get ex
 
 const getTimeTable = AsyncHandler(async (req: Requestany, res: Response) => {//get tiem table from mongodb
     const user: user = req.user;//takes data from user
-    const {Class}=req.body;//takes dat from user
+    const {Class}=req.body;//takes data from user
     const {...name}=await findSingleCollegeForStudent(user?.Id);//finds user college using his id;
     if (!Class || !name) throw new ApiError(400, "Invalid data");//if not provided then throw error
     const findtimetable = await TimeTable.findOne({//find only one data which have class and college name provided

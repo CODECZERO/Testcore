@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from './store'; // Adjust the path to your store file
 import "../styles/Chat.css";
 import Groups from "./chatFiles/group"
-
+import CreateChat from './chatFiles/createChat';
 interface ChatMessage {
   MessageID: string;
   content: string;
@@ -41,97 +41,6 @@ const Chat: React.FC = () => {
 
 
   // // Initialize WebSocket connection
-    useEffect(() => {
-      if (!userId) return;
-  
-      if (!token) {
-        console.error('Access token is missing. Cannot connect to WebSocket.');
-        return;
-      }
-  
-      console.log('Connecting to WebSocket with token:', token);
-      const socketUrl = `wss://testcore-qmyu.onrender.com/ws1/?token=${token}`;
-      const ws = new WebSocket(socketUrl);
-  
-      setSocket(ws);
-  
-      ws.onopen = () => {
-        console.log('WebSocket connection established.');
-        setIsConnected(true);
-      };
-  
-      ws.onmessage = (event) => {
-        const incomingMessage: ChatMessage = JSON.parse(event.data);
-        setMessages((prev) => [...prev, incomingMessage]);
-        console.log('Incoming message:', event.data);
-      };
-  
-      ws.onclose = () => {
-        console.log('WebSocket connection closed.');
-        setIsConnected(false);
-      };
-  
-      ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-      };
-  
-      return () => {
-        ws.close();
-      };
-    }, [userId]);
-  
-  // Create Room functionality
-  const createRoom = async () => {
-    if (!createRoomName.trim()) {
-      alert('Room name cannot be empty.');
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('accesToken'); // Retrieve the token from localStorage
-      if (!token) {
-        console.error('Access token is missing. Cannot create a room.');
-        return;
-      }
-
-      const response = await fetch('https://testcore-qmyu.onrender.com/api/v1/chat/createChat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          roomName: createRoomName,
-          userId: localStorage.getItem('userId'),
-        }),
-      });
-
-console.log("The Auth token is ", token)
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error creating room:', errorText);
-        alert('Failed to create room. Please try again.');
-        return;
-      }
-
-      const data = await response.json();
-      if (data.statusCode === 200 && data.success) {
-        const { roomName, AdminId } = data.data;
-        setRoomName(roomName);
-        setGroups((prev) => [...prev, roomName]);
-        setCreateRoomName('');
-        console.log(`Room "${roomName}" created successfully by Admin ${AdminId}!`);
-
-        joinRoom(roomName);
-      } else {
-        alert('Room creation failed. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error creating room:', error);
-      alert('An unexpected error occurred while creating the room.');
-    }
-  };
 
   // Join Room functionality
   const joinRoom = async (room: string) => {
@@ -235,13 +144,6 @@ const sendMessage = () => {
             {joinStatus && <div>{joinStatus}</div>}
           </div>
 
-          <input
-            type="text"
-            value={createRoomName}
-            onChange={(e) => setCreateRoomName(e.target.value)}
-            placeholder="Enter new room name"
-          />
-          <button onClick={createRoom}>Create Room</button>
 
           {groups.map((group) => (
             <div
@@ -265,7 +167,7 @@ const sendMessage = () => {
             </li>
           ))}
         </ul>
-      </aside>
+      </div>
 
       {/* Chat Section */}
       <main>
@@ -296,6 +198,8 @@ const sendMessage = () => {
           <button onClick={sendMessage}>Send</button>
         </footer>
       </main>
+
+      <CreateChat/>
     </div>
   );
 };
