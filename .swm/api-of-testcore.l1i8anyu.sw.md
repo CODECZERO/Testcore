@@ -37,13 +37,34 @@ The **Chat API** facilitates various chat-related functionalities within the Tes
 **Purpose**:\
 This route is used to create a new chat room in the system, allowing users to connect and communicate with one another.
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="61">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="39">
 
 ---
 
 /createChat
 
 ```typescript
+const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//using this function a user can join chat
+  const roomdata: roomData = req.chatRoomData;//takes data about room
+  const user: user = req.user;//takes user id or uder data
+
+  if (!roomdata.roomName || !user.Id) throw new ApiError(400, 'Inviad data provied');//if any of theme is not provided then throw error
+
+  const findChatID = await chatModel.findOne({//find chat Id in chatmodel collection
+    roomName: roomdata.roomName,
+  });
+
+  if (!findChatID) throw new ApiError(404, 'room not found');
+
+  const joinChat = await User.updateOne({//after finding room it will help user to join the room and update value in database
+    sqlId: user.Id
+  }, { $addToSet: { chatRoomIDs: findChatID._id } }
+  );
+
+  if (!joinChat) throw new ApiError(500, 'unable to join chat');//if unable to do so , then throw error
+  return res.status(200).json(new ApiResponse(200, joinChat));//else return value
+});
+
 const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//if a user want to create chat room then, this function will help theme
   const roomData: roomData = req.body;
   const { Id } = req.user;//takes data from client
@@ -53,25 +74,26 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   const user = await User.findOne({//fiding user using client data
     sqlId: Id
-  });
+  }).lean();
 
   if (!user) throw new ApiError(404, "No user Found");
 
+
   const createRoom = await chatModel.create({//making chat room in chatmodel 
-    romeName: roomData.roomName,
+    roomName: roomData.roomName,
     AdminId: user?._id,
   });
 
   if (!(createRoom)) throw new ApiError(500, 'unable to create chat group');
 
-  const data = await cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
+  await cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
     roomData.roomName,
     JSON.stringify(createRoom?._id),
   );
 
+
   return res.status(200).json(new ApiResponse(200, createRoom));//return data
 });
-
 ```
 
 ---
@@ -128,7 +150,7 @@ This endpoint provides three distinct methods (\`POST\`, `PUT`, `GET`) to manage
 
 &nbsp;
 
-**1. POST Method: Join a Chat Room** 
+**1. POST Method: Join a Chat Room**
 
 Purpose: Allows a user to join a specific chat room.&nbsp;&nbsp;
 
@@ -150,27 +172,25 @@ Workflow:&nbsp;&nbsp;
 
 ```typescript
 const joinChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {//using this function a user can join chat
-  const roomdata: roomData = req.body;//takes data about room
+  const roomdata: roomData = req.chatRoomData;//takes data about room
   const user: user = req.user;//takes user id or uder data
 
   if (!roomdata.roomName || !user.Id) throw new ApiError(400, 'Inviad data provied');//if any of theme is not provided then throw error
 
   const findChatID = await chatModel.findOne({//find chat Id in chatmodel collection
-    romeName: roomdata.roomName,
+    roomName: roomdata.roomName,
   });
 
   if (!findChatID) throw new ApiError(404, 'room not found');
 
   const joinChat = await User.updateOne({//after finding room it will help user to join the room and update value in database
-    sqlId:user.Id
-  },{
-    chatRoomIDs: findChatID._id,//taking chat id and puting here
-  });
+    sqlId: user.Id
+  }, { $addToSet: { chatRoomIDs: findChatID._id } }
+  );
 
   if (!joinChat) throw new ApiError(500, 'unable to join chat');//if unable to do so , then throw error
   return res.status(200).json(new ApiResponse(200, joinChat));//else return value
 });
-
 ```
 
 ---
@@ -191,7 +211,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;&nbsp;&nbsp;&nbsp;- Updates the `ChatModel` collection to reflect the removal of the user from the chat room.&nbsp;&nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="111">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="112">
 
 ---
 
@@ -205,10 +225,10 @@ const LeaveRoom = AsyncHandler(async (req: Requestany, res: Response) => {
   if (!(roomData || user)) throw new ApiError(400, 'invalid data');
 
   const findChatID = await chatModel.findOne({//check if user is part of that chat
-    romeName: roomData.roomName,
+    roomName: roomData.roomName,
   });
   const removeUser = await User.updateOne(//after that remove user from chat group
-    { sqlId:user.Id},
+    { sqlId: user.Id },
     { $pull: { chatRoomIDs: new mongoose.Types.ObjectId(findChatID?._id) } },
   );
   if (!removeUser) throw new ApiError(406, 'User unable to remove');
@@ -236,7 +256,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;&nbsp;&nbsp;&nbsp;-  Returns the total number of users in the chat room and their respective details.&nbsp;&nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="89">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="90">
 
 ---
 
@@ -262,7 +282,7 @@ const getUserInChat = AsyncHandler(async (req: Requestany, res: Response) => {//
 
 &nbsp;
 
-**Key Notes:**  
+**Key Notes:**
 
 \- All methods ensure efficient data retrieval and updates using MongoDB aggregation pipelines and optimized queries.&nbsp;&nbsp;
 
@@ -276,9 +296,9 @@ const getUserInChat = AsyncHandler(async (req: Requestany, res: Response) => {//
 
 #### **API Endpoint:** `/connectChat/:College/:Branch`
 
-**Method:** `POST`  
+**Method:** `POST`
 
-**Purpose: Establishes a connection to a chat room for a user, ensuring access is authorized and secure through token generation.**  
+**Purpose: Establishes a connection to a chat room for a user, ensuring access is authorized and secure through token generation.**
 
 &nbsp;
 
@@ -312,7 +332,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="163">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="164">
 
 ---
 
@@ -324,7 +344,7 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//if
   const user: user = req.user;
   if (!roomData) throw new ApiError(400, 'invalid request');//throw error if not provided
   const Checker = await checkUserAccess(user.Id, roomData.roomID);//check in database if user have access to the chat room
-  if(!Checker) throw new ApiError(409,"user don't have access to chat");//if fail then throw error
+  if (!Checker) throw new ApiError(409, "user don't have access to chat");//if fail then throw error
   //call token generater here
   const tokenGen = await ChatTokenGen(Checker[0]);//takes first value and gen token based on that data
   if (!tokenGen) throw new ApiError(500, "someting went wrong while making token");//if token not gen then throw error
@@ -346,13 +366,21 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//if
 use of token in main chat server to verify user
 
 ```typescript
-    const token = tokenExtractr(req);//this function extract the token from req objcet in starting and verify's it
+    // const token = tokenExtractr(req);//this function extract the token from req objcet in starting and verify's it
     
-    if(!token){//for some reason , i am feeling that it can lead to vulnerability
-      ws.close(4000,"Invalid request,User not have access to this group");
-      return;
-    }
+    // if(!token){//for some reason , i am feeling that it can lead to vulnerability
+    //   ws.close(4000,"Invalid request,User not have access to this group");
+    //   return;
+    // }
 
+    ws.on('message', async (message: string) => {//if websocket is running
+      const MessageData: MessageData = JSON.parse(message);//take data or message in message pattern from user first time as they join
+      //beter use onconnection  or connection      
+      
+      if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId)) {//check if the whole messagedata is provided or not 
+        ws.close(4000, "Message data is not provided");//if not close the websocket connection
+        return;
+      }
 ```
 
 ---
@@ -373,10 +401,398 @@ Note : Ensure that tokens are securely stored and managed on the frontend to pre
 
 &nbsp;
 
-## **Video API**
+## **User API**
+
+The **User API** is a core component of the system, designed to handle user-specific operations. It is structured into four main sections to address diverse user roles and functionalities efficiently.
+
+---
+
+### **Overview**
+
+The User API is divided into the following parts:
+
+1. **Basic Operations:**\
+   Covers general user functionalities such as login, signup, and authentication. These endpoints are shared across all user roles.
+
+2. **Role-Based APIs:**\
+   From this point, the API is categorized based on user roles to provide tailored functionalities:
+
+   - **Student API:** Focuses on operations specific to students, such as accessing exams, timetables, and submitting exam results.
+
+   - **College API:** Provides features for college administrators, including managing students, scheduling exams, and tracking results.
+
+   - **Examiner API:** Designed for examiners to manage exam content, distribute tokens, and view exam submissions.
 
 &nbsp;
 
 &nbsp;
+
+### **verifyExamData Middleware**
+
+The `verifyExamData` function is a middleware designed to validate and fetch exam-related data based on user-provided tokens. It ensures that users are authorized and the requested exam data exists before proceeding to the next step in the application flow. This middleware integrates multiple security checks and database lookups to facilitate secure and efficient operations.
+
+---
+
+#### **Functionality Overview**
+
+1. **Purpose:**
+
+   - Verify the validity of a token (ExamToken).
+
+   - Ensure the associated user is valid and exists in the database.
+
+   - Retrieve exam data from the database based on the verified token.
+
+   - Attach the retrieved data to the `req` object for use in subsequent middleware or route handlers.
+
+2. **Key Features:**
+
+   - JWT token verification for secure authentication.
+
+   - MongoDB lookup for mapping short ExamTokens (7-8 characters) to longer unique SQL IDs (32 bytes).
+
+   - Separation of user data and exam data for modular access.
+
+   - Robust error handling to ensure smooth workflow.
+
+---
+
+#### **Implementation Details**
+
+**Input:**
+
+- **Cookies:**
+
+  - `ExamToken`: Short token to identify the exam.
+
+  - `accessToken`: JWT token for user authentication.
+
+- **Body (Optional):**
+
+  - If the `ExamToken` is not found in cookies, it is expected in the request body.
+
+**Steps:**
+
+1. **Token Retrieval and Validation:**
+
+   - Retrieve `ExamToken` and `accessToken` from cookies or request body.
+
+   - Ensure both tokens are provided; throw an error if missing.
+
+   - Use `jsonwebtoken` to decode and verify the `accessToken` using a secret key (`ATS`).
+
+2. **User Validation:**
+
+   - Extract user information (`email`, `role`) from the decoded token.
+
+   - Query the user database (`findOp`) to verify the existence of the user.
+
+3. **Exam Token Mapping:**
+
+   - Use the `ExamToken` to query MongoDB (`searchMongodb`) and retrieve the associated unique exam ID.
+
+4. **Exam Data Retrieval:**
+
+   - Fetch the exam details from the database (`getExam`) using the unique exam ID.
+
+5. **Data Structuring:**
+
+   - Exclude sensitive fields (e.g., `password`) from user data.
+
+   - Attach both user and exam data to `req.examData` for downstream middleware or route handlers.
+
+6. **Error Handling:**
+
+   - Handles missing or invalid tokens, missing database records, and unexpected errors gracefully.
+
+&nbsp;
+
+#### **Example Workflow**
+
+1. **Client Request:**
+
+   - Sends a request with `ExamToken` and `accessToken` in cookies or request body.
+
+2. **Middleware Operations:**
+
+   - **Step 1:** Verify `accessToken` to authenticate the user.
+
+   - **Step 2:** Use `ExamToken` to find the associated exam ID in MongoDB.
+
+   - **Step 3:** Retrieve exam data and user data.
+
+   - **Step 4:** Attach the structured data to the `req` object.
+
+&nbsp;
+
+**Response:**
+
+- If successful, the `req.examData` object will contain:
+
+  ```js
+  {
+    findTokenInDb: { /* Exam Data */ },
+    userData: { /* User Data (excluding password) */ }
+  }
+  
+  ```
+
+&nbsp;
+
+#### **Example Error Cases**
+
+| Error Code | Scenario                                 | Message                         |
+| ---------- | ---------------------------------------- | ------------------------------- |
+| `400`      | Missing `ExamToken` or `accessToken`.    | `"Token not provided"`          |
+| `404`      | `ExamToken` not found in MongoDB.        | `"Exam token not found"`        |
+| `404`      | User not found in the database.          | `"User not found"`              |
+| `404`      | Exam data not found for the given token. | `"Exam data not found"`         |
+| `401`      | Invalid or expired `accessToken`.        | `"Unauthorized: Invalid token"` |
+
+---
+
+#### **Use Case**
+
+- Used in exam-related endpoints where both user authentication and exam-specific data retrieval are required.
+
+- Ensures that only valid and authenticated users can access exam information.
+
+&nbsp;
+
+&nbsp;
+
+### **1)Student Api**
+
+The **Student API** provides endpoints for operations that can be performed by students, such as viewing exam information, accessing timetables, and submitting exams. This API is structured to ensure efficient and secure data access.
+
+---
+
+#### **1. Get Exam Information**
+
+**Endpoint:** `POST /api/v1/student/Exam`
+
+**Description:**\
+This endpoint retrieves exam details for a student based on a unique token provided by the examiner. The token allows students to access exam-related information securely.
+
+#### **Request Parameters**
+
+| Parameter | Type   | Required | Description                                                                                           |
+| --------- | ------ | -------- | ----------------------------------------------------------------------------------------------------- |
+| `token`   | String | Yes      | An 8-character unique token provided by the examiner. This token maps to a 32-byte string in MongoDB. |
+
+#### **How It Works**
+
+1. **Token Mapping:**
+
+   - The 8-character token is mapped to a 32-byte unique identifier stored in a MongoDB NoSQL database.
+
+   - The 32-byte identifier corresponds to the primary key in the SQL database, ensuring seamless cross-database integration.
+
+2. **Search Mechanism:**
+
+   - The API searches the MongoDB collection for the provided token.
+
+   - If the token is found, the associated exam details are fetched from the SQL database using the mapped unique identifier.
+
+---
+
+&nbsp;
+
+#### **Additional Notes**
+
+- **Security:**\
+  Tokens are designed to be short (8 characters) for user convenience but are mapped internally to a 32-byte unique identifier in MongoDB to enhance security and reduce the risk of exposure.
+
+- **Database Integration:**
+
+  - MongoDB is used to store token mappings and metadata for faster queries.
+
+  - The SQL database stores detailed exam information linked via the 32-byte unique identifier.
+
+- **Use Case:**\
+  This endpoint is particularly useful for examiners to distribute tokens to students. Students can use these tokens to retrieve detailed exam information without exposing sensitive database identifiers.
+
+### **2)**<SwmToken path="/server/src/controller/student.controller.ts" pos="33:2:2" line-data="const giveExam = AsyncHandler(async (req: Requestany, res: Response) =&gt; {//this function saves question data in database">`giveExam`</SwmToken>
+
+#### **PUT /api/v1/student/Exam**
+
+Updates the exam data, such as answers or the question paper, in the database. This endpoint accepts an 8-character token to identify the exam, the student's answer sheet, and the question paper data. The token maps to a 32-byte unique identifier in the database for efficiency and security.
+
+#### **Request**
+
+| Field           | Type   | Required | Description                                              |
+| --------------- | ------ | -------- | -------------------------------------------------------- |
+| `token`         | String | Yes      | An 8-character unique token for the exam.                |
+| `answerSheet`   | Object | Yes      | Contains the student's answer sheet details.             |
+| `questionPaper` | Object | Yes      | Contains the question paper data provided by the client. |
+
+---
+
+**Headers:**
+
+| Name           | Type   | Required | Description                  |
+| -------------- | ------ | -------- | ---------------------------- |
+| `Content-Type` | String | Yes      | Should be `application/json` |
+
+```json
+Body (JSON):
+
+{
+  "token": "ABCDEFGH",
+  "answerSheet": {
+    "studentId": "123456",
+    "answers": [
+      {
+        "questionId": "Q1",
+        "answer": "4"
+      },
+      {
+        "questionId": "Q2",
+        "answer": "The Pythagorean theorem states that..."
+      }
+    ]
+  },
+  "questionPaper": {
+    "title": "Mathematics Final Exam",
+    "totalMarks": 100,
+    "questions": [
+      {
+        "id": "Q1",
+        "type": "MCQ",
+        "content": "What is 2 + 2?",
+        "options": ["1", "2", "3", "4"]
+      },
+      {
+        "id": "Q2",
+        "type": "Descriptive",
+        "content": "Explain the Pythagorean theorem."
+      }
+    ]
+  }
+}
+
+```
+
+&nbsp;
+
+### **3)**<SwmToken path="/server/src/controller/student.controller.ts" pos="83:2:2" line-data="const getTimeTable = AsyncHandler(async (req: Requestany, res: Response) =&gt; {//get tiem table from mongodb">`getTimeTable`</SwmToken>
+
+#### **POST /api/v1/student/TimeTable**
+
+Retrieves the exam timetable created by the examiner. This endpoint accepts user-specific data, such as `userId` and `class`, and maps it to the corresponding college and class in the database to locate and return the timetable. The timetable is stored as a nested JSON object in MongoDB.
+
+---
+
+#### **Request**
+
+**Headers:**
+
+| Name           | Type   | Required | Description                   |
+| -------------- | ------ | -------- | ----------------------------- |
+| `Content-Type` | String | Yes      | Should be `application/json`. |
+
+#### **Workflow**
+
+1. **Input Validation:**
+
+   - The `userId` and `class` are validated to ensure correct format and presence.
+
+2. **Database Lookup:**
+
+   - MongoDB is queried to find the college associated with the provided `userId`.
+
+   - The timetable is mapped to the `college` and `class` combination.
+
+3. **Return Data:**
+
+   - If found, the timetable is returned as a nested JSON object.
+
+---
+
+#### **Additional Notes**
+
+- **User Authentication:** Ensure proper authentication is handled to verify the user requesting the timetable.
+
+- **Data Mapping:**
+
+  - `userId` → College
+
+  - `class` → Class-specific timetable.
+
+- This endpoint assumes the timetable is stored in MongoDB in a structured, nested format mapped to the college and class identifiers.
+
+### **4)**<SwmToken path="/server/src/controller/student.controller.ts" pos="96:2:2" line-data="const getResult = AsyncHandler(async (req: Requestany, res: Response) =&gt; {//get result for student">`getResult`</SwmToken>
+
+#### **POST /api/v1/student/Result**
+
+This endpoint retrieves a student's exam result. It accepts an 8-byte token as input, which is used to identify the associated `questionPaperId`. The `questionPaperId` is then used to locate the corresponding exam result in the database
+
+&nbsp;
+
+#### **Workflow**
+
+1. **Input Validation:**
+
+   - The `token` is validated to ensure it is an 8-byte string.
+
+2. **Database Lookup:**
+
+   - The token is used to fetch the associated `questionPaperId` from MongoDB.
+
+   - The `questionPaperId` is then used to search the SQL or NoSQL database for the student's result.
+
+3. **Return Data:**
+
+   - If found, the result data is returned to the client.
+
+---
+
+#### **Additional Notes**
+
+- **Authentication:** Proper authentication should be implemented to ensure that only authorized users can access this endpoint.
+
+- **Token Mapping:**
+
+  - The 8-byte token is mapped to a 32-byte unique `questionPaperId` in MongoDB for lookup.
+
+- **Result Storage:** The result data should be stored in a structured format to allow efficient retrieval.
+
+&nbsp;
+
+### 5)<SwmToken path="/server/src/controller/student.controller.ts" pos="121:2:2" line-data="const getQuestionPaperForStundet = AsyncHandler(async (req: Requestany, res: Response) =&gt; {//get question for studnet">`getQuestionPaperForStundet`</SwmToken>
+
+#### **POST /api/v1/student/Question**
+
+This endpoint allows students to retrieve the question paper for a specific exam using an 8-byte token. The token is mapped to a unique identifier in the database to locate and fetch the corresponding question paper.
+
+&nbsp;
+
+#### **Workflow**
+
+1. **Input Validation:**
+
+   - The `token` is validated to ensure it is an 8-byte string.
+
+2. **Database Lookup:**
+
+   - The token is used to fetch the associated unique identifier (`questionPaperId`) from MongoDB.
+
+   - The `questionPaperId` is then used to locate the question paper in the database.
+
+3. **Return Data:**
+
+   - If the question paper is found, it is returned to the client in a structured format.
+
+---
+
+#### **Additional Notes**
+
+- **Authentication:** Proper authentication should be implemented to ensure that only authorized students can access this endpoint.
+
+- **Token Mapping:**
+
+  - The 8-byte token is mapped to a 32-byte unique `questionPaperId` in MongoDB for lookup.
+
+- **Question Paper Structure:** Ensure that question paper data is stored in a well-organized format to facilitate efficient retrieval and formatting.
 
 <SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBVGVzdGNvcmUlM0ElM0FDT0RFQ1pFUk8=" repo-name="Testcore"><sup>Powered by [Swimm](https://app.swimm.io/)</sup></SwmMeta>
