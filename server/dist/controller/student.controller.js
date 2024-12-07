@@ -74,7 +74,7 @@ const getExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, fun
 }));
 const getTimeTable = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user; //takes data from user
-    const { Class } = req.body; //takes dat from user
+    const { Class } = req.body; //takes data from user
     const name = __rest(yield findSingleCollegeForStudent(user === null || user === void 0 ? void 0 : user.Id), []); //finds user college using his id;
     if (!Class || !name)
         throw new ApiError(400, "Invalid data"); //if not provided then throw error
