@@ -15,6 +15,14 @@ import SessionCheck from './components/SessionCheck.tsx';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css'
 import Chat from './components/Chat.tsx';
+import { ChatWrapper } from "./components/chatFiles/ChatWrapper.tsx";
+import CreateChat from "./components/chatFiles/createChat.tsx";
+import JoinChat from "./components/chatFiles/joinChat.tsx";
+import Groups from "./components/chatFiles/group.tsx";
+
+
+
+
 const darkTheme = createTheme({
   palette: {
     mode: "dark",
@@ -67,6 +75,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={darkTheme}>
           {/* RouterProvider now includes the router */}
+      
           <RouterProvider router={router} />
         </ThemeProvider>
       </QueryClientProvider>
