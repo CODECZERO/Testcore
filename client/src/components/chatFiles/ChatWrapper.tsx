@@ -33,8 +33,12 @@
 
 import React, { createContext, useState, useEffect, ReactNode, useContext } from "react";
 
+interface WebSocketContextType {
+    socket: WebSocket | null;
+    sendMessage: (roomName: string, content: string) => void;
+}
 // WebSocket context to provide the WebSocket instance
-const WebSocketContext = createContext<WebSocket | null>(null);
+const WebSocketContext = createContext<WebSocketContextType | null>(null);
 
 interface ChatWrapperProps {
     children: ReactNode;
@@ -44,7 +48,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ children }) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket("wss://testcore-qmyu.onrender.com/api/v1/chat");
+        const ws = new WebSocket("wss://testcore-qmyu.onrender.com/ws1/");
 
         setSocket(ws);
 
