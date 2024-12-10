@@ -25,7 +25,7 @@
 //   const [createRoomName, setCreateRoomName] = useState<string>(''); // State for create room input
 //   const [joinRoomName, setJoinRoomName] = useState<string>(''); // State for join room input
 //   const [joinStatus, setJoinStatus] = useState<string>('');
-  
+
 //   // Redux: Extract user information
 //   const userInfo = useSelector((state: RootState) => state.user.userInfo);
 //   const userId = localStorage.getItem('userId') || '';
@@ -215,7 +215,7 @@
 //       alert('Access token is missing.');
 //       return;
 //     }
-   
+
 //     const response = await fetch(`https://testcore-qmyu.onrender.com/api/v1/chat/connectChat/${room}`, {
 //       method: 'POST',
 //       headers: {
@@ -252,17 +252,17 @@
 
 
 import React, { useContext, useState, useEffect } from "react";
-import { WebSocketContext } from "./chatFiles/ChatWrapper";
+import { WebSocketContext, useWebSocket } from "./chatFiles/ChatWrapper";
 import { ChatWrapper } from "./chatFiles/ChatWrapper.tsx";
 import CreateChat from "./chatFiles/createChat.tsx";
 import JoinChat from "./chatFiles/joinChat.tsx";
 import Groups from "./chatFiles/group.tsx";
+const userId = localStorage.getItem('userId') || ' ';
 
 const Chat: React.FC = () => {
-    const socket = useContext(WebSocketContext);
     const [messages, setMessages] = useState<string[]>([]);
     const [input, setInput] = useState("");
-   
+    const { socket } = useWebSocket();
 
     useEffect(() => {
         if (socket) {
@@ -272,33 +272,45 @@ const Chat: React.FC = () => {
         }
     }, [socket]);
 
-    const sendMessage = () => {
+    const sendMessage = (e: React.FormEvent) => {
+        e.preventDefault();
+        const message = {
+            MessageId: "12345", // Example message ID, you can dynamically generate it if needed
+            roomName: "CC/bsc",
+            content: input,
+            typeOfMessage: "SEND_MESSAGE",
+            userId: userId, // Dynamically pass userId from localStorage
+        };
+        console.log(socket);
         if (socket && input.trim()) {
-            socket.send(input);
+            console.log("entered")
+            socket.send(JSON.stringify(message));
             setMessages((prev) => [...prev, `You: ${input}`]);
             setInput("");
         }
     };
 
     return (
-        <div>
-            <ChatWrapper>
-        <CreateChat />
-        <JoinChat />
-        <Groups />
-    </ChatWrapper>
+
+        <>
+            <CreateChat />
+            <JoinChat />
+            <Groups />
             <div>
-                {messages.map((msg, index) => (
-                    <div key={index}>{msg}</div>
-                ))}
+                <div>
+                    {messages.map((msg, index) => (
+                        <div key={index}>{msg}</div>
+                    ))}
+                </div>
+                <input
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type a message"
+                />
+                <button onClick={sendMessage}>Send</button>
             </div>
-            <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type a message"
-            />
-            <button onClick={sendMessage}>Send</button>
-        </div>
+        </>
+
     );
 };
 
