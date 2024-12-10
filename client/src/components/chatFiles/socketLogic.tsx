@@ -35,7 +35,7 @@ const socketConnect = async (Message: Object) => {
 
 
 
-        ws.onmessage(event)=> {
+        ws.onmessage(event) => {
     SetMessage(JSON.parse(event.data));
 }
         
