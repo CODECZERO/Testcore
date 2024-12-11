@@ -4,7 +4,7 @@ import { UniError } from "../../util/UniErrorHandler.js";
 import videoMethode from "./videoMethodes.services.js";
 import { DtlsParameters } from "mediasoup/node/lib/fbs/web-rtc-transport.js";
 import { RtpParameters } from "mediasoup/node/lib/fbs/rtp-parameters.js";
-import { RtpCapabilities } from "mediasoup/node/lib/RtpParameters.js";
+import { RtpCapabilities } from "mediasoup/node/lib/rtpParametersTypes.js";
 import { nanoid } from "nanoid";
 import { Router, WebRtcTransport } from "mediasoup/node/lib/types.js";
 import { getVideoServerTransport, removeVideoServerTranspor, setVideoServerTransport } from "../../db/database.redis.query.js";
@@ -69,6 +69,7 @@ const runVideoServer = async () => {
 
                     case "createTransport":
                         const id = nanoid(12);
+                        //@ts-ignore
                         const TransportData = await videoMethode.createTransportForService(router, true, producerTransport);
 
                         const transportParams = {
@@ -84,6 +85,7 @@ const runVideoServer = async () => {
 
                     case "connectTransport":
                         const producerTransportxL = await getVideoServerTransport(messageData.Id);
+                        //@ts-ignore
                         connectTransport = await videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransportxL as any);
                         ws.send("connected");
                         break;
