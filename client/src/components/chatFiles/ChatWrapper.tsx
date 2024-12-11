@@ -1,36 +1,3 @@
-// import React, { createContext, useState, useEffect, ReactNode } from "react";
-
-// const WebSocketContext = createContext<WebSocket | null>(null);
-
-// interface ChatWrapperProps {
-//     children: ReactNode;
-// }
-
-// const ChatWrapper: React.FC<ChatWrapperProps> = ({ children }) => {
-//     const [socket, setSocket] = useState<WebSocket | null>(null);
-
-//     useEffect(() => {
-//         const ws = new WebSocket("wss://testcore-qmyu.onrender.com/api/v1/chat");
-//         setSocket(ws);
-
-//         ws.onopen = () => console.log("WebSocket connected");
-//         ws.onclose = () => console.log("WebSocket disconnected");
-//         ws.onerror = (error) => console.error("WebSocket error", error);
-
-//         return () => ws.close();
-//     }, []);
-
-//     return (
-//         <WebSocketContext.Provider value={socket}>
-//             {children}
-//         </WebSocketContext.Provider>
-//     );
-// };
-
-// export { ChatWrapper, WebSocketContext };
-
-
-
 import React, { createContext, useState, useEffect, ReactNode, useContext } from "react";
 
 interface WebSocketContextType {
@@ -71,6 +38,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ children }) => {
             console.error("User ID not found in localStorage.");
             return;
         }
+
 
         const message = {
             MessageId: "12345", // Example message ID, you can dynamically generate it if needed
