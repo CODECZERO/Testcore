@@ -17,7 +17,7 @@ const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, funct
         const messageInfo = JSON.stringify(MessageData); //converts message pattern to string or json to string
         // const messageEnc=await SendMessageEncryption();//it a enctyption function, which encrypts message bfore sending,it to queue
         //so only the user/group/group member person can only open/read that message
-        rabbitmq.publishData(JSON.stringify(MessageData), MessageData.roomName); //publishing or send data to rabbitmq queue, so it can make record of message for 7 day
+        rabbitmq.publishData(messageInfo, MessageData.roomName); //publishing or send data to rabbitmq queue, so it can make record of message for 7 day
         //or for user defin time and it's a way of scaling the whole chat feature/application, insted of rabbitmq you can use kafka as it will be fast and quit robust
     }
     catch (error) {
@@ -26,25 +26,26 @@ const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, funct
 });
 const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield clients.forEach(client => {
-            if (message && client != ws && client.readyState === ws.OPEN) { //checks, if webscoket and message exist,if the set of websocket or websocket is ready
-                //or open,then send message 
-                message = message === null || message === void 0 ? void 0 : message.content.toString();
-                client.send(JSON.stringify(message)); //takes message from rabbitmq queue
+        const messageContent = message.content.toString();
+        const parsedMessage = JSON.parse(messageContent);
+        for (const client of clients) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName) {
+                client.send(messageContent);
             }
-        });
+        }
     }
     catch (error) {
-        throw new ApiError(500, "error while receiving message"); //throw error if any thing went wrong, so later the dev can debug it 
+        console.error("Error while sending message to receiver:", error);
+        throw new ApiError(500, "Error while receiving message");
     }
 });
 const reciveMEssage = (roomName, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const messageEnc = yield rabbitmq.subData(roomName); //subscribe to the queue, the queue name is same as roomName 
+        yield rabbitmq.subData(roomName); //subscribe to the queue, the queue name is same as roomName 
         yield rabbitmq.channel.consume(rabbitmq.queue.queue, (message) => {
             //send it to user 
             if (message)
-                sendMessageToReciver(message, ws);
+                sendMessageToReciver(message, ws).catch(console.error);
         });
     }
     catch (error) {
@@ -53,16 +54,17 @@ const reciveMEssage = (roomName, ws) => __awaiter(void 0, void 0, void 0, functi
 });
 const closeSocket = (MessageData, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        rooms[MessageData.roomName].delete(ws); //checks the roomName in the collection of the rooms and removes the websocket connection from that room
-        //rooms is a object which has information about how many users are connected to server as any user close's or end the connection with server
-        //it will remove user from object 
-        if (rooms[MessageData.roomName].size === 0) { //if there is no one in the current websocket server of that room or user of a room are not connected to the
-            //websocket, it will delete the room from the rooms(object of room);.
-            delete rooms[MessageData.roomName];
+        const room = rooms[MessageData.roomName];
+        if (room) {
+            room.delete(ws);
+            if (room.size === 0) {
+                delete rooms[MessageData.roomName];
+            }
         }
     }
     catch (error) {
-        throw new ApiError(500, "error while closeing socket"); //throw error if any thing went wrong, so later the dev can debug it 
+        console.error("Error while closing socket:", error);
+        throw new ApiError(500, "Error while closing socket");
     }
 });
 const closeConnection = () => __awaiter(void 0, void 0, void 0, function* () {
