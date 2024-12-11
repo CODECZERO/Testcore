@@ -33,6 +33,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                         break;
                     case "createTransport":
                         const id = nanoid(12);
+                        //@ts-ignore
                         const TransportData = yield videoMethode.createTransportForService(router, true, producerTransport);
                         const transportParams = {
                             id: TransportData.id,
@@ -45,6 +46,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                         break;
                     case "connectTransport":
                         const producerTransportxL = yield getVideoServerTransport(messageData.Id);
+                        //@ts-ignore
                         connectTransport = yield videoMethode.connectTransport(false, messageData.dtlsParameters, producerTransportxL);
                         ws.send("connected");
                         break;
