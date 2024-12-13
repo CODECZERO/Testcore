@@ -27,11 +27,11 @@ const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
 
-        for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName) {
+        clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(messageContent);
             }
-        }
+        });
     } catch (error) {
         console.error("Error while sending message to receiver:", error);
         throw new ApiError(500, "Error while receiving message");
