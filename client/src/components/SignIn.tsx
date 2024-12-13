@@ -115,18 +115,6 @@ const CreateAccount: React.FC = () => {
             />
           </label>
 
-          <label>
-            <span>Last Name</span>
-            <input
-              className="input"
-              type="text"
-              name="lastName"
-              placeholder=""
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-            />
-          </label>
         </div>
 
         <label>
