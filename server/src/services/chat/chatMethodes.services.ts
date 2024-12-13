@@ -23,19 +23,18 @@ const sendMessage = async (MessageData: MessageData, ws: CustomWebSocket,) => {/
 }
 
 const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket): Promise<void> => {
-    const messageContent = message.content.toString();
-    const parsedMessage: MessageData = JSON.parse(messageContent);
+    try {
+        const messageContent = message.content.toString();
+        const parsedMessage = JSON.parse(messageContent);
 
-    const room = rooms[parsedMessage.roomName];
-    if (!room) {
-        console.warn(`Room ${parsedMessage.roomName} not found`);
-        return;
-    }
-
-    for (const client of room) {
-        if (client !== ws && client.readyState === WebSocket.OPEN) {
-            client.send(messageContent);
+        for (const client of clients) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName) {
+                client.send(messageContent);
+            }
         }
+    } catch (error) {
+        console.error("Error while sending message to receiver:", error);
+        throw new ApiError(500, "Error while receiving message");
     }
 };
 
