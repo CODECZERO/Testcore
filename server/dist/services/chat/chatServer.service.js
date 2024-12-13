@@ -36,7 +36,6 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
         ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
             const MessageData = JSON.parse(message); //take data or message in message pattern from user first time as they join
             //beter use onconnection  or connection      
-            ws.roomName = '';
             if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId)) { //check if the whole messagedata is provided or not 
                 ws.close(4000, "Message data is not provided"); //if not close the websocket connection
                 return;
