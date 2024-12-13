@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { WebSocketServer } from "ws";
 import { sendMessage, reciveMEssage, closeSocket } from "./chatMethodes.services.js";
 import AsyncHandler from "../../util/ayscHandler.js";
-const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
+export const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
 const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 9017; //running websocket on same webserver but different port,
 //i won't recommend that , as websocket it should be run on different server
 //and it's better for scablity of the application 
@@ -71,4 +71,4 @@ const closeChatSocket = () => __awaiter(void 0, void 0, void 0, function* () {
         return error;
     }
 });
-export { runWebSocket, clients, rooms, closeChatSocket }; //exoprt the function so you can start the server at the beging
+export { runWebSocket, clients, closeChatSocket }; //exoprt the function so you can start the server at the beging
