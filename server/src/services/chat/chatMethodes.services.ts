@@ -31,9 +31,8 @@ const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket
         const room=rooms[parsedMessage.roomName];
         if(!room) throw new ApiError(400,"room name not found");
 
-
-        for (const client of room) {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
+        for (const client of clients) {
+            if (messageContent&&client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(messageContent);
             }
         }
