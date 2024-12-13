@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { parse } from "url";
-import { clients, rooms } from './chatServer.service.js';
+import { rooms } from './chatServer.service.js';
 import { ApiError } from "../../util/apiError.js";
 import rabbitmq from "../rabbitmq/rabbitmq.services.js";
 import { ChatTokenDec } from "./chatToken.services.js";
@@ -28,8 +28,11 @@ const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, 
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
-        for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName) {
+        const room = rooms[parsedMessage.roomName];
+        if (!room)
+            throw new ApiError(400, "room name not found");
+        for (const client of room) {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(messageContent);
             }
         }
