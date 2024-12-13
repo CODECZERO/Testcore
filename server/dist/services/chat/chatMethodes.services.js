@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { parse } from "url";
-import { clients, rooms } from './chatServer.service.js';
+import { rooms } from './chatServer.service.js';
 import { ApiError } from "../../util/apiError.js";
 import rabbitmq from "../rabbitmq/rabbitmq.services.js";
 import { ChatTokenDec } from "./chatToken.services.js";
@@ -25,19 +25,17 @@ const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const messageContent = message.content.toString();
-        const parsedMessage = JSON.parse(messageContent);
-        for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName) {
-                console.log(ws.roomName);
-                client.send(messageContent);
-            }
-        }
+    const messageContent = message.content.toString();
+    const parsedMessage = JSON.parse(messageContent);
+    const room = rooms[parsedMessage.roomName];
+    if (!room) {
+        console.warn(`Room ${parsedMessage.roomName} not found`);
+        return;
     }
-    catch (error) {
-        console.error("Error while sending message to receiver:", error);
-        throw new ApiError(500, "Error while receiving message");
+    for (const client of room) {
+        if (client !== ws && client.readyState === WebSocket.OPEN) {
+            client.send(messageContent);
+        }
     }
 });
 const reciveMEssage = (roomName, ws) => __awaiter(void 0, void 0, void 0, function* () {
