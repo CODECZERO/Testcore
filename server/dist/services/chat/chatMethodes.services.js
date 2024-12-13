@@ -28,11 +28,9 @@ const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, 
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
-        const room = rooms[parsedMessage.roomName];
-        if (!room)
-            throw new ApiError(400, "room name not found");
         for (const client of clients) {
-            if (messageContent && client !== ws && client.readyState === WebSocket.OPEN) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName) {
+                console.log(ws.roomName);
                 client.send(messageContent);
             }
         }
