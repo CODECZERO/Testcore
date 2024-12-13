@@ -30,7 +30,12 @@ interface CustomWebSocket extends WebSocket {//custom interface for websocket so
   sub?: string;
 }
 
-const rooms: any = {};//a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
+export interface Room {
+  [roomName: string]: Set<CustomWebSocket>;
+}
+
+
+export const rooms: Room = {};//a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
 const port: number = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 9017;//running websocket on same webserver but different port,
 //i won't recommend that , as websocket it should be run on different server
 //and it's better for scablity of the application 
@@ -113,6 +118,5 @@ export {
   MessageData,
   CustomWebSocket,
   clients,
-  rooms,
   closeChatSocket
 }//exoprt the function so you can start the server at the beging
