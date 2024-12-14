@@ -15,7 +15,7 @@ const Chat: React.FC = () => {
     const [messages, setMessages] = useState<string[]>([]);
     const [input, setInput] = useState("");
     const { socket } = useWebSocket();
-    const roomName = localStorage.getItem("roomName") || ""; 
+    const roomName = localStorage.getItem("roomName") || "cc/v"; 
 
     useEffect(() => {
         if (socket) {
