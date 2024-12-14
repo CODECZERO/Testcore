@@ -41,11 +41,9 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
                 return;
             }
             if (!rooms[MessageData.roomName]) {
-                rooms[MessageData.roomName] = new Set();
-            }
-            rooms[MessageData.roomName].add(ws);
-            ws.roomName = MessageData.roomName;
-            //if the room is not in rooms collection then add theme to roomCollection 
+                ws.roomName = MessageData.roomName;
+                ws.userId = MessageData.userId;
+            } //if the room is not in rooms collection then add theme to roomCollection 
             //but , know i think, this conditon is stoping multiple people to connect to same room,check and find it out
             clients.add(ws); //adding websocket to the collection of websocket
             const typeAction = MessageData.typeOfMessage; //check the message data type
