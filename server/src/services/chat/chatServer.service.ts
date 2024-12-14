@@ -78,8 +78,13 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
         return;
       }
 
-      if (!rooms[MessageData.roomName]) ws.roomName = MessageData.roomName;//if the room is not in rooms collection then add theme to roomCollection 
-      //but , know i think, this conditon is stoping multiple people to connect to same room,check and find it out
+      // When a user connects, check if the room exists. If not, create it.
+      if (!rooms[MessageData.roomName]) {
+        rooms[MessageData.roomName] = new Set<CustomWebSocket>();
+      }
+      ws.roomName = MessageData.roomName; // Set the room name to the WebSocket connection
+      rooms[MessageData.roomName].add(ws); // Add the WebSocket to the room's client set
+
 
       clients.add(ws);//adding websocket to the collection of websocket
       const typeAction = MessageData.typeOfMessage;//check the message data type
@@ -88,7 +93,7 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
         return;
       }
 
-      const actiondata = actions[typeAction](MessageData,ws);//if the messagedat type exists then use the function, pass these function parameters
+      const actiondata = actions[typeAction](MessageData, ws);//if the messagedat type exists then use the function, pass these function parameters
       //message data and webscoket connection
 
       if (!actiondata) {//if the message type is not in the typeOfMessage then close the websocket and return message
