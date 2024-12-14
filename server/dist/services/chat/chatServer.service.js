@@ -36,12 +36,16 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
         ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
             const MessageData = JSON.parse(message); //take data or message in message pattern from user first time as they join
             //beter use onconnection  or connection      
-            if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId)) { //check if the whole messagedata is provided or not 
+            if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId && MessageData.roomName)) { //check if the whole messagedata is provided or not 
                 ws.close(4000, "Message data is not provided"); //if not close the websocket connection
                 return;
             }
-            if (!rooms[MessageData.roomName])
-                ws.roomName = MessageData.roomName; //if the room is not in rooms collection then add theme to roomCollection 
+            if (!rooms[MessageData.roomName]) {
+                rooms[MessageData.roomName] = new Set();
+            }
+            rooms[MessageData.roomName].add(ws);
+            ws.roomName = MessageData.roomName;
+            //if the room is not in rooms collection then add theme to roomCollection 
             //but , know i think, this conditon is stoping multiple people to connect to same room,check and find it out
             clients.add(ws); //adding websocket to the collection of websocket
             const typeAction = MessageData.typeOfMessage; //check the message data type
@@ -59,7 +63,13 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
         }));
         ws.on('close', () => {
             clients.delete(ws);
-            console.log(`Client disconnected. Total clients: ${clients.size}`); //tells how many clients are there
+            if (ws.roomName && rooms[ws.roomName]) {
+                rooms[ws.roomName].delete(ws);
+                if (rooms[ws.roomName].size === 0) {
+                    delete rooms[ws.roomName];
+                }
+            }
+            console.log(`Client disconnected. Total clients: ${clients.size}`);
         });
     });
 }));
