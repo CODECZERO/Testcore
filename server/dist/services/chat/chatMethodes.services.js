@@ -12,6 +12,7 @@ import { clients, rooms } from './chatServer.service.js';
 import { ApiError } from "../../util/apiError.js";
 import rabbitmq from "../rabbitmq/rabbitmq.services.js";
 import { ChatTokenDec } from "./chatToken.services.js";
+import { clinet } from "../twilio/twilioClinet.service.js";
 const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const messageInfo = JSON.stringify(MessageData); //converts message pattern to string or json to string
@@ -28,11 +29,13 @@ const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, 
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
-        clients.forEach((client) => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
+        for (const client of clients) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName) {
+                console.log(clinet + "\n");
+                console.log(ws);
                 client.send(messageContent);
             }
-        });
+        }
     }
     catch (error) {
         console.error("Error while sending message to receiver:", error);
