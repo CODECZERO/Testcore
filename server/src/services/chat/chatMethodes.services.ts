@@ -23,13 +23,13 @@ const sendMessage = async (MessageData: MessageData, ws: CustomWebSocket,) => {/
     }
 }
 
-const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket): Promise<void> => {
+const sendMessageToReciver = async (message: ConsumeMessage, userId: string, ws: CustomWebSocket): Promise<void> => {
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
 
         for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName&&ws.userId!==parsedMessage?.userId) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName && !(userId == parsedMessage?.userId)) {
                 client.send(messageContent);
             }
         }
@@ -39,12 +39,12 @@ const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket
     }
 };
 
-const reciveMEssage = async (roomName: string, ws: CustomWebSocket) => {//recive message function
+const reciveMEssage = async (roomName: string, userId: string, ws: CustomWebSocket) => {//recive message function
     try {
         await rabbitmq.subData(roomName);//subscribe to the queue, the queue name is same as roomName 
         await rabbitmq.channel.consume(rabbitmq.queue.queue, (message: ConsumeMessage | null) => {//consume the message from queue and uses a call back where it the message exitst
             //send it to user 
-            if (message) sendMessageToReciver(message, ws).catch(console.error);
+            if (message) sendMessageToReciver(message, userId, ws).catch(console.error);
 
 
         })
