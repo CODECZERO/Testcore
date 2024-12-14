@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { parse } from "url";
-import { rooms } from './chatServer.service.js';
+import { clients, rooms } from './chatServer.service.js';
 import { ApiError } from "../../util/apiError.js";
 import rabbitmq from "../rabbitmq/rabbitmq.services.js";
 import { ChatTokenDec } from "./chatToken.services.js";
@@ -24,30 +24,29 @@ const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, funct
         throw new ApiError(500, "error while sending message"); //throw error if any thing went wrong, so later the dev can debug it 
     }
 });
-const sendMessageToReciver = (message, rooms, ws) => __awaiter(void 0, void 0, void 0, function* () {
+const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, function* () {
     //message to other and help theme recive that message also
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
-        const room = rooms[parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.roomName];
-        for (const client of room) {
+        clients.forEach((client) => {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(messageContent);
             }
-        }
+        });
     }
     catch (error) {
         console.error("Error while sending message to receiver:", error);
         throw new ApiError(500, "Error while receiving message");
     }
 });
-const reciveMEssage = (roomName, rooms, ws) => __awaiter(void 0, void 0, void 0, function* () {
+const reciveMEssage = (roomName, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield rabbitmq.subData(roomName); //subscribe to the queue, the queue name is same as roomName 
         yield rabbitmq.channel.consume(rabbitmq.queue.queue, (message) => {
             //send it to user 
             if (message)
-                sendMessageToReciver(message, rooms, ws).catch(console.error);
+                sendMessageToReciver(message, ws).catch(console.error);
         });
     }
     catch (error) {
