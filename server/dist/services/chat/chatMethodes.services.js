@@ -24,12 +24,12 @@ const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, funct
         throw new ApiError(500, "error while sending message"); //throw error if any thing went wrong, so later the dev can debug it 
     }
 });
-const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, function* () {
+const sendMessageToReciver = (message, userId, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
         for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName && ws.userId !== (parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.userId)) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName && !(userId == (parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.userId))) {
                 client.send(messageContent);
             }
         }
@@ -39,13 +39,13 @@ const sendMessageToReciver = (message, ws) => __awaiter(void 0, void 0, void 0, 
         throw new ApiError(500, "Error while receiving message");
     }
 });
-const reciveMEssage = (roomName, ws) => __awaiter(void 0, void 0, void 0, function* () {
+const reciveMEssage = (roomName, userId, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield rabbitmq.subData(roomName); //subscribe to the queue, the queue name is same as roomName 
         yield rabbitmq.channel.consume(rabbitmq.queue.queue, (message) => {
             //send it to user 
             if (message)
-                sendMessageToReciver(message, ws).catch(console.error);
+                sendMessageToReciver(message, userId, ws).catch(console.error);
         });
     }
     catch (error) {
