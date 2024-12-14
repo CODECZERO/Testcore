@@ -78,10 +78,7 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
         return;
       }
 
-      if (!rooms[MessageData.roomName]) {
-        ws.roomName = MessageData.roomName;
-        ws.userId = MessageData.userId;
-      }//if the room is not in rooms collection then add theme to roomCollection 
+      if (!rooms[MessageData.roomName]) ws.roomName = MessageData.roomName;//if the room is not in rooms collection then add theme to roomCollection 
       //but , know i think, this conditon is stoping multiple people to connect to same room,check and find it out
 
       clients.add(ws);//adding websocket to the collection of websocket
@@ -98,7 +95,7 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
         ws.close(4000, "message type wasn't define");
         return;
       }
-      await reciveMEssage(MessageData.roomName, ws);//call the function and wait, if user send message the send to the websocket or wait for the message to come or send
+      await reciveMEssage(MessageData.roomName, MessageData.userId, ws);//call the function and wait, if user send message the send to the websocket or wait for the message to come or send
     })
 
     ws.on('close', () => {
