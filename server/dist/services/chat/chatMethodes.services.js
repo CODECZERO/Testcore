@@ -8,7 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import { parse } from "url";
-import { clients, rooms } from './chatServer.service.js';
+import { rooms } from './chatServer.service.js';
 import { ApiError } from "../../util/apiError.js";
 import rabbitmq from "../rabbitmq/rabbitmq.services.js";
 import { ChatTokenDec } from "./chatToken.services.js";
@@ -24,13 +24,14 @@ const sendMessage = (MessageData, ws) => __awaiter(void 0, void 0, void 0, funct
         throw new ApiError(500, "error while sending message"); //throw error if any thing went wrong, so later the dev can debug it 
     }
 });
-const sendMessageToReciver = (message, userId, ws) => __awaiter(void 0, void 0, void 0, function* () {
+const sendMessageToReciver = (message, rooms, ws) => __awaiter(void 0, void 0, void 0, function* () {
+    //message to other and help theme recive that message also
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
-        for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName && userId !== (parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.userId)) {
-                console.log(userId + "\n" + (parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.userId));
+        const room = rooms[parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.roomName];
+        for (const client of room) {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(messageContent);
             }
         }
@@ -40,13 +41,13 @@ const sendMessageToReciver = (message, userId, ws) => __awaiter(void 0, void 0, 
         throw new ApiError(500, "Error while receiving message");
     }
 });
-const reciveMEssage = (roomName, userId, ws) => __awaiter(void 0, void 0, void 0, function* () {
+const reciveMEssage = (roomName, rooms, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield rabbitmq.subData(roomName); //subscribe to the queue, the queue name is same as roomName 
         yield rabbitmq.channel.consume(rabbitmq.queue.queue, (message) => {
             //send it to user 
             if (message)
-                sendMessageToReciver(message, userId, ws).catch(console.error);
+                sendMessageToReciver(message, rooms, ws).catch(console.error);
         });
     }
     catch (error) {
@@ -55,12 +56,12 @@ const reciveMEssage = (roomName, userId, ws) => __awaiter(void 0, void 0, void 0
 });
 const closeSocket = (MessageData, ws) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const room = rooms[MessageData.roomName];
-        if (room) {
-            room.delete(ws);
-            if (room.size === 0) {
-                delete rooms[MessageData.roomName];
-            }
+        rooms[MessageData.roomName].delete(ws); //checks the roomName in the collection of the rooms and removes the websocket connection from that room
+        //rooms is a object which has information about how many users are connected to server as any user close's or end the connection with server
+        //it will remove user from object 
+        if (rooms[MessageData.roomName].size === 0) { //if there is no one in the current websocket server of that room or user of a room are not connected to the
+            //websocket, it will delete the room from the rooms(object of room);.
+            delete rooms[MessageData.roomName];
         }
     }
     catch (error) {

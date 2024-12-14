@@ -2,11 +2,10 @@ import { parse } from "url";
 import { ParsedUrlQuery } from "querystring";
 import { Request } from "express";
 import { ConsumeMessage } from "amqplib";
-import { MessageData, CustomWebSocket, clients, rooms } from './chatServer.service.js';
+import { MessageData, CustomWebSocket, clients, Room, rooms } from './chatServer.service.js';
 import { ApiError } from "../../util/apiError.js";
 import rabbitmq from "../rabbitmq/rabbitmq.services.js";
 import { ChatTokenDec } from "./chatToken.services.js";
-import { clinet } from "../twilio/twilioClinet.service.js";
 
 
 
@@ -23,14 +22,16 @@ const sendMessage = async (MessageData: MessageData, ws: CustomWebSocket,) => {/
     }
 }
 
-const sendMessageToReciver = async (message: ConsumeMessage, userId: string, ws: CustomWebSocket): Promise<void> => {
+const sendMessageToReciver = async (message: ConsumeMessage, rooms: Room, ws: CustomWebSocket): Promise<void> => {//this function take's message from user and send
+    //message to other and help theme recive that message also
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
 
-        for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName && userId !== parsedMessage?.userId) {
-                console.log(userId + "\n" + parsedMessage?.userId);
+        const room = rooms[parsedMessage?.roomName];
+
+        for (const client of room) {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(messageContent);
             }
         }
@@ -40,12 +41,12 @@ const sendMessageToReciver = async (message: ConsumeMessage, userId: string, ws:
     }
 };
 
-const reciveMEssage = async (roomName: string, userId: string, ws: CustomWebSocket) => {//recive message function
+const reciveMEssage = async (roomName: string, rooms: Room, ws: CustomWebSocket) => {//recive message function
     try {
         await rabbitmq.subData(roomName);//subscribe to the queue, the queue name is same as roomName 
         await rabbitmq.channel.consume(rabbitmq.queue.queue, (message: ConsumeMessage | null) => {//consume the message from queue and uses a call back where it the message exitst
             //send it to user 
-            if (message) sendMessageToReciver(message, userId, ws).catch(console.error);
+            if (message) sendMessageToReciver(message, rooms, ws).catch(console.error);
 
 
         })
@@ -57,12 +58,12 @@ const reciveMEssage = async (roomName: string, userId: string, ws: CustomWebSock
 
 const closeSocket = async (MessageData: MessageData, ws: CustomWebSocket): Promise<void> => {
     try {
-        const room = rooms[MessageData.roomName];
-        if (room) {
-            room.delete(ws);
-            if (room.size === 0) {
-                delete rooms[MessageData.roomName];
-            }
+        rooms[MessageData.roomName].delete(ws);//checks the roomName in the collection of the rooms and removes the websocket connection from that room
+        //rooms is a object which has information about how many users are connected to server as any user close's or end the connection with server
+        //it will remove user from object 
+        if (rooms[MessageData.roomName].size === 0) {//if there is no one in the current websocket server of that room or user of a room are not connected to the
+            //websocket, it will delete the room from the rooms(object of room);.
+            delete rooms[MessageData.roomName];
         }
     } catch (error) {
         console.error("Error while closing socket:", error);
