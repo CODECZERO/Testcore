@@ -30,7 +30,7 @@ const sendMessageToReciver = async (message: ConsumeMessage, userId: string, ws:
 
         for (const client of clients) {
             if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName && userId !== parsedMessage?.userId) {
-                console.log(userId +"\n"+ parsedMessage?.userId);
+                console.log(userId + "\n" + parsedMessage?.userId);
                 client.send(messageContent);
             }
         }
