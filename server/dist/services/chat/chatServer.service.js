@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { WebSocketServer } from "ws";
 import { sendMessage, reciveMEssage, closeSocket } from "./chatMethodes.services.js";
 import AsyncHandler from "../../util/ayscHandler.js";
-export const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
-const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 9017; //running websocket on same webserver but different port,
+const rooms = {}; //a collection of rooms, to ensure/check how many user with same rooms are connected to websocket
+const port = process.env.WEBSOCKETPORT ? Number(process.env.WEBSOCKETPORT) : 3000; //running websocket on same webserver but different port,
 //i won't recommend that , as websocket it should be run on different server
 //and it's better for scablity of the application 
 const wss = new WebSocketServer({ port }); //creating websocket server on the port 9001 or 3000 or any other port diffene by the user
@@ -36,16 +36,13 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
         ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
             const MessageData = JSON.parse(message); //take data or message in message pattern from user first time as they join
             //beter use onconnection  or connection      
-            if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId && MessageData.roomName)) { //check if the whole messagedata is provided or not 
+            if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId)) { //check if the whole messagedata is provided or not 
                 ws.close(4000, "Message data is not provided"); //if not close the websocket connection
                 return;
             }
-            // When a user connects, check if the room exists. If not, create it.
-            if (!rooms[MessageData.roomName]) {
-                rooms[MessageData.roomName] = new Set();
-            }
-            ws.roomName = MessageData.roomName; // Set the room name to the WebSocket connection
-            rooms[MessageData.roomName].add(ws); // Add the WebSocket to the room's client set
+            if (!rooms[MessageData.roomName])
+                ws.roomName = MessageData.roomName; //if the room is not in rooms collection then add theme to roomCollection 
+            //but , know i think, this conditon is stoping multiple people to connect to same room,check and find it out
             clients.add(ws); //adding websocket to the collection of websocket
             const typeAction = MessageData.typeOfMessage; //check the message data type
             if (!(typeAction === 'SEND_MESSAGE' || typeAction === 'LEAVE_ROOM')) { //if the message type is not in the typeOfMessage then close the websocket and return message
@@ -58,17 +55,11 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
                 ws.close(4000, "message type wasn't define");
                 return;
             }
-            yield reciveMEssage(MessageData.roomName, rooms, ws); //call the function and wait, if user send message the send to the websocket or wait for the message to come or send
+            yield reciveMEssage(MessageData.roomName, ws); //call the function and wait, if user send message the send to the websocket or wait for the message to come or send
         }));
         ws.on('close', () => {
             clients.delete(ws);
-            if (ws.roomName && rooms[ws.roomName]) {
-                rooms[ws.roomName].delete(ws);
-                if (rooms[ws.roomName].size === 0) {
-                    delete rooms[ws.roomName];
-                }
-            }
-            console.log(`Client disconnected. Total clients: ${clients.size}`);
+            console.log(`Client disconnected. Total clients: ${clients.size}`); //tells how many clients are there
         });
     });
 }));
@@ -80,4 +71,4 @@ const closeChatSocket = () => __awaiter(void 0, void 0, void 0, function* () {
         return error;
     }
 });
-export { runWebSocket, clients, closeChatSocket }; //exoprt the function so you can start the server at the beging
+export { runWebSocket, clients, rooms, closeChatSocket }; //exoprt the function so you can start the server at the beging
