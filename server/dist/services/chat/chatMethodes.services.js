@@ -29,7 +29,8 @@ const sendMessageToReciver = (message, userId, ws) => __awaiter(void 0, void 0, 
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
         for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName && !(userId == (parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.userId))) {
+            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName && userId !== (parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.userId)) {
+                console.log(userId + "\n" + (parsedMessage === null || parsedMessage === void 0 ? void 0 : parsedMessage.userId));
                 client.send(messageContent);
             }
         }
