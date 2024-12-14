@@ -29,9 +29,7 @@ const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket
         const parsedMessage = JSON.parse(messageContent);
 
         for (const client of clients) {
-            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName) {
-                console.log(clinet+"\n");
-                console.log(ws);
+            if (client !== ws && client.readyState === WebSocket.OPEN && ws.roomName === parsedMessage.roomName&&ws.userId!==parsedMessage?.userId) {
                 client.send(messageContent);
             }
         }

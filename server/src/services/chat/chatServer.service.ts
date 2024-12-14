@@ -27,7 +27,7 @@ type MessageData = {//Message pattern
 
 interface CustomWebSocket extends WebSocket {//custom interface for websocket so i can put extra value there
   roomName?: string;  // Optional property's
-  sub?: string;
+  userId?: string;
 }
 
 export interface Room {
@@ -73,23 +73,19 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
       const MessageData: MessageData = JSON.parse(message);//take data or message in message pattern from user first time as they join
       //beter use onconnection  or connection      
 
-      if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId&&MessageData.roomName)) {//check if the whole messagedata is provided or not 
+      if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId && MessageData.roomName)) {//check if the whole messagedata is provided or not 
         ws.close(4000, "Message data is not provided");//if not close the websocket connection
         return;
       }
 
       if (!rooms[MessageData.roomName]) {
-        rooms[MessageData.roomName] = new Set();
-      }
-      rooms[MessageData.roomName].add(ws);
-      ws.roomName = MessageData.roomName;
-
-      //if the room is not in rooms collection then add theme to roomCollection 
+        ws.roomName = MessageData.roomName;
+        ws.userId = MessageData.userId;
+      }//if the room is not in rooms collection then add theme to roomCollection 
       //but , know i think, this conditon is stoping multiple people to connect to same room,check and find it out
 
       clients.add(ws);//adding websocket to the collection of websocket
       const typeAction = MessageData.typeOfMessage;//check the message data type
-
       if (!(typeAction === 'SEND_MESSAGE' || typeAction === 'LEAVE_ROOM')) {//if the message type is not in the typeOfMessage then close the websocket and return message
         ws.close(4000, "message type wasn't define");
         return;
@@ -102,7 +98,6 @@ const runWebSocket = AsyncHandler(async () => {//runWebSocket, it will create we
         ws.close(4000, "message type wasn't define");
         return;
       }
-
       await reciveMEssage(MessageData.roomName, ws);//call the function and wait, if user send message the send to the websocket or wait for the message to come or send
     })
 
