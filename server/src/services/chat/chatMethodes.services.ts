@@ -2,7 +2,7 @@ import { parse } from "url";
 import { ParsedUrlQuery } from "querystring";
 import { Request } from "express";
 import { ConsumeMessage } from "amqplib";
-import { MessageData, CustomWebSocket, clients, Room, rooms } from './chatServer.service.js';
+import { MessageData, CustomWebSocket, clients, rooms } from './chatServer.service.js';
 import { ApiError } from "../../util/apiError.js";
 import rabbitmq from "../rabbitmq/rabbitmq.services.js";
 import { ChatTokenDec } from "./chatToken.services.js";
@@ -22,31 +22,29 @@ const sendMessage = async (MessageData: MessageData, ws: CustomWebSocket,) => {/
     }
 }
 
-const sendMessageToReciver = async (message: ConsumeMessage, rooms: Room, ws: CustomWebSocket): Promise<void> => {//this function take's message from user and send
+const sendMessageToReciver = async (message: ConsumeMessage, ws: CustomWebSocket): Promise<void> => {//this function take's message from user and send
     //message to other and help theme recive that message also
     try {
         const messageContent = message.content.toString();
         const parsedMessage = JSON.parse(messageContent);
 
-        const room = rooms[parsedMessage?.roomName];
-
-        for (const client of room) {
+        clients.forEach((client)=>{
             if (client !== ws && client.readyState === WebSocket.OPEN) {
                 client.send(messageContent);
             }
-        }
+        })
     } catch (error) {
         console.error("Error while sending message to receiver:", error);
         throw new ApiError(500, "Error while receiving message");
     }
 };
 
-const reciveMEssage = async (roomName: string, rooms: Room, ws: CustomWebSocket) => {//recive message function
+const reciveMEssage = async (roomName: string, ws: CustomWebSocket) => {//recive message function
     try {
         await rabbitmq.subData(roomName);//subscribe to the queue, the queue name is same as roomName 
         await rabbitmq.channel.consume(rabbitmq.queue.queue, (message: ConsumeMessage | null) => {//consume the message from queue and uses a call back where it the message exitst
             //send it to user 
-            if (message) sendMessageToReciver(message, rooms, ws).catch(console.error);
+            if (message) sendMessageToReciver(message, ws).catch(console.error);
 
 
         })
