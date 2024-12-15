@@ -11,6 +11,7 @@ import Tracker from './loginTracker.controller.js';
 import { ClassModel } from '../models/class.model.nosql.js';
 
 
+
 //all error retunr/out format
 // {
 //     "statusCode": error status code,
@@ -18,6 +19,27 @@ import { ClassModel } from '../models/class.model.nosql.js';
 //     "success": false,
 //     "errors": []
 // } 
+
+interface ProfileImageFile {
+    path: string;
+}
+
+interface Requestany extends Request {
+    user?: any
+}
+
+interface RequestWithImage extends Requestany {
+    customFiles?: {
+        ProfileImage?: ProfileImageFile[];
+    };
+}
+
+type user = {
+    Id: string,
+    email: string,
+
+}
+
 
 const options = {//options for cookies to secure theme
     httpOnly: true,
@@ -33,10 +55,10 @@ const tokenGen = async (user: {
     phoneNumber?: string;
     address?: string;
 }) => {//creating token
-   const[accessToken,refreshToken]=await Promise.all([
-     genAccToken(user),//calling genAccToken function to genrate access token for user
-     genReffToken(user),//calling genReffToken function to genrate refersh token for server
-   ])
+    const [accessToken, refreshToken] = await Promise.all([
+        genAccToken(user),//calling genAccToken function to genrate access token for user
+        genReffToken(user),//calling genReffToken function to genrate refersh token for server
+    ])
     return { accessToken, refreshToken };//returing both of theme
 }
 
@@ -82,7 +104,7 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     if (!(email && password && phoneNumber && address && name && role)) throw new ApiError(400, "All fields are required");
 
 
-    const findUser = await findOp({email,role});//passing req.body value to query function
+    const findUser = await findOp({ email, role });//passing req.body value to query function
     if (findUser) return res.status(409).json(new ApiError(409, "user exists"));
     //if it exist throw error in this formate
     // {
@@ -92,11 +114,11 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     //     "errors": []
     // } 
     const findAndRole = { ...findUser, role };
-    const [tokenResult,hashedPassword]=await Promise.all([
+    const [tokenResult, hashedPassword] = await Promise.all([
         tokenGen(findAndRole),
         bcrypt.hash(password, 10)
     ])
-    const { refreshToken, accessToken } =tokenResult;//genereating token for the user
+    const { refreshToken, accessToken } = tokenResult;//genereating token for the user
     const UserSingupData = { ...req.body, refreshToken };
     const userCreate = await createOp(UserSingupData, hashedPassword);//passing req.body value to query function with hashed password
     const userData = { userCreate, password: "" };//replacing the password with empty string
@@ -111,9 +133,6 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
 })
 
 //
-interface Requestany extends Request {
-    user?: any
-}
 //
 const updatePassword = AsyncHandler(async (req: Requestany, res: Response) => {
     //updates password of user based on the roles
@@ -131,39 +150,39 @@ const updatePassword = AsyncHandler(async (req: Requestany, res: Response) => {
 })
 
 //
-const updateProfileImage = AsyncHandler(async (req: Request, res: Response) => {//update profile image of user based on the role
-    const fileURI = req.file?.path;
-    const { role, refreshToken } = req.body;
-    const findUser = await findOp({
-        email: "",
-        refreshToken,
-        role,
-        name: '',
-        phoneNumber: '',
-        address: '',
-    });//finding user using email
+const updateProfileImage = AsyncHandler(async (req: RequestWithImage, res: Response) => {//update profile image of user based on the role
+    const fileURI = req.customFiles?.ProfileImage?.[0]?.path;
+    const userData: user = req.user || {};
+
     if (!fileURI) return res.status(400).json(new ApiError(400, "please provide images"));
+
     const upload = await uploadFile(fileURI);//upload file on the cloud server
-    if (!(upload && findUser.email)) return res.status(500).json(new ApiError(500, "error while uploading file on server"));
+
+    if (!(upload && userData.email)) return res.status(500).json(new ApiError(500, "error while uploading file on server"));
+
     const user = await User.findOneAndUpdate(//finding user on mongodb if it'exists with that email id then chage photo
-        findUser.email, {
-        $set: {
-            sqlId: findUser?.id,
-            profile: upload,
-        }
-    }
-    )
+        { email: userData.email },
+        {
+            $set: {
+                sqlId: userData?.Id,
+                profile: upload,
+            },
+        },
+        { new: true, projection: { profile: true, _id: false } });
+
     let updateProfile = null;
-    if (!user) {//if user does not exist then create it
+
+    if (!(user)) {//if user does not exist then create it
         updateProfile = await User.create({
-            sqlId: findUser?.Id,
+            sqlId: userData?.Id,
             profile: upload
         })
     }//if there is any issues while updating data on monogodb
     //then return error
-    return res.status(200).json(new ApiResponse(200, updateProfile || user, "user profile image updated successfuly"));//else return success messsage
 
-})
+    return res.status(200).json(new ApiResponse(200, updateProfile || user?.profile, "user profile image updated successfuly"));//else return success messsage
+
+});
 //
 const getCollege = AsyncHandler(async (req: Request, res: Response) => {//findings college for student 
     const findCollegeName = await findCollege();//find college name 
@@ -200,6 +219,25 @@ const createClass = AsyncHandler(async (req: Request, res: Response) => {//creat
     return res.status(200).json(new ApiResponse(200, createClassForuser, "class created successfuly"));//return if successfuly
 })
 
+
+const getProfileImage = AsyncHandler(async (req: Requestany, res: Response) => {
+    const userData: user = req.user;
+
+    if (!(userData.email || userData.Id)) throw new ApiError(401, "unauthorized action");
+
+    const user = await User.findOne(
+        {
+            email: userData.email
+        },
+        {
+            profile: true,
+            _id: false
+        });
+
+    if (!user) throw new ApiError(404, "user profile not found");
+    return res.status(400).json(new ApiResponse(200, user, "found user Profile Image"));
+});
+
 export {
     signup,
     login,
@@ -211,4 +249,5 @@ export {
     options,
     getClass,
     createClass,
+    getProfileImage
 }

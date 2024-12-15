@@ -69,6 +69,7 @@ const runWebSocket = AsyncHandler(async () => {
           }
 
           await action(MessageData, ws);
+          
           await receiveMessage(ws);
         } catch (error) {
           console.error("Error processing message:", error);
