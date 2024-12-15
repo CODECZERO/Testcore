@@ -28,13 +28,6 @@ import { User } from '../models/user.model.nosql.js';
 import AsyncHandler from '../util/ayscHandler.js';
 import Tracker from './loginTracker.controller.js';
 import { ClassModel } from '../models/class.model.nosql.js';
-//all error retunr/out format
-// {
-//     "statusCode": error status code,
-//     "data": "eror message",
-//     "success": false,
-//     "errors": []
-// } 
 const options = {
     httpOnly: true,
     secure: true
@@ -103,6 +96,7 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
     new ApiResponse(201, { userData, accessToken }, "User create successfuly"));
 }));
 //
+//
 const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //updates password of user based on the roles
     const { email, role } = req.user; //taking email,role,passwrod from user
@@ -120,38 +114,30 @@ const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
 }));
 //
 const updateProfileImage = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const fileURI = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
-    const { role, refreshToken } = req.body;
-    const findUser = yield findOp({
-        email: "",
-        refreshToken,
-        role,
-        name: '',
-        phoneNumber: '',
-        address: '',
-    }); //finding user using email
+    var _a, _b, _c;
+    const fileURI = (_c = (_b = (_a = req.customFiles) === null || _a === void 0 ? void 0 : _a.ProfileImage) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.path;
+    const userData = req.user || {};
     if (!fileURI)
         return res.status(400).json(new ApiError(400, "please provide images"));
     const upload = yield uploadFile(fileURI); //upload file on the cloud server
-    if (!(upload && findUser.email))
+    if (!(upload && userData.email))
         return res.status(500).json(new ApiError(500, "error while uploading file on server"));
     const user = yield User.findOneAndUpdate(//finding user on mongodb if it'exists with that email id then chage photo
-    findUser.email, {
+    { email: userData.email }, {
         $set: {
-            sqlId: findUser === null || findUser === void 0 ? void 0 : findUser.id,
+            sqlId: userData === null || userData === void 0 ? void 0 : userData.Id,
             profile: upload,
-        }
-    });
+        },
+    }, { new: true, projection: { profile: true, _id: false } });
     let updateProfile = null;
-    if (!user) { //if user does not exist then create it
+    if (!(user)) { //if user does not exist then create it
         updateProfile = yield User.create({
-            sqlId: findUser === null || findUser === void 0 ? void 0 : findUser.Id,
+            sqlId: userData === null || userData === void 0 ? void 0 : userData.Id,
             profile: upload
         });
     } //if there is any issues while updating data on monogodb
     //then return error
-    return res.status(200).json(new ApiResponse(200, updateProfile || user, "user profile image updated successfuly")); //else return success messsage
+    return res.status(200).json(new ApiResponse(200, updateProfile || (user === null || user === void 0 ? void 0 : user.profile), "user profile image updated successfuly")); //else return success messsage
 }));
 //
 const getCollege = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -188,4 +174,18 @@ const createClass = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0,
         throw new ApiError(406, "unable to create class or class existe");
     return res.status(200).json(new ApiResponse(200, createClassForuser, "class created successfuly")); //return if successfuly
 }));
-export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen, SessionActive, options, getClass, createClass, };
+const getProfileImage = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userData = req.user;
+    if (!(userData.email || userData.Id))
+        throw new ApiError(401, "unauthorized action");
+    const user = yield User.findOne({
+        email: userData.email
+    }, {
+        profile: true,
+        _id: false
+    });
+    if (!user)
+        throw new ApiError(404, "user profile not found");
+    return res.status(400).json(new ApiResponse(200, user, "found user Profile Image"));
+}));
+export { signup, login, updatePassword, updateProfileImage, getCollege, tokenGen, SessionActive, options, getClass, createClass, getProfileImage };
