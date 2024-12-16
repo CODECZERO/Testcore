@@ -1,0 +1,77 @@
+h1{
+    text-align: center;
+    padding: 10px;  
+    
+}
+
+/* Chatbox Container */
+.chat-container {
+    display: flex;
+    flex-direction: column; /* Stack messages and input vertically */
+    justify-content: flex-end; /* Ensure input is at the bottom */
+    padding-left: 290px; /* Space for sidebar */
+    height: 100vh;
+    background-color: #ece3e3;
+}
+
+/* Messages Container */
+.messages-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #afa6a6;
+}
+
+/* Individual Message Styles */
+.message {
+    max-width: 70%; /* Limit message width */
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+/* Sent Messages */
+.sent {
+    background-color: #d1f7d6; /* Light green for sent messages */
+    align-self: flex-end; /* Align to the left */
+}
+
+/* Received Messages */
+.received {
+    background-color: #f1f1f1; /* Light grey for received messages */
+    align-self: flex-start; /* Align to the right */
+}
+
+/* Input and Button Styles */
+.input-container {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background-color: #fff;
+    position: relative;
+    width: 100%;
+}
+
+.input-container input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    margin-right: 10px;
+}
+
+.input-container button {
+    padding: 10px 20px;
+    background-color: #4caf50;
+    border: none;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+}
+
+.input-container button:hover {
+    background-color: #45a049;
+}

@@ -1,0 +1,81 @@
+.chat-rooms {
+    width: 100%; /* Fit the entire sidebar width */
+    height: 100%; /* Take full height of the sidebar */
+    padding: 20px; /* Space around the content */
+    box-sizing: border-box; /* Include padding in width/height calculations */
+    overflow-y: auto; /* Enable vertical scrolling for overflow content */
+}
+
+.chat-rooms h2 {
+    font-size: 20px; /* Slightly smaller font to fit better */
+    font-weight: bold;
+    margin-bottom: 15px; /* Reduce space below the title */
+    color: #333; /* Darker text color for readability */
+}
+
+.chat-rooms div {
+    border: 1px solid #ccc; /* Add a subtle border around each group */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px; /* Padding inside each group */
+    margin-bottom: 10px; /* Space between groups */
+    background-color: #f9f9f9; /* Light background color */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    display: flex;
+    flex-direction: column; /* Align content vertically */
+    justify-content: center;
+    word-wrap: break-word; /* Break long text into multiple lines */
+}
+
+.chat-rooms h3 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #007bff; /* Blue color for group names */
+    margin: 0 0 5px; /* Space below the group name */
+    cursor: pointer; /* Indicate that it's clickable */
+    word-wrap: break-word; /* Allow breaking long text */
+}
+
+.chat-rooms h3:hover {
+    text-decoration: underline; /* Highlight the group name on hover */
+}
+
+.chat-rooms p {
+    font-size: 14px;
+    color: #666; /* Light gray for group ID */
+    margin: 0 0 10px; /* Reduce space below the ID */
+}
+
+.chat-rooms ul {
+    list-style: none; /* Remove bullet points */
+    padding: 0; /* Remove default padding */
+    margin: 0; /* Remove default margin */
+}
+
+.chat-rooms ul li {
+    font-size: 14px;
+    color: #333; /* Slightly darker text for list items */
+    background-color: #fff; /* White background for list items */
+    padding: 5px 10px; /* Padding for content spacing */
+    margin-bottom: 5px; /* Space between list items */
+    border: 1px solid #ddd; /* Subtle border */
+    border-radius: 3px; /* Slightly rounded corners */
+    word-wrap: break-word; /* Prevent content from overflowing */
+}
+
+.chat-rooms ul li:hover {
+    background-color: #f0f8ff; /* Light blue hover effect */
+}
+
+/* Adjust scrolling for overflow */
+.chat-rooms::-webkit-scrollbar {
+    width: 8px; /* Narrow scrollbar width */
+}
+
+.chat-rooms::-webkit-scrollbar-thumb {
+    background-color: #ccc; /* Light gray thumb */
+    border-radius: 4px; /* Rounded scrollbar edges */
+}
+
+.chat-rooms::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb; /* Slightly darker thumb on hover */
+}
