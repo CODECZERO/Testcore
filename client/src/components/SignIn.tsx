@@ -105,7 +105,7 @@ const CreateAccount: React.FC = () => {
             <input
               className="input"
               type="text"
-              name="firstName"
+              name="name"
               placeholder=""
               value={formData.firstName}
               onChange={handleChange}
