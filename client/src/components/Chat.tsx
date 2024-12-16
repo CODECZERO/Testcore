@@ -4,11 +4,14 @@ import CreateChat from "./chatFiles/createChat.tsx";
 import JoinChat from "./chatFiles/joinChat.tsx";
 import Groups from "./chatFiles/group.tsx";
 import { nanoid } from 'nanoid';
+import { useSelector } from "react-redux";
+import { RootState } from "./store.tsx";
 
 
 const generateMessageId = () => nanoid();
 
-const userId = localStorage.getItem('userId') || ' ';
+const tabId = window.name; // Get the current tab's ID
+const userId = localStorage.getItem(`userId_${tabId}`) || '';
 
 
 const Chat: React.FC = () => {
@@ -16,15 +19,32 @@ const Chat: React.FC = () => {
     const [input, setInput] = useState("");
     const { socket } = useWebSocket();
     const roomName = localStorage.getItem("roomName") || "cc/v"; 
-
-    useEffect(() => {
-        if (socket) {
-            socket.onmessage = (event) => {
-                setMessages((prev) => [...prev, event.data]);
-            };
+    const userInfo = useSelector((state: RootState) => state.user.userInfo);
+useEffect(() => {
+  if (socket) {
+    console.log("Socket object:", socket);
+    console.log("Socket ready state:", socket.readyState);
+    socket.onmessage = (event) => {
+      console.log("Message received:", event.data);
+      try {
+        const messageData = JSON.parse(event.data);
+        console.log("Parsed message data:", messageData);
+        if (messageData.userId && messageData.content) {
+          const formattedMessage = messageData.userId === userId
+            ? `You: ${messageData.content}`
+            : `${userInfo?.name}: ${messageData.content}`;
+          setMessages((prev) => [...prev, formattedMessage]);
+          console.log("Updated messages state:", messages);
+        } else {
+          console.warn("Unexpected message structure:", messageData);
         }
-    }, [socket]);
-    
+      } catch (error) {
+        console.error("Error parsing message:", error);
+      }
+    };
+  }
+}, [socket]);
+   
     const sendMessage = (e: React.FormEvent) => {
         e.preventDefault();
         const message = {
