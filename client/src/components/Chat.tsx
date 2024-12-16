@@ -14,11 +14,13 @@ const tabId = window.name; // Get the current tab's ID
 const userId = localStorage.getItem(`userId_${tabId}`) || '';
 
 
+
 const Chat: React.FC = () => {
     const [messages, setMessages] = useState<string[]>([]);
     const [input, setInput] = useState("");
     const { socket } = useWebSocket();
-    const roomName = localStorage.getItem("roomName") || "cc/v"; 
+    const roomName = localStorage.getItem("roomName") || " "; 
+    console.log(roomName);
     const userInfo = useSelector((state: RootState) => state.user.userInfo);
 useEffect(() => {
   if (socket) {
