@@ -39,7 +39,6 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ children }) => {
             return;
         }
 
-
         const message = {
             MessageId: "12345", // Example message ID, you can dynamically generate it if needed
             roomName: roomName,
@@ -47,6 +46,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ children }) => {
             typeOfMessage: "SEND_MESSAGE",
             userId: userId, // Dynamically pass userId from localStorage
         };
+        
 
         // Send the message in JSON format
         socket.send(JSON.stringify(message));
