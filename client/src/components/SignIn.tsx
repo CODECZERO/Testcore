@@ -8,8 +8,7 @@ const Backend_URL = `https://testcore-qmyu.onrender.com`;
 type UserRole = 'Student' | 'College' | 'Examiner';
 
 interface FormData {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   phoneNumber: string;
   age: number;
@@ -22,8 +21,7 @@ interface FormData {
 
 const CreateAccount: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    lastName: '',
+    name: '',
     email: '',
     phoneNumber: '',
     age: 0,
