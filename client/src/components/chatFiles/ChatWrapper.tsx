@@ -31,8 +31,8 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ children }) => {
             console.error("WebSocket is not connected.");
             return;
         }
-
-        const userId = localStorage.getItem("userId"); // Retrieve userId from localStorage
+        const tabId = window.name; // Get the current tab's ID
+        const userId = localStorage.getItem(`userId_${tabId}`) || '';
 
         if (!userId) {
             console.error("User ID not found in localStorage.");
