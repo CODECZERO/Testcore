@@ -128,6 +128,7 @@ const JoinChat: React.FC<JoinChatProps> = ({ onRoomJoin }) => {
 
       localStorage.setItem("roomName", roomName); // Update localStorage
       onRoomJoin(roomName); // Notify parent component immediately
+      console.log("Room Joined in joinchat component :", roomName);
       setFeedback(response.data.message || "Joined room successfully");
     } catch (error: any) {
       setFeedback(error.response?.data?.message || "Error while joining room");
