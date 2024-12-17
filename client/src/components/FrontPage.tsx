@@ -1,7 +1,7 @@
 
 
 import React, { useState, useEffect } from 'react';
-import '../styles/Front.css';  // Import the CSS file for styles
+import './styles/Front.css';  // Import the CSS file for styles
 import { useNavigate } from 'react-router-dom';
 const FrontPage: React.FC = () => {
   const [showButtons, setShowButtons] = useState(false);
