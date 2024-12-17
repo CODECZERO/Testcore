@@ -31,7 +31,7 @@ interface decodedUser {
 const verifyData = AsyncHandler(async (req: RequestWithCookies, res: Response, next: NextFunction) => {
     try {
         const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
-        const token = req.cookies?.accesToken || headertoken?.replace("Bearer ", "")||req.body.token; // Handling cookies and headers
+        const token = req.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
 
         if (!token) {
             throw new ApiError(401, "Unauthorized");
@@ -48,7 +48,6 @@ const verifyData = AsyncHandler(async (req: RequestWithCookies, res: Response, n
         });//finding user using email
 
         if (!findUser) throw new ApiError(400, "Invalid Token");
-        console.log(decoded);
         req.user = decoded; // Assuming `req.user` is where you store the decoded token
 
         next();

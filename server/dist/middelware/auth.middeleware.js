@@ -27,7 +27,7 @@ const verifyData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, vo
     var _a;
     try {
         const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
-        const token = ((_a = req.cookies) === null || _a === void 0 ? void 0 : _a.accesToken) || (headertoken === null || headertoken === void 0 ? void 0 : headertoken.replace("Bearer ", "")) || req.body.token; // Handling cookies and headers
+        const token = ((_a = req.cookies) === null || _a === void 0 ? void 0 : _a.accesToken) || (headertoken === null || headertoken === void 0 ? void 0 : headertoken.replace("Bearer ", "")); // Handling cookies and headers
         if (!token) {
             throw new ApiError(401, "Unauthorized");
         }
@@ -41,7 +41,6 @@ const verifyData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, vo
         }); //finding user using email
         if (!findUser)
             throw new ApiError(400, "Invalid Token");
-        console.log(decoded);
         req.user = decoded; // Assuming `req.user` is where you store the decoded token
         next();
     }
