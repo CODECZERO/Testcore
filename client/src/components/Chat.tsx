@@ -105,24 +105,25 @@ import { useSelector } from "react-redux";
 import { RootState } from "./store.tsx";
 
 const generateMessageId = () => nanoid();
- // Get the current tab's ID
-const userId = localStorage.getItem("userId") || '';
 
-const Chat: React.FC = () => {
-    const [messages, setMessages] = useState<string[]>([]);
-    const [input, setInput] = useState("");
-    const [roomName, setRoomName] = useState(localStorage.getItem("roomName") || "");
-    const { socket } = useWebSocket();
-    const userInfo = useSelector((state: RootState) => state.user.userInfo);
-    
+ 
+ const Chat: React.FC = () => {
+     const [messages, setMessages] = useState<string[]>([]);
+     const [input, setInput] = useState("");
+     const [roomName, setRoomName] = useState(localStorage.getItem("roomName") || "");
+     const { socket } = useWebSocket();
+     const userInfo = useSelector((state: RootState) => state.user.userInfo);
+     
+const tabId = window.name; // Get the current tab's ID
+const userId = localStorage.getItem(`userId_${tabId}`) || '';
+     
   // Update roomName dynamically when a new room is joined
   const handleRoomJoin = (newRoomName: string) => {
     setRoomName(newRoomName);
     console.log("Joined new room:", newRoomName);
   };
-
-  console.log("User ID : ",userId)
-  console.log("Room :",roomName)    
+ 
+  
 
  
 useEffect(() => {
