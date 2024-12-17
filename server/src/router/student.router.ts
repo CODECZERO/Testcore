@@ -8,7 +8,7 @@ const router=Router();
 
 
 router.route("/Exam").post(verifyexamData,getExam).put(verifyexamData,giveExam);
-router.route("/TimeTable").post(getTimeTable);
+router.route("/TimeTable").post(verifyData,getTimeTable);
 router.route("/Result").post(verifyexamData,getResult);
 router.route("/Question").post(verifyexamData,getQuestionPaperForStundet);
 
