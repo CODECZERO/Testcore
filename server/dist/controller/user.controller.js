@@ -48,9 +48,6 @@ const login = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, funct
     if (!findUser)
         throw new ApiError(400, "Invaild User"); //checking if user passwrod is valid or not
     const passwordCheck = yield bcrypt.compare(password, findUser.password);
-    console.log(findUser.password);
-    console.log(password);
-    console.log(passwordCheck);
     if (!passwordCheck)
         throw new ApiError(400, "Invalid password");
     const findAndRole = Object.assign(Object.assign({}, findUser), { role });
