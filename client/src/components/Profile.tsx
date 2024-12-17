@@ -1,4 +1,4 @@
-import '../styles/Profile.css';
+import './styles/Profile.css';
 import { useSelector } from 'react-redux';
 import { RootState } from './store';
 import Pic from '../Assets/Pic.png'

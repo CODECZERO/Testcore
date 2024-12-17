@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import ContentHeader from './ContentHeader';
-import '../styles/content.css';
+import './styles/content.css';
 import Card from './Card';
 import { BiBookAlt, BiMessage, BiStats } from 'react-icons/bi';
+import TimeTablePopup from './StudentFunctions/TimeTable';
+import GetExam from './StudentFunctions/GetExam';
 
 const Content: React.FC = () => {
   // Get the user's role from localStorage or Redux
   const userRole = localStorage.getItem('userRole'); // Assuming user role is stored in localStorage
 
   const [cardsToDisplay, setCardsToDisplay] = useState<JSX.Element[]>([]);
+  const [isTimeTablePopupOpen, setIsTimeTablePopupOpen] = useState(false);
+  const [isGetExamOpen, setIsGetExamOpen] = useState<boolean>(false);
+
+  const openTimeTablePopup = () => setIsTimeTablePopupOpen(true);
+  const closeTimeTablePopup = () => setIsTimeTablePopupOpen(false);
 
   useEffect(() => {
     // Logic to display cards based on user role
@@ -16,10 +23,11 @@ const Content: React.FC = () => {
       case 'Student':
         setCardsToDisplay([
           <Card
-            key="stats"
-            title="Stats"
-            description="View all your stats and progress in one place."
+            key="TimeTable"
+            title="TimeTable"
+            description="View all your TimeTable."
             icon={<BiStats />}
+            onClick={openTimeTablePopup}
           />,
           <Card
             key="messages"
@@ -28,10 +36,11 @@ const Content: React.FC = () => {
             icon={<BiMessage />}
           />,
           <Card
-            key="assignments"
-            title="Assignments"
-            description="Keep track of your assignments and deadlines."
+            key="Get Exams"
+            title="Exams"
+            description="View all your Exams."
             icon={<BiBookAlt />}
+            onClick={() => setIsGetExamOpen(true)}
           />,
         ]);
         break;
@@ -83,6 +92,12 @@ const Content: React.FC = () => {
       <div className="cards-grid">
         {cardsToDisplay}
       </div>
+      <TimeTablePopup
+        isOpen={isTimeTablePopupOpen}
+        onClose={closeTimeTablePopup}
+      />
+      <GetExam  isOpen={isGetExamOpen}
+        onClose={() => setIsGetExamOpen(false)}/>
     </div>
   );
 };
