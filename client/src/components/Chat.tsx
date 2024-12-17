@@ -122,8 +122,7 @@ const userId = localStorage.getItem(`userId_${tabId}`) || '';
     setRoomName(newRoomName);
     console.log("Joined new room:", newRoomName);
   };
-  console.log("User ID : ",userId)
-  console.log("Room :",roomName)    
+ 
   
 
  
