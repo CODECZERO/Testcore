@@ -106,15 +106,15 @@ import { RootState } from "./store.tsx";
 
 const generateMessageId = () => nanoid();
  // Get the current tab's ID
-const userId = localStorage.getItem("userId") || '';
-
-const Chat: React.FC = () => {
-    const [messages, setMessages] = useState<string[]>([]);
-    const [input, setInput] = useState("");
-    const [roomName, setRoomName] = useState(localStorage.getItem("roomName") || "");
-    const { socket } = useWebSocket();
-    const userInfo = useSelector((state: RootState) => state.user.userInfo);
-    
+ 
+ const Chat: React.FC = () => {
+     const [messages, setMessages] = useState<string[]>([]);
+     const [input, setInput] = useState("");
+     const [roomName, setRoomName] = useState(localStorage.getItem("roomName") || "");
+     const { socket } = useWebSocket();
+     const userInfo = useSelector((state: RootState) => state.user.userInfo);
+     
+     const userId = localStorage.getItem("userId") || '';
   // Update roomName dynamically when a new room is joined
   const handleRoomJoin = (newRoomName: string) => {
     setRoomName(newRoomName);
