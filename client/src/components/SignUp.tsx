@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from './store';
 import "../styles/Login.css"
+import { nanoid } from 'nanoid';
 
 type Role = 'Student' | 'College' | 'Examiner';
 
@@ -56,12 +57,20 @@ console.log(response.data);
         const { accessToken } = response.data.data;
         const userId = response.data.data.userData.Id;
 
-        
+         // Create a unique tab ID if it doesn't exist
+         if (!window.name) {
+          window.name = nanoid(); // Generate a unique tab ID
+        }
+        const tabId = window.name;
+
+        // Store userId with a tab-specific key
+        localStorage.setItem(`userId_${tabId}`, userId);
 
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userRole', userData.role); 
-        localStorage.setItem('userId', userId);
+       
  console.log(accessToken);
+ console.log(userId);
         const userdata = {
           name: response.data.data.userData.name,
           email: response.data.data.userData.email,
