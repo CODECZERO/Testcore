@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { login } from './store';
-import "../styles/Login.css"
+import "./styles/Login.css"
 import { nanoid } from 'nanoid';
 
 type Role = 'Student' | 'College' | 'Examiner';

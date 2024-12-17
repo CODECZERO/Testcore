@@ -1,7 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/CreateAccount.css'; // CSS file for styles
+import './styles/CreateAccount.css'; // CSS file for styles
 
 const Backend_URL = `https://testcore-qmyu.onrender.com`;
 
