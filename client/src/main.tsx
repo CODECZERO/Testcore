@@ -91,18 +91,19 @@ import { QueryClientProvider } from 'react-query';
 import { queryClient } from './components/queryClient';
 import './index.css';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import SignIn from './components/SignIn';
-import Dashboard from './components/Dashboard.tsx';
-import FrontPage from './components/FrontPage.tsx';
-import Login from './components/SignUp.tsx';
+import SignIn from './components/LoginSign/SignIn.tsx';
+import Dashboard from './components/DashBoard/Dashboard.tsx';
+import FrontPage from './components/LoginSign/FrontPage.tsx';
+import Login from './components/LoginSign/SignUp.tsx';
 import Help from './components/Help.tsx';
 import SessionCheck from './components/SessionCheck.tsx';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css'
-import Chat from './components/Chat.tsx';
+import Chat from './components/chatFiles/Chat.tsx';
 import { ChatWrapper } from "./components/chatFiles/ChatWrapper.tsx";
 
 import RestoreUser from './components/RestoreUser.tsx';
+import { RoomProvider } from './components/chatFiles/RoomContext.tsx';
 
 
 const darkTheme = createTheme({
@@ -157,10 +158,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={darkTheme}>
+        <RoomProvider> 
             <ChatWrapper>
         <RouterProvider router={router} />
-            <RestoreUser /> {/* RestoreUser component now inside the router context */}
+            <RestoreUser /> 
           </ChatWrapper>
+          </RoomProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </Provider>

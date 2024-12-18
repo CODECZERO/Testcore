@@ -1,7 +1,7 @@
 import Content from "./Content";
 import Profile from "./Profile";
 import SideBar from "./SideBar";
-import  '../App.css'
+import '../../App.css';
 
 
 
