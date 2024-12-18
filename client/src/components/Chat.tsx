@@ -9,70 +9,91 @@ import { RootState } from "./store.tsx";
 
 const generateMessageId = () => nanoid();
 
- 
- const Chat: React.FC = () => {
-     const [messages, setMessages] = useState<string[]>([]);
-     const [input, setInput] = useState("");
-     const [roomName, setRoomName] = useState(localStorage.getItem("roomName") || "");
-     const { socket } = useWebSocket();
-     const userInfo = useSelector((state: RootState) => state.user.userInfo);
-     
-const tabId = window.name; // Get the current tab's ID
-const userId = localStorage.getItem(`userId_${tabId}`) || '';
-     
+const Chat: React.FC = () => {
+  const [messages, setMessages] = useState<string[]>(() => {
+    const savedMessages = sessionStorage.getItem("messages");
+    return savedMessages ? JSON.parse(savedMessages) : [];
+  });
+  const [input, setInput] = useState("");
+  const [roomName, setRoomName] = useState(
+    localStorage.getItem("roomName") || ""
+  );
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const { socket } = useWebSocket();
+  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+
+  const tabId = window.name; // Get the current tab's ID
+  const userId = localStorage.getItem(`userId_${tabId}`) || "";
+
   // Update roomName dynamically when a new room is joined
   const handleRoomJoin = (newRoomName: string) => {
     setRoomName(newRoomName);
     console.log("Joined new room:", newRoomName);
   };
- 
-  
 
- 
-useEffect(() => {
-  if (socket) {
-    console.log("Socket object:", socket);
-    console.log("Socket ready state:", socket.readyState);
-    socket.onmessage = (event) => {
-      console.log("Message received:", event.data);
+  // Handle Notification Permission Request
+  const requestNotificationPermission = async () => {
+    if (Notification.permission === "default") {
       try {
-        const messageData = JSON.parse(event.data);
-        console.log("Parsed message data:", messageData);
-        if (messageData.userId && messageData.content) {
-          const formattedMessage = messageData.userId === userId
-            ? `You: ${messageData.content}`
-            : `${userInfo?.name}: ${messageData.content}`;
-          setMessages((prev) => [...prev, formattedMessage]);
-          console.log("Updated messages state:", messages);
+        const permission = await Notification.requestPermission();
+        if (permission === "granted") {
+          console.log("Notification permission granted.");
+          setNotificationsEnabled(true);
         } else {
-          console.warn("Unexpected message structure:", messageData);
+          console.warn("Notification permission denied.");
         }
-      } catch (error) {
-        console.error("Error parsing message:", error);
+      } catch (err) {
+        console.error("Error requesting notification permission:", err);
       }
-    };
-  }
-}, [socket]);
+    } else if (Notification.permission === "granted") {
+      setNotificationsEnabled(true);
+    } else {
+      console.warn("Notifications are denied.");
+    }
+  };
 
-const sendMessage = (e: React.FormEvent) => {
-            e.preventDefault();
-            const message = {
-                MessageId: generateMessageId(), // Example message ID, you can dynamically generate it if needed
-                roomName:roomName,
-                content: input,
-                typeOfMessage: "SEND_MESSAGE",
-                userId: userId, // Dynamically pass userId from localStorage
-              };
-             
-            console.log(socket);
-            if (socket && input.trim()) {
-                console.log("entered")
-                socket.send(JSON.stringify(message));
-                setMessages((prev) => [...prev, `You: ${input}`]);
-                setInput("");
+  useEffect(() => {
+    if (socket) {
+      socket.onmessage = (event) => {
+        try {
+          const messageData = JSON.parse(event.data);
+          if (messageData.userId && messageData.content) {
+            const formattedMessage =
+              messageData.userId === userId
+                ? `You: ${messageData.content}`
+                : `${userInfo?.name}: ${messageData.content}`;
+            setMessages((prev) => [...prev, formattedMessage]);
+
+            // Show a notification if enabled
+            if (Notification.permission === "granted") {
+              new Notification("New Message", {
+                body: messageData.content,
+              });
             }
-        };
-    
+          }
+        } catch (error) {
+          console.error("Error parsing message:", error);
+        }
+      };
+    }
+  }, [socket, userId, userInfo]);
+
+  const sendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    const message = {
+      MessageId: generateMessageId(),
+      roomName: roomName,
+      content: input,
+      typeOfMessage: "SEND_MESSAGE",
+      userId: userId,
+    };
+
+    if (socket && input.trim()) {
+      socket.send(JSON.stringify(message));
+      setMessages((prev) => [...prev, `You: ${input}`]);
+      setInput("");
+    }
+  };
 
   return (
     <>
@@ -80,6 +101,10 @@ const sendMessage = (e: React.FormEvent) => {
       <JoinChat onRoomJoin={handleRoomJoin} />
       <Groups />
       <div>
+        <button onClick={requestNotificationPermission}>
+          Enable Notifications
+        </button>
+        {notificationsEnabled && <p>Notifications are enabled!</p>}
         <div>
           {messages.map((msg, index) => (
             <div key={index}>{msg}</div>
