@@ -79,10 +79,10 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
     //     "errors": []
     // } 
     const findAndRole = Object.assign(Object.assign({}, findUser), { role });
-    const [tokenResult, hashedPassword] = yield Promise.all([
-        tokenGen(findAndRole),
-        bcrypt.hash(password, 10)
-    ]);
+    const tokenResult = yield tokenGen(findAndRole);
+    const hashedPassword = yield bcrypt.hash(password, 10);
+    if (!(tokenResult && hashedPassword))
+        throw new ApiError(400, "something went wrong while hashing password");
     const { refreshToken, accessToken } = tokenResult; //genereating token for the user
     const UserSingupData = Object.assign(Object.assign({}, req.body), { refreshToken });
     const userCreate = yield createOp(UserSingupData, hashedPassword); //passing req.body value to query function with hashed password
