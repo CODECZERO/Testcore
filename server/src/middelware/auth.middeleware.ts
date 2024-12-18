@@ -31,7 +31,7 @@ interface decodedUser {
 const verifyData = AsyncHandler(async (req: RequestWithCookies, res: Response, next: NextFunction) => {
     try {
         const headertoken = req.get("Authorization"); // Correctly getting the Authorization header
-        const token = req.cookies?.accesToken || headertoken?.replace("Bearer ", "")||req.body.token; // Handling cookies and headers
+        const token = req.cookies?.accesToken || headertoken?.replace("Bearer ", ""); // Handling cookies and headers
 
         if (!token) {
             throw new ApiError(401, "Unauthorized");

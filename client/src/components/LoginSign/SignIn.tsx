@@ -8,7 +8,10 @@ const Backend_URL = `https://testcore-qmyu.onrender.com`;
 type UserRole = 'Student' | 'College' | 'Examiner';
 
 interface FormData {
+
   firstName: string;
+
+  name: string;
   email: string;
   phoneNumber: string;
   age: number;
@@ -21,7 +24,10 @@ interface FormData {
 
 const CreateAccount: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
+
     firstName: '',
+
+    name: '',
     email: '',
     phoneNumber: '',
     age: 0,
@@ -90,165 +96,160 @@ const CreateAccount: React.FC = () => {
   };
 
   return (
-       <div className='container'>
-    <div className="create-account-container">
-      <form className="form" onSubmit={handleSubmit}>
-        <p className="title">Register</p>
-        <p className="message">Signup now and get full access to our app.</p>
+    <>
+    <div className='container'>
+      <div className="create-account-container">
+        <form className="form" onSubmit={handleSubmit}>
+          <p className="title">Register</p>
+          <p className="message">Signup now and get full access to our app.</p>
 
-        {error && <p className="error-message">{error}</p>}
-        {success && <p className="success-message">{success}</p>}
+          {error && <p className="error-message">{error}</p>}
+          {success && <p className="success-message">{success}</p>}
 
-        <div className="flex">
+          <div className="flex">
+            <label>
+              <span>First Name</span>
+              <input
+                className="input"
+                type="text"
+                name="name"
+                placeholder=""
+                value={formData.firstName}
+                onChange={handleChange}
+                required />
+            </label>
+
+          </div>
+
           <label>
-            <span>First Name</span>
+            <span>Email</span>
+            <input
+              className="input"
+              type="email"
+              name="email"
+              placeholder=""
+              value={formData.email}
+              onChange={handleChange}
+              required />
+          </label>
+
+          <label>
+            <span>Phone Number</span>
+            <input
+              className="input"
+              type="tel"
+              name="phoneNumber"
+              placeholder=""
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              required />
+          </label>
+
+          <label>
+            <span>Age</span>
+            <input
+              className="input"
+              type="number"
+              name="age"
+              placeholder=""
+              value={formData.age}
+              onChange={handleChange}
+              required />
+          </label>
+
+          <label>
+            <span>Address</span>
             <input
               className="input"
               type="text"
-              name="firstName"
+              name="address"
               placeholder=""
-              value={formData.firstName}
+              value={formData.address}
               onChange={handleChange}
-              required
-            />
+              required />
           </label>
 
-        </div>
-
-        <label>
-          <span>Email</span>
-          <input
-            className="input"
-            type="email"
-            name="email"
-            placeholder=""
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
-        <label>
-          <span>Phone Number</span>
-          <input
-            className="input"
-            type="tel"
-            name="phoneNumber"
-            placeholder=""
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
-        <label>
-          <span>Age</span>
-          <input
-            className="input"
-            type="number"
-            name="age"
-            placeholder=""
-            value={formData.age}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
-        <label>
-          <span>Address</span>
-          <input
-            className="input"
-            type="text"
-            name="address"
-            placeholder=""
-            value={formData.address}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
-        <div className="form-group">
-          <span>Role</span>
-          <select
-            id="role"
-            name="role"
-            value={formData.role}
-            onChange={handleRoleChange}
-            required
-            className="select"
-          >
-            <option value="" disabled hidden>
-              Choose your role
-            </option>
-            <option value="Student">Student</option>
-            <option value="College">College</option>
-            <option value="Examiner">Examiner</option>
-          </select>
-        </div>
-
-        {formData.role === 'Student' && (
           <div className="form-group">
-            <label htmlFor="collegeID" style={{color:"#fff"}}>College Name</label>
+            <span>Role</span>
             <select
-              id="collegeID"
-              name="collegeID"
-              value={formData.collegeID}
-              onClick={getCollege}
-              onChange={getCollegeID}
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleRoleChange}
               required
+              className="select"
             >
-              <option value="" disabled>
-                Select your college
+              <option value="" disabled hidden>
+                Choose your role
               </option>
-              {collegeID.map((college, index) => (
-                <option key={index} value={college.Id}>
-                  {college.name}
-                </option>
-              ))}
+              <option value="Student">Student</option>
+              <option value="College">College</option>
+              <option value="Examiner">Examiner</option>
             </select>
           </div>
-        )}
 
-        <label>
-          <span>Password</span>
-          <input
-            className="input"
-            type="password"
-            name="password"
-            placeholder=""
-            value={formData.password}
-            onChange={handleChange}
-            required
-          />
-        </label>
+          {formData.role === 'Student' && (
+            <div className="form-group">
+              <label htmlFor="collegeID" style={{ color: "#fff" }}>College Name</label>
+              <select
+                id="collegeID"
+                name="collegeID"
+                value={formData.collegeID}
+                onClick={getCollege}
+                onChange={getCollegeID}
+                required
+              >
+                <option value="" disabled>
+                  Select your college
+                </option>
+                {collegeID.map((college, index) => (
+                  <option key={index} value={college.Id}>
+                    {college.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-        <label>
-          <span>Confirm Password</span>
-          <input
-            className="input"
-            type="password"
-            name="confirmPassword"
-            placeholder=""
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-        </label>
+          <label>
+            <span>Password</span>
+            <input
+              className="input"
+              type="password"
+              name="password"
+              placeholder=""
+              value={formData.password}
+              onChange={handleChange}
+              required />
+          </label>
 
-        <button type="submit" className="submit">
-          Submit
-        </button>
+          <label>
+            <span>Confirm Password</span>
+            <input
+              className="input"
+              type="password"
+              name="confirmPassword"
+              placeholder=""
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required />
+          </label>
 
-        <p className="signin">
-          Already have an account? {" "} <a href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            navigate("/sign-up")
-          }}>Sign in</a>
-        </p>
-      </form>
+          <button type="submit" className="submit">
+            Submit
+          </button>
+
+          <p className="signin">
+            Already have an account? {" "} <a href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("/sign-up");
+              } }>Sign in</a>
+          </p>
+        </form>
+      </div>
     </div>
-    </div>
+    </>
   );
 };
 
