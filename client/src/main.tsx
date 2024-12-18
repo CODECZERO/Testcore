@@ -101,11 +101,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css'
 import Chat from './components/Chat.tsx';
 import { ChatWrapper } from "./components/chatFiles/ChatWrapper.tsx";
-import Modal from 'react-modal'; // Import Modal
-import TimeTablePopup from './components/StudentFunctions/TimeTable.tsx';
 
-// Ensure Modal is accessible by linking to the root element
-Modal.setAppElement('#root');
+import RestoreUser from './components/RestoreUser.tsx';
+
 
 const darkTheme = createTheme({
   palette: {
@@ -159,9 +157,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider theme={darkTheme}>
-          {/* RouterProvider now includes the router */}
-          <ChatWrapper>
-            <RouterProvider router={router} />
+            <ChatWrapper>
+        <RouterProvider router={router} />
+            <RestoreUser /> {/* RestoreUser component now inside the router context */}
           </ChatWrapper>
         </ThemeProvider>
       </QueryClientProvider>

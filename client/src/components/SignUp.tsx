@@ -56,18 +56,31 @@ console.log(response.data);
         // Extract and store the token and user ID
         const { accessToken } = response.data.data;
         const userId = response.data.data.userData.Id;
+        const userName = response.data.data.userData.name;
+        const useremail = response.data.data.userData.email;
+        const usernumber= response.data.data.userData.phoneNumber;
+        const useraddress = response.data.data.userData.address;
 
          // Create a unique tab ID if it doesn't exist
          if (!window.name) {
           window.name = nanoid(); // Generate a unique tab ID
         }
         const tabId = window.name;
-
         // Store userId with a tab-specific key
         localStorage.setItem(`userId_${tabId}`, userId);
-
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('userRole', userData.role); 
+        localStorage.setItem('userName', userName);
+        localStorage.setItem('userEmail', useremail);
+        localStorage.setItem('userPhone', usernumber);
+        localStorage.setItem('userAddress', useraddress);
+
+        console.log("userRole", userData.role);
+        console.log("userName", userName);
+        console.log("useremail", useremail);
+        console.log("usernumber", usernumber);
+        console.log("useraddress",useraddress);
+        
        
  console.log(accessToken);
  console.log(userId);
@@ -76,6 +89,9 @@ console.log(response.data);
           email: response.data.data.userData.email,
           image:
             'https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3407.jpg',
+            role: userData.role,
+          phone:response.data.data.userData.phoneNumber,
+           address: response.data.data.userData.address,
         };
 
         dispatch(login(userdata));
