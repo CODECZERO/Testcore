@@ -2,8 +2,8 @@ import React, { useState, FormEvent } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { login } from './store';
-import "./styles/Login.css"
+import { login } from '../store';
+import "../styles/Login.css"
 import { nanoid } from 'nanoid';
 
 type Role = 'Student' | 'College' | 'Examiner';
@@ -75,11 +75,7 @@ console.log(response.data);
         localStorage.setItem('userPhone', usernumber);
         localStorage.setItem('userAddress', useraddress);
 
-        console.log("userRole", userData.role);
-        console.log("userName", userName);
-        console.log("useremail", useremail);
-        console.log("usernumber", usernumber);
-        console.log("useraddress",useraddress);
+       
         
        
  console.log(accessToken);
