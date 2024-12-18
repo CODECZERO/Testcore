@@ -95,7 +95,7 @@ import SignIn from './components/LoginSign/SignIn.tsx';
 import Dashboard from './components/DashBoard/Dashboard.tsx';
 import FrontPage from './components/LoginSign/FrontPage.tsx';
 import Login from './components/LoginSign/SignUp.tsx';
-import Help from './components/Help.tsx';
+import Help from './components/DashBoard/Help.tsx';
 import SessionCheck from './components/SessionCheck.tsx';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css'
