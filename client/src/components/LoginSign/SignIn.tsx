@@ -1,7 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './styles/CreateAccount.css'; // CSS file for styles
+import '../styles/CreateAccount.css'; // CSS file for styles
 
 const Backend_URL = `https://testcore-qmyu.onrender.com`;
 
@@ -9,7 +9,6 @@ type UserRole = 'Student' | 'College' | 'Examiner';
 
 interface FormData {
   firstName: string;
-  lastName: string;
   email: string;
   phoneNumber: string;
   age: number;
@@ -23,7 +22,6 @@ interface FormData {
 const CreateAccount: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
-    lastName: '',
     email: '',
     phoneNumber: '',
     age: 0,
