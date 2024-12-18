@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ContentHeader from './ContentHeader';
-import './styles/content.css';
-import Card from './Card';
+import '../styles/content.css';
+import Card from '../Card';
 import { BiBookAlt, BiMessage, BiStats } from 'react-icons/bi';
-import TimeTablePopup from './StudentFunctions/TimeTable';
-import GetExam from './StudentFunctions/GetExam';
+import TimeTablePopup from '../StudentFunctions/TimeTable';
+import GetExam from '../StudentFunctions/GetExam';
 
 const Content: React.FC = () => {
   // Get the user's role from localStorage or Redux

@@ -1,4 +1,4 @@
-import { RootState } from './store';
+import { RootState } from '../store';
 import {  useSelector } from 'react-redux';
 import { BiSearch } from 'react-icons/bi'
 

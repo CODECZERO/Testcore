@@ -1,24 +1,131 @@
-/* Sidebar Styles */
-.sidebar {
-    width: 250px; /* Fixed width for the sidebar */
-    height: 100vh; /* Full height of the viewport */
-    position: fixed; /* Sticks it to the side */
-    left: 0;
-    top: 0;
-    background-color: #f4f4f4; /* Light background color */
-    border-right: 1px solid #ccc; /* Optional border for separation */
-    padding: 20px; /* Padding for inner content */
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Optional shadow for a subtle effect */
-    overflow-y: auto; /* Scrollable if content exceeds height */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Sidebar content */
-.sidebar div {
-    flex-grow: 1;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+}
+
+/* Sidebar container */
+.sidebar {
+    width: 280px;
+    height: 100vh;
+    background-color: #ffffff;
+    border-right: 1px solid #ddd;
     display: flex;
     flex-direction: column;
-    gap: 10px; /* Spacing between messages */
+    padding: 15px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Sidebar header */
+.sidebar-header {
+    font-size: 18px;
+    font-weight: bold;
+    color: #075e54;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Sidebar sections */
+.sidebar-section {
+    margin-bottom: 20px;
+}
+
+.sidebar-section h3 {
+    font-size: 16px;
+    color: #128c7e;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.sidebar-section button {
+    width: 100%;
+    padding: 10px;
+    background-color: #128c7e;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-section button:hover {
+    background-color: #075e54;
+}
+
+.sidebar-section button:disabled {
+    background-color: #c4c4c4;
+    cursor: not-allowed;
+}
+
+/* CreateChat section specific styles */
+.create-chat-btn {
+    background-color: #25d366; /* WhatsApp green */
+}
+
+.create-chat-btn:hover {
+    background-color: #128c7e;
+}
+
+/* JoinChat section specific styles */
+.join-chat-btn {
+    background-color: #34b7f1; /* WhatsApp blue */
+}
+
+.join-chat-btn:hover {
+    background-color: #007bb5;
+}
+
+/* Groups section styles */
+.groups-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.groups-list li {
+    padding: 10px;
+    background-color: #f1f1f1;
+    margin-bottom: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.groups-list li:hover {
+    background-color: #d3e7e0;
+}
+
+/* Scrollable area for the groups list */
+.groups-list-container {
+    max-height: 250px;
+    overflow-y: auto;
+    margin-top: 10px;
+}
+
+/* For responsiveness on smaller screens */
+@media screen and (max-width: 600px) {
+    .sidebar {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .sidebar-header {
+        font-size: 16px;
+    }
+
+    .sidebar-section h3 {
+        font-size: 14px;
+    }
+
+    .sidebar-section button {
+        font-size: 12px;
+    }
 }

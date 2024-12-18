@@ -1,7 +1,7 @@
 import React, { useEffect,useState } from 'react'
 import axios from 'axios'
-import Login from './SignUp';
-import Dashboard from './Dashboard';
+import Login from './LoginSign/SignUp';
+import Dashboard from './DashBoard/Dashboard';
 
 const SessionCheck:React.FC=()=>{
     const [loginData,setLoginData]=useState<any>(false);

@@ -1,7 +1,7 @@
-import './styles/Profile.css';
+import '../styles/Profile.css';
 import { useSelector } from 'react-redux';
-import { RootState } from './store';
-import Pic from '../Assets/Pic.png'
+import { RootState } from '../store';
+import Pic from '../../Assets/Pic.png'
 
 const Profile = () => {
   const userInfo = useSelector((state: RootState) => state.user.userInfo);
