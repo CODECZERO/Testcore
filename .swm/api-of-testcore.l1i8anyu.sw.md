@@ -801,13 +801,13 @@ This endpoint allows students to retrieve the question paper for a specific exam
 
 &nbsp;
 
-Endpoint: `/api/v1/examiner/scheduleExam`
+### **Endpoint:** `/api/v1/examiner/scheduleExam`
 
-\*\*Method:\*\* POST&nbsp;&nbsp;
+Method:POST&nbsp;&nbsp;
 
-\*\*Description:\*\* Allows an examiner to schedule an exam for students.&nbsp;
+Description: Allows an examiner to schedule an exam for students.&nbsp;
 
-\#### Workflow:
+Workflow:
 
 1\. Takes exam data (\`subjectCode\`, `subjectName`, `examName`, `date`, `examStart`, `examEnd`, `examDuration`) from the request body.
 
@@ -825,25 +825,25 @@ Endpoint: `/api/v1/examiner/scheduleExam`
 
 8\. Returns a success response with the `exam` details and `tokenID`.
 
-\#### Output:
+Output:
 
-\- \*\*Success:\*\*
+\- Success:
 
 &nbsp;&nbsp;- HTTP Status: 201
 
 &nbsp;&nbsp;- Body: `{ exam: { Id: <Exam ID> }, tokenID: <Generated Token> }`
 
-\- \*\*Failure:\*\* Appropriate error messages with relevant HTTP status codes.
+\- Failure: Appropriate error messages with relevant HTTP status codes.
 
-\---
+&nbsp;
 
-\### \*\*Endpoint: `/api/v1/examiner/questionPaper`\*\*
+### **Endpoint:** `/api/v1/examiner/questionPaper`
 
-\#### \*\*1. Method: GET\*\*
+1\. Method: GET
 
-\*\*Description:\*\* Retrieves all question papers associated with a specific exam for the examiner.
+Description: Retrieves all question papers associated with a specific exam for the examiner.
 
-\#### Workflow:
+Workflow:
 
 1\. Takes `examID` from the request.
 
@@ -851,21 +851,21 @@ Endpoint: `/api/v1/examiner/scheduleExam`
 
 3\. Returns the question papers.
 
-\#### Output:
+&nbsp;Output:
 
-\- \*\*Success:\*\*
+\- Success:
 
 &nbsp;&nbsp;- HTTP Status: 200
 
 &nbsp;&nbsp;- Body: `{ data: <Array of Question Papers> }`
 
-\- \*\*Failure:\*\* Appropriate error messages with relevant HTTP status codes.
+\- Failure: Appropriate error messages with relevant HTTP status codes.
 
-\#### \*\*2. Method: POST\*\*
+2\. Method: POST
 
-\*\*Description:\*\* Creates a question paper for an exam.
+Description: Creates a question paper for an exam.
 
-\#### Workflow:
+Workflow:
 
 1\. Takes `QuestionPaperData` and `examData` from the request.
 
@@ -873,21 +873,21 @@ Endpoint: `/api/v1/examiner/scheduleExam`
 
 3\. Returns the created question paper.
 
-\#### Output:
+&nbsp;Output:
 
-\- \*\*Success:\*\*
+\- Success:
 
 &nbsp;&nbsp;- HTTP Status: 201
 
 &nbsp;&nbsp;- Body: `{ data: <Created Question Paper> }`
 
-\- \*\*Failure:\*\* Appropriate error messages with relevant HTTP status codes.
+\- Failure: Appropriate error messages with relevant HTTP status codes.
 
-\#### \*\*3. Method: PUT\*\*
+3\. Method: PUT
 
-\*\*Description:\*\* Updates an existing question paper for an exam.
+Description: Updates an existing question paper for an exam.
 
-\#### Workflow:
+&nbsp;Workflow:
 
 1\. Takes `examID` and `QuestionPaperData` from the request.
 
@@ -895,25 +895,25 @@ Endpoint: `/api/v1/examiner/scheduleExam`
 
 3\. Returns the updated question paper.
 
-\#### Output:
+&nbsp;Output:
 
-\- \*\*Success:\*\*
+\- Success:
 
 &nbsp;&nbsp;- HTTP Status: 200
 
 &nbsp;&nbsp;- Body: `{ data: <Updated Question Paper> }`
 
-\- \*\*Failure:\*\* Appropriate error messages with relevant HTTP status codes.
+\- Failure: Appropriate error messages with relevant HTTP status codes.
 
-\---
+### \---
 
-\### \*\*Endpoint: `/api/v1/examiner/afterExam`\*\*
+### **Endpoint:** `/api/v1/examiner/afterExam`
 
-\#### \*\*1. Method: GET\*\*
+1\. Method: GET
 
-\*\*Description:\*\* Retrieves the total count of students who participated in an exam.
+Description: Retrieves the total count of students who participated in an exam.
 
-\#### Workflow:
+Workflow:
 
 1\. Takes `examID` from the request.
 
@@ -921,21 +921,21 @@ Endpoint: `/api/v1/examiner/scheduleExam`
 
 3\. Returns the count.
 
-\#### Output:
+&nbsp;Output:
 
-\- \*\*Success:\*\*
+\- Success:
 
 &nbsp;&nbsp;- HTTP Status: 200
 
 &nbsp;&nbsp;- Body: `{ count: <Number of Participants> }`
 
-\- \*\*Failure:\*\* Appropriate error messages with relevant HTTP status codes.
+\- Failure: Appropriate error messages with relevant HTTP status codes.
 
-\#### \*\*2. Method: PUT\*\*
+2\. Method: PUT
 
-\*\*Description:\*\* Updates marks for students who participated in an exam.
+Description: Updates marks for students who participated in an exam.
 
-\#### Workflow:
+&nbsp;Workflow:
 
 1\. Takes `QuestionPaperId` and marks-related data from the request.
 
@@ -943,25 +943,25 @@ Endpoint: `/api/v1/examiner/scheduleExam`
 
 3\. Returns the updated result data.
 
-\#### Output:
+&nbsp;Output:
 
-\- \*\*Success:\*\*
+\-Success:
 
 &nbsp;&nbsp;- HTTP Status: 200
 
 &nbsp;&nbsp;- Body: `{ data: <Updated Results> }`
 
-\- \*\*Failure:\*\* Appropriate error messages with relevant HTTP status codes.
+\- Failure: Appropriate error messages with relevant HTTP status codes.
 
 \---
 
-\### \*\*Endpoint: `/api/v1/examiner/exam`\*\*
+### **Endpoint:** `/api/v1/examiner/exam`
 
-\*\*Method:\*\* GET&nbsp;&nbsp;
+Method: GET&nbsp;&nbsp;
 
-\*\*Description:\*\* Retrieves all exams created by an examiner.
+Description: Retrieves all exams created by an examiner.
 
-\#### Workflow:
+&nbsp;Workflow:
 
 1\. Takes `examinerID` from the request.
 
@@ -971,23 +971,23 @@ Endpoint: `/api/v1/examiner/scheduleExam`
 
 \#### Output:
 
-\- \*\*Success:\*\*
+\- Success:
 
 &nbsp;&nbsp;- HTTP Status: 200
 
 &nbsp;&nbsp;- Body: `{ examdata: <Array of Exams with Details> }`
 
-\- \*\*Failure:\*\* Appropriate error messages with relevant HTTP status codes.
+\- Failure: Appropriate error messages with relevant HTTP status codes.
 
 \---
 
-\### \*\*Endpoint: `/api/v1/examiner/timeTable`\*\*
+### **Endpoint:** `/api/v1/examiner/timeTable`
 
-\*\*Method:\*\* POST&nbsp;&nbsp;
+Method: POST&nbsp;&nbsp;
 
-\*\*Description:\*\* Allows an examiner to create a timetable.
+Description: Allows an examiner to create a timetable.
 
-\#### Workflow:
+Workflow:
 
 1\. Takes `Class`, `Subjects` (nested object), and `CollegeName` from the request.
 
@@ -995,19 +995,19 @@ Endpoint: `/api/v1/examiner/scheduleExam`
 
 3\. Returns the created timetable data.
 
-\#### Output:
+&nbsp;Output:
 
-\- \*\*Success:\*\*
+\- Success:
 
 &nbsp;&nbsp;- HTTP Status: 201
 
 &nbsp;&nbsp;- Body: `{ data: <Created Timetable> }`
 
-\- \*\*Failure:\*\* Appropriate error messages with relevant HTTP status codes.
+\- Failure: Appropriate error messages with relevant HTTP status codes.
 
 \---
 
-\## Notes:
+Notes:
 
 \- All endpoints handle errors using the `ApiError` class.
 
