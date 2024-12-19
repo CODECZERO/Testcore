@@ -23,14 +23,6 @@ const scheuldeExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
         throw new ApiError(401, "user is not login"); //check if data is provided or not 
     else if (!createExamdata)
         throw new ApiError(401, "exam data is not provide");
-    const findUser = yield prisma.examiner.findUnique({
-        where: {
-            Id,
-            email
-        }
-    });
-    if (!(findUser))
-        throw new ApiError(401, "user is not allowed to scheulde exam"); //check if user is there or not then throw error
     const getsubject = yield getSubject(createExamdata.subjectCode, createExamdata.subjectName); //then passes to it the getSubject fuction to get function
     if (!getsubject)
         throw new ApiError(404, "subject not found"); //if not then throw error
@@ -43,7 +35,7 @@ const scheuldeExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
             examStart: createExamdata.examStart,
             examEnd: createExamdata.examEnd,
             examDuration: createExamdata.examDuration,
-            examinerID: createExamdata.examinerID
+            examinerID: Id
         },
         select: {
             Id: true,
@@ -87,16 +79,12 @@ const getQuestionPaperForExaminers = AsyncHandler((req, res) => __awaiter(void 0
     return res.status(200).json(new ApiResponse(200, examPaper)); //return data
 }));
 const updateQuestionPaperMarks = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const examdata = req.examData;
     const examdataupdata = req.body; //takes data
     if (!examdataupdata)
         throw new ApiError(400, "examId and marks are not provied");
-    const findQuestionpaper = yield getQuestionPaperForExaminer(examdata.examID); //uses another query function
-    if (!findQuestionpaper)
-        throw new ApiError(406, "no able to find question paper");
     const updatemarks = yield prisma.result.updateMany({
         where: {
-            questionPaperID: examdata.QuestionPaperId
+            questionPaperID: examdataupdata.QuestionPaperId
         },
         data: {
             marks: examdataupdata.marks,
@@ -112,8 +100,8 @@ const updateQuestionPaperMarks = AsyncHandler((req, res) => __awaiter(void 0, vo
 }));
 const makeQuestionPaper = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const extraData = req.examData;
-    const { QuestionPapaerData } = req.body; //takes data
-    if (!QuestionPapaerData)
+    const { QuestionPaperData } = req.body; //takes data
+    if (!QuestionPaperData)
         throw new ApiError(400, "Question paper is not provided");
     const questionPaperInsert = yield prisma.questionPaper.create({
         data: {
@@ -121,7 +109,7 @@ const makeQuestionPaper = AsyncHandler((req, res) => __awaiter(void 0, void 0, v
             examID: extraData.examID,
             studentID: " ",
             answer: "",
-            question: JSON.stringify(QuestionPapaerData), // Serialize the object/array to a string
+            question: JSON.stringify(QuestionPaperData), // Serialize the object/array to a string
         }
     });
     if (!questionPaperInsert)
@@ -145,7 +133,7 @@ const getParticipant = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
 }));
 const UpdateQuestionPaper = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const examData = req.examData;
-    const { QuestionPapaerData } = req.body; //takes data from user
+    const { QuestionPaperData } = req.body; //takes data from user
     if (!examData)
         throw new ApiError(400, "exam data is not provied");
     const updatePaper = yield prisma.questionPaper.updateMany({
@@ -153,7 +141,7 @@ const UpdateQuestionPaper = AsyncHandler((req, res) => __awaiter(void 0, void 0,
             examID: examData.examID
         },
         data: {
-            question: QuestionPapaerData
+            question: QuestionPaperData
         }
     });
     if (!updatePaper)

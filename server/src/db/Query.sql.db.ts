@@ -313,6 +313,8 @@ const getExam = async (examID: string) => {//this find exam in databases
                 examName: true,
                 examinerID: true,
                 date: true,
+                questionPapers:true,
+                Subject:true
             }
         });
 

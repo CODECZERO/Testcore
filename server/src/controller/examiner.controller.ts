@@ -33,6 +33,7 @@ type examdataupdata = {
     passingMark: number
     obtainedMarks: number
     totalMarks: number
+    QuestionPaperId:string
 }
 
 type subject = {
@@ -58,14 +59,7 @@ const scheuldeExam = AsyncHandler(async (req: Requestany, res: Response) => {//t
     const createExamdata: examSubject = req.body;//takes data from user
     if (!(Id || email)) throw new ApiError(401, "user is not login");//check if data is provided or not 
     else if (!createExamdata) throw new ApiError(401, "exam data is not provide");
-    const findUser = await prisma.examiner.findUnique({//first it will find examiner in the database to confirm
-        where: {
-            Id,
-            email
-        }
-    });
 
-    if (!(findUser)) throw new ApiError(401, "user is not allowed to scheulde exam");//check if user is there or not then throw error
     const getsubject = await getSubject(createExamdata.subjectCode, createExamdata.subjectName);//then passes to it the getSubject fuction to get function
     if (!getsubject) throw new ApiError(404, "subject not found");//if not then throw error
     const createExam = await prisma.exam.create({//make data in exam table about this exam
@@ -78,7 +72,7 @@ const scheuldeExam = AsyncHandler(async (req: Requestany, res: Response) => {//t
             examStart: createExamdata.examStart,
             examEnd: createExamdata.examEnd,
             examDuration: createExamdata.examDuration,
-            examinerID: createExamdata.examinerID
+            examinerID: Id
         },
         select: {
             Id: true,
@@ -123,14 +117,11 @@ const getQuestionPaperForExaminers = AsyncHandler(async (req: Requestany, res: R
 })
 
 const updateQuestionPaperMarks = AsyncHandler(async (req: Requestany, res: Response) => {//this function updates question paper data
-    const examdata: examdata = req.examData;
     const examdataupdata: examdataupdata = req.body;//takes data
     if (!examdataupdata) throw new ApiError(400, "examId and marks are not provied");
-    const findQuestionpaper = await getQuestionPaperForExaminer(examdata.examID);//uses another query function
-    if (!findQuestionpaper) throw new ApiError(406, "no able to find question paper");
     const updatemarks = await prisma.result.updateMany({//update all of the question paper, who have question paper id
         where: {
-            questionPaperID: examdata.QuestionPaperId
+            questionPaperID: examdataupdata.QuestionPaperId
         },
         data: {
             marks: examdataupdata.marks,
@@ -142,22 +133,19 @@ const updateQuestionPaperMarks = AsyncHandler(async (req: Requestany, res: Respo
     });
     if (!updatemarks) throw new ApiError(406, "unable to update reult");
     return res.status(200).json(new ApiResponse(200, updatemarks));//return data
-
-
-
 })
 
 const makeQuestionPaper = AsyncHandler(async (req: Requestany, res: Response) => {//make question paper
     const extraData: examdata = req.examData;
-    const { QuestionPapaerData } = req.body;//takes data
-    if (!QuestionPapaerData) throw new ApiError(400, "Question paper is not provided");
+    const { QuestionPaperData } = req.body;//takes data
+    if (!QuestionPaperData) throw new ApiError(400, "Question paper is not provided");
     const questionPaperInsert = await prisma.questionPaper.create({//create record of the question paper in database
         data: {
             SubjectID: extraData.SubjectID,
             examID: extraData.examID,
             studentID: " ",//it's default empty as the user hadn't given exam
             answer: "",//and same here as studentID
-            question: JSON.stringify(QuestionPapaerData), // Serialize the object/array to a string
+            question: JSON.stringify(QuestionPaperData), // Serialize the object/array to a string
         }
     });
 
@@ -183,14 +171,14 @@ const getParticipant = AsyncHandler(async (req: Requestany, res: Response) => {/
 
 const UpdateQuestionPaper = AsyncHandler(async (req: Requestany, res: Response) => {//this function updates data or exam question paper
     const examData: examdata = req.examData;
-    const { QuestionPapaerData } = req.body;//takes data from user
+    const { QuestionPaperData } = req.body;//takes data from user
     if (!examData) throw new ApiError(400, "exam data is not provied");
     const updatePaper = await prisma.questionPaper.updateMany({//updates all of the question where the questionpaper matchs the id exam id
         where: {
             examID: examData.examID
         },
         data: {
-            question: QuestionPapaerData
+            question: QuestionPaperData
         }
     });
     if (!updatePaper) throw new ApiError(400, "exam paper can't be update as exam is not selected");

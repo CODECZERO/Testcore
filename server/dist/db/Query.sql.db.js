@@ -295,6 +295,8 @@ const getExam = (examID) => __awaiter(void 0, void 0, void 0, function* () {
                 examName: true,
                 examinerID: true,
                 date: true,
+                questionPapers: true,
+                Subject: true
             }
         });
     }
