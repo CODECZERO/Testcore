@@ -7,11 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { cacheSearch, cacheUpdate } from "../db/database.redis.query";
-import { searchMongodb } from "../db/database.MongoDb";
-import AsyncHandler from "../util/ayscHandler";
-import { ApiError } from "../util/apiError";
-import { getExam } from "../db/Query.sql.db";
+import { cacheSearch, cacheUpdate } from "../db/database.redis.query.js";
+import { searchMongodb } from "../db/database.MongoDb.js";
+import AsyncHandler from "../util/ayscHandler.js";
+import { ApiError } from "../util/apiError.js";
+import { getExam } from "../db/Query.sql.db.js";
 //@ts-ignore
 //let the @ts-ignore be there it's for good reason
 const cacheCheck = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {

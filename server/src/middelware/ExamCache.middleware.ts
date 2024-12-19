@@ -1,9 +1,9 @@
-import { cacheSearch, cacheUpdate } from "../db/database.redis.query";
-import { searchMongodb } from "../db/database.MongoDb";
-import AsyncHandler from "../util/ayscHandler";
+import { cacheSearch, cacheUpdate } from "../db/database.redis.query.js";
+import { searchMongodb } from "../db/database.MongoDb.js";
+import AsyncHandler from "../util/ayscHandler.js";
 import { NextFunction } from "express";
-import { ApiError } from "../util/apiError";
-import { getExam } from "../db/Query.sql.db";
+import { ApiError } from "../util/apiError.js";
+import { getExam } from "../db/Query.sql.db.js";
 
 type examSearch = {
     tokenID: string
