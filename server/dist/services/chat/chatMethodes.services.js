@@ -46,7 +46,6 @@ const receiveMessage = (ws) => __awaiter(void 0, void 0, void 0, function* () {
         yield rabbitmq.channel.consume(rabbitmq.queue.queue, (message) => {
             if (message) {
                 broadcastMessage(message, ws.roomName).catch(console.error);
-                rabbitmq.channel.ack(message);
             }
         });
     }
