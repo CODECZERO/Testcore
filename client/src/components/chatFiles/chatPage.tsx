@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+
+
+import React, { useState, useEffect, useRef } from "react";
 import { useWebSocket } from "./ChatWrapper.tsx";
 import { nanoid } from "nanoid";
 import { useSelector } from "react-redux";
 import { RootState } from "../store.tsx";
 import { useRoom } from "./RoomContext"; // Import RoomContext
 import "../chatFiles/styles2/chatPage.css";
+import { BiLogoZoom, BiSolidSend, BiLinkAlt } from "react-icons/bi";
 
 const generateMessageId = () => nanoid();
 
@@ -21,6 +24,8 @@ const ChatPage: React.FC = () => {
 
   const tabId = window.name; // Get the current tab's ID
   const userId = localStorage.getItem(`userId_${tabId}`) || "";
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null); // Reference for the auto-scroll
 
   // Handle Notification Permission Request
   const requestNotificationPermission = async () => {
@@ -51,6 +56,13 @@ const ChatPage: React.FC = () => {
     }
   }, [socket, userId, userInfo]);
 
+  // Auto-scroll logic
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]); // Trigger auto-scroll when messages update
+
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (!roomName) {
@@ -76,32 +88,38 @@ const ChatPage: React.FC = () => {
   return (
     <div className="chat-container">
       <div className="chat-header">
-        Chat Application
+      {roomName}
+        <BiLogoZoom className="icons" />
       </div>
-    <div className="messages">
+      <div className="messages">
         <button className="enable-notifications-btn" onClick={requestNotificationPermission}>
           Enable Notifications
-       </button>
-       {notificationsEnabled && <p className="notifications-status">Notifications are enabled!</p>}
-        
-       {messages.map((msg, index) => (
-          <div key={index} className={`message ${msg ? 'sent' : 'received'}`}>
+        </button>
+        {notificationsEnabled && <p className="notifications-status">Notifications are enabled!</p>}
+
+        {messages.map((msg, index) => (
+          <div key={index} className={`message ${msg.startsWith("You:") ? "sent" : "received"}`}>
             <div className="text">{msg}</div>
           </div>
-         ))}
-       </div>
-      
-       <div className="input-container">
+        ))}
+        <div ref={messagesEndRef} /> {/* Auto-scroll target */}
+      </div>
+
+      <div className="input-container">
         <input
           className="message-input"
           value={input}
-       onChange={(e) => setInput(e.target.value)}
-       placeholder="Type a message"
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type a message"
         />
-        <button className="send-btn" onClick={sendMessage}>Send</button>
+        <BiLinkAlt className="iconsss" />
+        <button className="send-btn" onClick={sendMessage}>
+          <BiSolidSend className="iconss" />
+        </button>
       </div>
     </div>
   );
 };
 
 export default ChatPage;
+
