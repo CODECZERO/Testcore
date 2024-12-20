@@ -5,34 +5,31 @@
     display: flex;
     flex-direction: column;
     padding: 1rem;
-    height: calc(95vh - 20px); 
+    height: calc(85vh - 20px); 
     width: 100%; 
     max-width: 300px;
-    margin: 10px auto;
+    margin: 50px auto;
     border-radius: 3%;
   }
   
   .sidebar-header {
     font-size: 1.5rem;
     font-weight: bold;
-    margin-bottom: 1rem;
     color: #2d4059;
   }
   
-  .sidebar-section {
-    margin-bottom: 1rem;
-  }
   
   .sidebar-section h3 {
-    margin-bottom: 0.75rem;
-    font-size: 1.15rem;
+    font-size: 1.5rem;
     color: #4a90e2;
+    margin: 0px 0px 35px 0px;
   }
   
   .groups-list-container {
+    height: 76%;
     display: flex;
     flex-direction: column;
-
+    scroll-snap-type: y;
   }
    
    

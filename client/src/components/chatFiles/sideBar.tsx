@@ -28,9 +28,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCreateChatVisible }) => {
     return (
     <>
      <div className="sidebar">
-            <div className="sidebar-header">
-                Chat Sidebar
-            </div>
+          
 
             {isCreateChatVisible && (
                 <div className="sidebar-section">

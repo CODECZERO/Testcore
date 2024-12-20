@@ -43,13 +43,29 @@
 } */
 
 .menu {
+    height: 490px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    margin-top: 3.5%;
     width: 15%;
-    background-color: #ffffff;
+    background-color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 1rem 0;
-  }
+    box-shadow: inset -4px 0 5px -5px rgb(0, 0, 0); /* Horizontal inset shadow */
+}
+
+
+#AG{
+    color: rgb(255, 183, 49);
+}
+
+#G{
+    color: rgb(17, 17, 17);
+}
+
+
   
   .logo {
     display: flex;

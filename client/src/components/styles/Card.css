@@ -40,11 +40,11 @@
   --bg: #e1e1e3;
   --hover-bg: #d8d4d4dc;
   --hover-text: #514d4f;
-  max-width: 23ch;
+  max-width: 25ch;
   text-align: center;
-  background: var(--bg);
-  padding: 1.5em;
-  padding-block: 1.8em;
+  background: rgb(230, 230, 230);
+  padding: 1.2em;
+  padding-block: 1.2em;
   border-radius: 5px;
   position: relative;
   overflow: hidden;
@@ -53,7 +53,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1em;
+  gap: 1.2em;
+  margin-bottom: 10px;
+ 
 }
 
 .card__body {
