@@ -1,151 +1,168 @@
-/* General layout */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #ece5dd;
-}
-
-/* Container for the chat */
+/* General Container Styling */
 .chat-container {
-    width: 360px;
-    height: 600px;
-    margin: 20px auto;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-}
-
-/* Header */
+    justify-content: space-between;
+    height: calc(100vh - 20px); /* Fit within the viewport with some padding */
+    width: 100%; /* Ensure full width */
+    max-width: 700px; /* Center and limit the container width */
+    margin: 10px auto; /* Add some margin at the top and bottom */
+    background-color: #f4f8fc;
+    border: 1px solid #d1e1f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    overflow: hidden; /* Prevent overflow issues */
+  }
+  
+/* Chat Header */
 .chat-header {
-    background-color: #128c7e;
+    background-color: #4a90e2;
     color: white;
-    padding: 10px;
-    text-align: center;
-    font-size: 18px;
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically center the content */
+    justify-content: space-between; /* Push content to the sides */
+    padding: 1rem;
+    font-size: 1.25rem;
     font-weight: bold;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  
+  /* Chat Header Icon */
+  .chat-header .icons {
+    font-size: 1.6rem; /* Adjust the icon size */
+    color: white; /* Match the header text color */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    margin-left: 10px; /* Add some spacing between the title and the icon */
+    transition: transform 0.3s ease; /* Add a hover effect */
+  }
+  
+  .iconss{
+    font-size: 1.1rem; /* Adjust the icon size */
+    color: white; /* Match the header text color */
+    cursor: pointer; /* Add a pointer cursor on hover */
+    transition: transform 0.3s ease;
+  }
+
+  .iconss:hover{
+    transform: scale(1.2); 
+  }
+
+.iconsss{
+    font-size: 1.3rem; 
+    color: rgb(33, 29, 29);
+   margin-right: 10px ;
+   cursor: pointer;
+   transition: transform 0.3s ease;
+   
+}
+.iconsss:hover{
+   transform: scale(1.2);
+   
 }
 
-/* Messages area */
-.messages {
-    padding: 10px;
-    overflow-y: scroll;
-    flex-grow: 1;
-}
-
-.message {
+  .chat-header .icons:hover {
+    transform: scale(1.2); /* Slightly enlarge the icon on hover */
+  }
+  
+  /* Messages Section */
+  .messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto; /* Enable scrolling for overflowing messages */
     display: flex;
-    margin-bottom: 10px;
-}
-
-.message.sent {
-    justify-content: flex-end;
-}
-
-.message.received {
-    justify-content: flex-start;
-}
-
-.message .text {
-    max-width: 80%;
-    padding: 10px;
-    border-radius: 10px;
-    font-size: 14px;
-    line-height: 1.5;
-    word-wrap: break-word;
-}
-
-.message.sent .text {
-    background-color: #dcf8c6;
-}
-
-.message.received .text {
-    background-color: #f1f0f0;
-}
-
-/* Notification button and status */
-.enable-notifications-btn {
-    background-color: #128c7e;
-    color: white;
-    padding: 8px;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-}
-
-.enable-notifications-btn:hover {
-    background-color: #075e54;
-}
-
-.notifications-status {
-    color: #4caf50;
-    font-size: 14px;
-    margin-top: 5px;
-}
-
-/* Input area */
-.input-container {
+    flex-direction: column;
+    gap: 0.5rem;
     background-color: #ffffff;
-    border-top: 1px solid #ddd;
-    padding: 10px;
+  }
+  
+  /* Sent and Received Message Styles */
+  .messages .message {
     display: flex;
     align-items: center;
-}
-
-.input-container input {
-    width: 100%;
-    height: 40px;
-    padding: 10px;
-    border: 1px solid #ccc;
+    max-width: 70%;
+    padding: 0.5rem 1rem;
     border-radius: 20px;
-    font-size: 14px;
-    outline: none;
-}
-
-.input-container input:focus {
-    border-color: #128c7e;
-}
-
-.send-btn {
-    margin-left: 10px;
-    background-color: #128c7e;
-    border: none;
+    word-wrap: break-word;
+  }
+  
+  .messages .sent {
+    align-self: flex-end;
+    background-color: #4a90e2;
     color: white;
-    font-size: 16px;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
+  }
+  
+  .messages .received {
+    align-self: flex-start;
+    background-color: #e6e6e6;
+    color: #2d4059;
+  }
+  
+  .messages .text {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  /* Enable Notifications Button */
+  .enable-notifications-btn {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
     cursor: pointer;
-}
-
-.send-btn:hover {
-    background-color: #075e54;
-}
-
-/* For better appearance on small screens */
-@media screen and (max-width: 400px) {
-    .chat-container {
-        width: 100%;
-        height: 100%;
-    }
-
-    .messages {
-        padding: 5px;
-    }
-
-    .input-container input {
-        font-size: 12px;
-    }
-
-    .send-btn {
-        width: 35px;
-        height: 35px;
-    }
-}
+    margin-bottom: 1rem;
+    transition: background-color 0.3s ease;
+    width: 26%;
+  }
+  
+  .enable-notifications-btn:hover {
+    background-color: #357acb;
+  }
+  
+  .notifications-status {
+    color: #2d4059;
+    font-size: 0.9rem;
+    text-align: flex-end;
+  }
+  
+  /* Input Section */
+  .input-container {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: #f4f8fc;
+    border-top: 1px solid #d1e1f0;
+  }
+  
+  .message-input {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border: 1px solid #d1e1f0;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    outline: none;
+    margin-right: 0.5rem;
+  }
+  
+  .message-input:focus {
+    border-color: #4a90e2;
+  }
+  
+  .send-btn {
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .send-btn:hover {
+    background-color: #357acb;
+  }
+  

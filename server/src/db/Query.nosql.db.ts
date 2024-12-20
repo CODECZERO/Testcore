@@ -1,7 +1,6 @@
 import { chatModel } from "../models/chatRoomData.model.nosql.js";
 import mongoose from "mongoose";
 import { User } from "../models/user.model.nosql.js";
-import { error, profile } from "console";
 
 const findUsers = async (roomID: string, AdminId?: string, userId?: string) => {//this function user in chatroom
     try {

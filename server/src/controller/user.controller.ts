@@ -114,10 +114,10 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
     //     "errors": []
     // } 
     const findAndRole = { ...findUser, role };
-    const [tokenResult, hashedPassword] = await Promise.all([
-        tokenGen(findAndRole),
-        bcrypt.hash(password, 10)
-    ])
+    const tokenResult=await tokenGen(findAndRole);
+    const hashedPassword=await bcrypt.hash(password,10);
+
+    if(!(tokenResult&&hashedPassword)) throw new ApiError(400,"something went wrong while hashing password");
     const { refreshToken, accessToken } = tokenResult;//genereating token for the user
     const UserSingupData = { ...req.body, refreshToken };
     const userCreate = await createOp(UserSingupData, hashedPassword);//passing req.body value to query function with hashed password
