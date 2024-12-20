@@ -21,22 +21,9 @@ import { ChatWrapper } from "./components/chatFiles/ChatWrapper.tsx";
 
 import RestoreUser from './components/RestoreUser.tsx';
 import { RoomProvider } from './components/chatFiles/RoomContext.tsx';
-import CreateChat from './components/chatFiles/createChat.tsx';
 
 
-const darkTheme = createTheme({
-  palette: {
-    mode: "dark",
-    background: {
-      default: '#121212', // Dark background color
-      paper: '#1e1e1e',
-    },
-    text: {
-      primary: '#ffffff', // Primary text color
-      secondary: '#b0b0b0', // Secondary text color
-    },
-  },
-});
+
 
 // Browser router setup
 const router = createBrowserRouter([
@@ -69,24 +56,19 @@ const router = createBrowserRouter([
     path: "/Help",
     element: <Help />,
   },
-  {
-    path: "/CreateChat",
-    element: <CreateChat />,
-  },
+ 
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={darkTheme}>
         <RoomProvider> 
             <ChatWrapper>
         <RouterProvider router={router} />
             <RestoreUser /> 
           </ChatWrapper>
           </RoomProvider>
-        </ThemeProvider>
       </QueryClientProvider>
     </Provider>
   </React.StrictMode>
