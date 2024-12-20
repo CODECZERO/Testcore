@@ -1,14 +1,25 @@
 import ChatPage from "./chatPage";
-import SideBar from "./sideBar";
+import Sidebar from "./sideBar";
+import SideBar from "../../components/DashBoard/SideBar";
+import { useState } from "react";
 
 
 const Chat: React.FC = () => {
  
+  const [isCreateChatVisible, setIsCreateChatVisible] = useState(false);
+
+  const toggleCreateChat = () => {
+      setIsCreateChatVisible(!isCreateChatVisible);
+  };
 
   return (
     <>
+     <div style={{ display: "flex", height: "100vh", backgroundColor: "#BEE4F4" }}>
+    <SideBar toggleCreateChat={toggleCreateChat} />
+    <br />
+    <Sidebar isCreateChatVisible={isCreateChatVisible} toggleCreateChat={toggleCreateChat} />
     <ChatPage/>
-    <SideBar/>
+    </div>
     </>
   );
 };
