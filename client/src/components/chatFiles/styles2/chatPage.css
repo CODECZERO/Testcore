@@ -3,10 +3,10 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: calc(100vh - 20px); /* Fit within the viewport with some padding */
+    height: calc(95vh - 20px); /* Fit within the viewport with some padding */
     width: 100%; /* Ensure full width */
     max-width: 700px; /* Center and limit the container width */
-    margin: 10px auto; /* Add some margin at the top and bottom */
+    margin: 25px auto; /* Add some margin at the top and bottom */
     background-color: #f4f8fc;
     border: 1px solid #d1e1f0;
     border-radius: 8px;
@@ -17,7 +17,7 @@
   
 /* Chat Header */
 .chat-header {
-    background-color: #4a90e2;
+    background-color: #2c82e5;
     color: white;
     display: flex; /* Use flexbox for alignment */
     align-items: center; /* Vertically center the content */

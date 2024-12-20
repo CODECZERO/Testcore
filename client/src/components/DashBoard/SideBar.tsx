@@ -17,7 +17,7 @@ const Sidebar : React.FC<{ toggleCreateChat: () => void }> = ({ toggleCreateChat
     <div className='menu'>
         <div className="logo">
             <BiBookAlt className='logo-icon'/>
-            <h2>AG</h2>
+            <h2 ><span id='AG'>A</span><span id='G'>G</span></h2>
         </div>
       <div className="menu--list">
         <Link to="/Dash-Board" className="item">

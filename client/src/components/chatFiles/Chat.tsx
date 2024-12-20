@@ -14,7 +14,7 @@ const Chat: React.FC = () => {
 
   return (
     <>
-     <div style={{ display: "flex", height: "100vh", backgroundColor: "#BEE4F4" }}>
+     <div style={{ display: "flex", height: "100vh", backgroundColor: "catedblue" }}>
     <SideBar toggleCreateChat={toggleCreateChat} />
     <br />
     <Sidebar isCreateChatVisible={isCreateChatVisible} toggleCreateChat={toggleCreateChat} />
