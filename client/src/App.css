@@ -1,16 +1,17 @@
 .dashboard{
   display: flex;
   gap: 20px;
+  color: cadetblue;
+  height: 100vh;
 }
 
 .dashboard--content {
   background-color: #fff;
-  flex:1;
+ flex:1;
 border-radius: 20px;
-padding: 2rem;
+padding: 1.5rem;
 margin:2rem;
 display: flex;
-gap: 1.5rem;
 justify-content: space-between;
-
 }
+

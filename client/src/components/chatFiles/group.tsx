@@ -65,6 +65,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addChatData } from './store/chatData.Store';
 import { RootState } from '../store';
 import { useRoom } from './RoomContext'; // Import RoomContext to update the room name when joining
+import Loader from '../Loader';
 
 const BackendUrl = "https://testcore-qmyu.onrender.com";
 const authToken = localStorage.getItem('accessToken');
@@ -108,7 +109,7 @@ const Groups: React.FC = () => {
   return (
     <div className="chat-rooms">
       {isLoading ? (
-        <p className="loading">Loading...</p>
+      <Loader/>
       ) : error ? (
         <p className="error">Error: {error}</p>
       ) : chatRooms && chatRooms.length > 0 ? (

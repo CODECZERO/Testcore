@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import { login } from '../store';
 import "../styles/Login.css"
 import { nanoid } from 'nanoid';
+import DashLoader from '../DashBoard/DashLoader';
 
 type Role = 'Student' | 'College' | 'Examiner';
 
@@ -102,6 +103,11 @@ console.log(response.data);
   };
 
       return (
+        <>
+        {loading ? (
+          <DashLoader />
+        ) : (
+
     <div className='container'>
   
       <div className="card2">
@@ -157,6 +163,7 @@ console.log(response.data);
               placeholder="Email"
               className="input-field"
               required
+               autoComplete="emsil"
             />
           </div>
 
@@ -176,6 +183,7 @@ console.log(response.data);
         placeholder="Password"
         className="input-field"
         required
+         autoComplete="current-password"
       />
       <button
         type="button"
@@ -234,9 +242,23 @@ console.log(response.data);
         </form>
       </div>
     </div>
-  
-  );
+      )
+    }
+    </>
+      );
 };
 
   export default Login;
   
+
+
+
+
+
+
+
+
+
+
+
+
