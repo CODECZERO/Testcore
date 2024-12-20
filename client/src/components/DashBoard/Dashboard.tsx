@@ -11,7 +11,9 @@ const Dashboard: React.FC = () => {
   return (
    <>
    <div className="dashboard">
-   <SideBar/>
+   <SideBar toggleCreateChat={function (): void {
+          throw new Error("Function not implemented.");
+        } }/>
    <div className="dashboard--content">
     <Content/>
     <Profile/>

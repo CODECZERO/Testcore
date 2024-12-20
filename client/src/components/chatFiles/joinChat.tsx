@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { TextField, Button } from "@mui/material";
 import { useRoom } from "./RoomContext"; // Import RoomContext for global room management
+import "./styles2/JoinChat.css"
 
 const BackendUrl = "https://testcore-qmyu.onrender.com";
 const authToken = localStorage.getItem("accessToken");
@@ -37,33 +37,12 @@ const JoinChat: React.FC<JoinChatProps> = ({ onRoomJoin }) => {
     }
   };
 
+  
+
   return (
-    <div>
-      <form onSubmit={handleJoin}>
-        <TextField
-          label="College"
-          variant="outlined"
-          value={college}
-          onChange={(e) => setCollege(e.target.value)}
-          required
-          fullWidth
-          margin="normal"
-        />
-        <TextField
-          label="Branch"
-          variant="outlined"
-          value={branch}
-          onChange={(e) => setBranch(e.target.value)}
-          required
-          fullWidth
-          margin="normal"
-        />
-        <Button type="submit" variant="contained" color="primary" fullWidth>
-          Join Chat Room
-        </Button>
-      </form>
-      {feedback && <p>{feedback}</p>}
-    </div>
+   <>
+   
+   </>
   );
 };
 

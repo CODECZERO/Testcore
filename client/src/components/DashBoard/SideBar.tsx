@@ -5,13 +5,14 @@ import {
     BiStats,
     BiTask,
     BiBookAlt,
-   BiHelpCircle
+   BiHelpCircle,
+   BiGroup
 } from 'react-icons/bi'
 import "../styles/sidebar.css"
 import { Link } from "react-router-dom";
 
 
-const Sidebar = () => {
+const Sidebar : React.FC<{ toggleCreateChat: () => void }> = ({ toggleCreateChat }) => {
   return (
     <div className='menu'>
         <div className="logo">
@@ -19,10 +20,10 @@ const Sidebar = () => {
             <h2>AG</h2>
         </div>
       <div className="menu--list">
-        <a href="#" className="item">
+        <Link to="/Dash-Board" className="item">
             <BiHome className="icon"/>
             Dashboard
-        </a>      </div>
+        </Link>      </div>
       <div className="menu--list">
         <a href="#" className="item">
             <BiTask className="icon"/>
@@ -34,6 +35,12 @@ const Sidebar = () => {
             <BiSolidReport className="icon"/>
             Report
         </a>
+      </div>
+      <div className="menu--list">
+      <a href="#" className="item" onClick={toggleCreateChat}>
+                    <BiGroup  className="icon"/>
+                    Create Group
+                </a>
       </div>
       <div className="menu--list">
         <Link to="/messages" className="item">

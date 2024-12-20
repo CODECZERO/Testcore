@@ -37,7 +37,7 @@
 
 /* From Uiverse.io by satyamchaudharydev */ 
 .card {
-  --bg: #f7f7f8;
+  --bg: #e1e1e3;
   --hover-bg: #d8d4d4dc;
   --hover-text: #514d4f;
   max-width: 23ch;
@@ -57,7 +57,7 @@
 }
 
 .card__body {
-  color: #464853;
+  color: #cdced0;
   line-height: 1.5em;
   font-size: 1em;
 }
