@@ -3,7 +3,8 @@ const timetableSchema = new mongoose.Schema({
     Class: {
         type: String,
         require: true,
-        index: true
+        index: true,
+        toLowerCase: true,
     },
     Subjects: [],
     Aprrove: {

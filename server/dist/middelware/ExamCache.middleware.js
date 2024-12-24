@@ -7,13 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { cacheSearch, cacheUpdate } from "../db/database.redis.query";
-import { searchMongodb } from "../db/database.MongoDb";
-import AsyncHandler from "../util/ayscHandler";
-import { ApiError } from "../util/apiError";
+import { cacheSearch, cacheUpdate } from "../db/database.redis.query.js";
+import { searchMongodb } from "../db/database.MongoDb.js";
+import AsyncHandler from "../util/ayscHandler.js";
+import { ApiError } from "../util/apiError.js";
+import { getExam } from "../db/Query.sql.db.js";
 //@ts-ignore
 //let the @ts-ignore be there it's for good reason
 const cacheCheck = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
     const examSearch = req.examData;
     if (!examSearch || !examSearch.tokenID) {
         throw new ApiError(400, "Token ID is not provided");
@@ -27,8 +29,16 @@ const cacheCheck = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, vo
         }
         yield cacheUpdate(examSearch.tokenID, findInDatabase.examID); //after finding data in monogdb update cache
     }
+    let examDataFinder = yield getExam(findInCache);
+    if (!examDataFinder) {
+        examDataFinder = yield getExam(findInDatabase === null || findInDatabase === void 0 ? void 0 : findInDatabase.examID);
+    }
     // Proceed to the next middleware
-    req.examData = findInCache || findInDatabase; //return data to the req.examData
+    req.examData = {
+        examID: findInCache || findInDatabase,
+        QuestionPaperId: (_b = (_a = examDataFinder === null || examDataFinder === void 0 ? void 0 : examDataFinder.questionPapers) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.Id,
+        SubjectID: (_c = examDataFinder === null || examDataFinder === void 0 ? void 0 : examDataFinder.Subject) === null || _c === void 0 ? void 0 : _c.Id,
+    }; //return data to the req.examData
     next();
 }));
 export default cacheCheck;

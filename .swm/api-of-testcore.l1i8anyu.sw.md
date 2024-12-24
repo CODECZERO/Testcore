@@ -359,28 +359,28 @@ const connectChat = AsyncHandler(async (req: Requestany, res: Response) => {//if
 
 &nbsp;
 
-<SwmSnippet path="/server/src/services/chat/chatServer.service.ts" line="60">
+<SwmSnippet path="server/src/services/chat/chatServer.service.ts" line="60">
 
 ---
 
 use of token in main chat server to verify user
 
-```typescript
-    // const token = tokenExtractr(req);//this function extract the token from req objcet in starting and verify's it
-    
-    // if(!token){//for some reason , i am feeling that it can lead to vulnerability
-    //   ws.close(4000,"Invalid request,User not have access to this group");
-    //   return;
-    // }
+```
+          ws.roomName = MessageData.roomName;
 
-    ws.on('message', async (message: string) => {//if websocket is running
-      const MessageData: MessageData = JSON.parse(message);//take data or message in message pattern from user first time as they join
-      //beter use onconnection  or connection      
-      
-      if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId)) {//check if the whole messagedata is provided or not 
-        ws.close(4000, "Message data is not provided");//if not close the websocket connection
-        return;
-      }
+          clients.add(ws);
+
+          const typeAction = MessageData.typeOfMessage;
+          const action = actions[typeAction];
+          if (!action) {
+            ws.close(4000, "Invalid message type");
+            return;
+          }
+
+          await action(MessageData, ws);
+          
+          await receiveMessage(ws);
+        } catch (error) {
 ```
 
 ---
@@ -561,7 +561,7 @@ The `verifyExamData` function is a middleware designed to validate and fetch exa
 
 &nbsp;
 
-### **1)Student Api**
+## **1)Student Api**
 
 The **Student API** provides endpoints for operations that can be performed by students, such as viewing exam information, accessing timetables, and submitting exams. This API is structured to ensure efficient and secure data access.
 
@@ -759,7 +759,7 @@ This endpoint retrieves a student's exam result. It accepts an 8-byte token as i
 
 &nbsp;
 
-### 5)<SwmToken path="/server/src/controller/student.controller.ts" pos="121:2:2" line-data="const getQuestionPaperForStundet = AsyncHandler(async (req: Requestany, res: Response) =&gt; {//get question for studnet">`getQuestionPaperForStundet`</SwmToken>
+### 5) getQuestionPaperForStundet
 
 #### **POST /api/v1/student/Question**
 
@@ -794,5 +794,225 @@ This endpoint allows students to retrieve the question paper for a specific exam
   - The 8-byte token is mapped to a 32-byte unique `questionPaperId` in MongoDB for lookup.
 
 - **Question Paper Structure:** Ensure that question paper data is stored in a well-organized format to facilitate efficient retrieval and formatting.
+
+&nbsp;
+
+# Examiner Api
+
+&nbsp;
+
+### **Endpoint:** `/api/v1/examiner/scheduleExam`
+
+Method:POST&nbsp;&nbsp;
+
+Description: Allows an examiner to schedule an exam for students.&nbsp;
+
+Workflow:
+
+1\. Takes exam data (\`subjectCode\`, `subjectName`, `examName`, `date`, `examStart`, `examEnd`, `examDuration`) from the request body.
+
+2\. Authenticates the user via `Id` and `email`.
+
+3\. Fetches subject details using `subjectCode` and `subjectName`.
+
+4\. Creates a record in the `exam` table in the SQL database.
+
+5\. Generates a unique 8-character token for the exam.
+
+6\. Stores the token and exam ID mapping in a NoSQL database.
+
+7\. Updates the Redis cache with the token and exam ID.
+
+8\. Returns a success response with the `exam` details and `tokenID`.
+
+Output:
+
+\- Success:
+
+&nbsp;&nbsp;- HTTP Status: 201
+
+&nbsp;&nbsp;- Body: `{ exam: { Id: <Exam ID> }, tokenID: <Generated Token> }`
+
+\- Failure: Appropriate error messages with relevant HTTP status codes.
+
+&nbsp;
+
+### **Endpoint:** `/api/v1/examiner/questionPaper`
+
+1\. Method: GET
+
+Description: Retrieves all question papers associated with a specific exam for the examiner.
+
+Workflow:
+
+1\. Takes `examID` from the request.
+
+2\. Queries the question papers using the `examID`.
+
+3\. Returns the question papers.
+
+&nbsp;Output:
+
+\- Success:
+
+&nbsp;&nbsp;- HTTP Status: 200
+
+&nbsp;&nbsp;- Body: `{ data: <Array of Question Papers> }`
+
+\- Failure: Appropriate error messages with relevant HTTP status codes.
+
+2\. Method: POST
+
+Description: Creates a question paper for an exam.
+
+Workflow:
+
+1\. Takes `QuestionPaperData` and `examData` from the request.
+
+2\. Inserts the question paper data into the `questionPaper` table in the SQL database.
+
+3\. Returns the created question paper.
+
+&nbsp;Output:
+
+\- Success:
+
+&nbsp;&nbsp;- HTTP Status: 201
+
+&nbsp;&nbsp;- Body: `{ data: <Created Question Paper> }`
+
+\- Failure: Appropriate error messages with relevant HTTP status codes.
+
+3\. Method: PUT
+
+Description: Updates an existing question paper for an exam.
+
+&nbsp;Workflow:
+
+1\. Takes `examID` and `QuestionPaperData` from the request.
+
+2\. Updates the relevant question paper in the `questionPaper` table.
+
+3\. Returns the updated question paper.
+
+&nbsp;Output:
+
+\- Success:
+
+&nbsp;&nbsp;- HTTP Status: 200
+
+&nbsp;&nbsp;- Body: `{ data: <Updated Question Paper> }`
+
+\- Failure: Appropriate error messages with relevant HTTP status codes.
+
+### \---
+
+### **Endpoint:** `/api/v1/examiner/afterExam`
+
+1\. Method: GET
+
+Description: Retrieves the total count of students who participated in an exam.
+
+Workflow:
+
+1\. Takes `examID` from the request.
+
+2\. Counts all `questionPaper` records where the `answer` field is not `undefined`.
+
+3\. Returns the count.
+
+&nbsp;Output:
+
+\- Success:
+
+&nbsp;&nbsp;- HTTP Status: 200
+
+&nbsp;&nbsp;- Body: `{ count: <Number of Participants> }`
+
+\- Failure: Appropriate error messages with relevant HTTP status codes.
+
+2\. Method: PUT
+
+Description: Updates marks for students who participated in an exam.
+
+&nbsp;Workflow:
+
+1\. Takes `QuestionPaperId` and marks-related data from the request.
+
+2\. Updates the `result` table in the SQL database with the provided marks and other data.
+
+3\. Returns the updated result data.
+
+&nbsp;Output:
+
+\-Success:
+
+&nbsp;&nbsp;- HTTP Status: 200
+
+&nbsp;&nbsp;- Body: `{ data: <Updated Results> }`
+
+\- Failure: Appropriate error messages with relevant HTTP status codes.
+
+\---
+
+### **Endpoint:** `/api/v1/examiner/exam`
+
+Method: GET&nbsp;&nbsp;
+
+Description: Retrieves all exams created by an examiner.
+
+&nbsp;Workflow:
+
+1\. Takes `examinerID` from the request.
+
+2\. Queries the `exam` table for exams created by the examiner, including related subject data.
+
+3\. Returns the exams and their details.
+
+\#### Output:
+
+\- Success:
+
+&nbsp;&nbsp;- HTTP Status: 200
+
+&nbsp;&nbsp;- Body: `{ examdata: <Array of Exams with Details> }`
+
+\- Failure: Appropriate error messages with relevant HTTP status codes.
+
+\---
+
+### **Endpoint:** `/api/v1/examiner/timeTable`
+
+Method: POST&nbsp;&nbsp;
+
+Description: Allows an examiner to create a timetable.
+
+Workflow:
+
+1\. Takes `Class`, `Subjects` (nested object), and `CollegeName` from the request.
+
+2\. Inserts the timetable data into the NoSQL database with an `Approve` flag set to `false`.
+
+3\. Returns the created timetable data.
+
+&nbsp;Output:
+
+\- Success:
+
+&nbsp;&nbsp;- HTTP Status: 201
+
+&nbsp;&nbsp;- Body: `{ data: <Created Timetable> }`
+
+\- Failure: Appropriate error messages with relevant HTTP status codes.
+
+\---
+
+Notes:
+
+\- All endpoints handle errors using the `ApiError` class.
+
+\- Success responses are wrapped in the `ApiResponse` format.
+
+&nbsp;
 
 <SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBVGVzdGNvcmUlM0ElM0FDT0RFQ1pFUk8=" repo-name="Testcore"><sup>Powered by [Swimm](https://app.swimm.io/)</sup></SwmMeta>
