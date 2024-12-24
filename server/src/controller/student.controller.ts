@@ -86,7 +86,7 @@ const getTimeTable = AsyncHandler(async (req: Requestany, res: Response) => {//g
     const {...name}=await findSingleCollegeForStudent(user?.Id);//finds user college using his id;
     if (!Class || !name) throw new ApiError(400, "Invalid data");//if not provided then throw error
     const findtimetable = await TimeTable.findOne({//find only one data which have class and college name provided
-        Class:Class,
+        Class:Class.toLowerCase(),
         CollegeName:name.college.name
     })
     if (!findtimetable) throw new ApiError(404, "time table not found");//not found throw error
