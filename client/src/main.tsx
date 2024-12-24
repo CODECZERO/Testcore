@@ -21,6 +21,7 @@ import { ChatWrapper } from "./components/chatFiles/ChatWrapper.tsx";
 
 import RestoreUser from './components/RestoreUser.tsx';
 import { RoomProvider } from './components/chatFiles/RoomContext.tsx';
+import CreateTimetable from './components/ExaminerFunctions/CreateTimeTable.tsx';
 
 
 
@@ -50,6 +51,11 @@ const router = createBrowserRouter([
   {
     path: "/messages",
     element: <Chat />,
+  },
+ 
+  {
+    path: "/create-timetable",
+    element: <CreateTimetable />,
   },
  
   {
