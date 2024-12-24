@@ -8,9 +8,6 @@ const Backend_URL = `https://testcore-qmyu.onrender.com`;
 type UserRole = 'Student' | 'College' | 'Examiner';
 
 interface FormData {
-
-  firstName: string;
-
   name: string;
   email: string;
   phoneNumber: string;
@@ -18,15 +15,12 @@ interface FormData {
   address: string;
   role: UserRole;
   password: string;
-  confirmPassword: string;
+
   collegeID?: string;
 }
 
 const CreateAccount: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
-
-    firstName: '',
-
     name: '',
     email: '',
     phoneNumber: '',
@@ -34,7 +28,6 @@ const CreateAccount: React.FC = () => {
     address: '',
     role: 'College',
     password: '',
-    confirmPassword: '',
     collegeID: '',
   });
 
@@ -114,7 +107,7 @@ const CreateAccount: React.FC = () => {
                 type="text"
                 name="name"
                 placeholder=""
-                value={formData.firstName}
+                value={formData.name}
                 onChange={handleChange}
                 required />
             </label>
@@ -223,18 +216,7 @@ const CreateAccount: React.FC = () => {
               required />
           </label>
 
-          <label>
-            <span>Confirm Password</span>
-            <input
-              className="input"
-              type="password"
-              name="confirmPassword"
-              placeholder=""
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              required />
-          </label>
-
+       
           <button type="submit" className="submit">
             Submit
           </button>

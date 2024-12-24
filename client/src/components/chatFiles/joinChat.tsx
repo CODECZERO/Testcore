@@ -12,13 +12,12 @@ interface JoinChatProps {
 
 const JoinChat: React.FC<JoinChatProps> = ({ onRoomJoin }) => {
   const [college, setCollege] = useState("");
-  const [branch, setBranch] = useState("");
   const [feedback, setFeedback] = useState("");
   const { setRoomName } = useRoom(); // Get the global setRoomName function from context
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const roomName = `${college}/${branch}`; // Create the room name from input values
+    const roomName = `${college}`; // Create the room name from input values
 
     try {
       const response = await axios.post(
