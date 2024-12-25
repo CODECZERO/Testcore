@@ -1,5 +1,5 @@
 import ChatPage from "./chatPage";
-import Sidebar from "./sideBar";
+import SidebaR from "./sideBar";
 import SideBar from "../../components/DashBoard/SideBar";
 import { useState } from "react";
 
@@ -17,7 +17,7 @@ const Chat: React.FC = () => {
      <div style={{ display: "flex", height: "100vh", backgroundColor: "catedblue" }}>
     <SideBar toggleCreateChat={toggleCreateChat} />
     <br />
-    <Sidebar isCreateChatVisible={isCreateChatVisible} toggleCreateChat={toggleCreateChat} />
+    <SidebaR isCreateChatVisible={isCreateChatVisible} toggleCreateChat={toggleCreateChat} />
     <ChatPage/>
     </div>
     </>
