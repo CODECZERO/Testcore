@@ -84,6 +84,14 @@ const Content: React.FC = () => {
             icon={<BiMessage />}
             onClick={openExamScheuler}
           />,
+          <Card
+            key="Create Exam"
+            title="Create Exam"
+            description="Create an Exam for Students"
+            icon={<BiMessage />}
+            onClick={() => navigate('/CreateExam')}
+           
+          />,
         ]);
         break;
 
