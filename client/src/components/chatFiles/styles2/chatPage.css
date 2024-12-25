@@ -76,6 +76,21 @@
     gap: 0.5rem;
     background-color: #ffffff;
   }
+
+
+
+.messages::-webkit-scrollbar-thumb {
+  background-color: #d0e0f3;
+  border-radius: 7px ;
+  }
+
+.messages::-webkit-scrollbar {
+  width: 4px;
+  }
+
+.messages::-webkit-scrollbar-thumb:hover {
+  background-color: #4a90e2;
+  }
   
   /* Sent and Received Message Styles */
   .messages .message {

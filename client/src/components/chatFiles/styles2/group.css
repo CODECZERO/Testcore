@@ -63,12 +63,13 @@
 
 /* Group List Container with Scrollbar and No Horizontal Scroll */
 .groups-list-container {
-    max-height: 78vh; /* Adjust based on how much space you want for the groups list */
+    max-height: 80vh; /* Adjust based on how much space you want for the groups list */
     overflow-y: auto; /* Enable vertical scrolling */
     overflow-x: hidden; /* Hide horizontal scrollbar */
     padding-right: 5px; /* Prevent content from being hidden behind scrollbar */
     width: 100%; /* Ensure it stays within the sidebar */
     box-sizing: border-box; /* Prevent overflow of padding */
+
 }
 
 /* Add custom scrollbar for better visibility (optional) */

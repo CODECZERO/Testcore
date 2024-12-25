@@ -1,6 +1,6 @@
 /* General Footer Styles */
 .footer {
-    background-color: #2d4059; /* Dark background color */
+    background-color: #eef6ff; /* Dark background color */
     color: #ffffff; /* White text color */
     text-align: center; /* Center align the content */
     padding: 1.5rem 1rem; /* Add padding for spacing */
@@ -24,6 +24,7 @@
   /* Footer Content Spacing */
   .footer p {
     margin: 0.5rem 0; /* Add vertical spacing between lines */
+    color: black;
   }
   
   /* Footer Responsiveness */
