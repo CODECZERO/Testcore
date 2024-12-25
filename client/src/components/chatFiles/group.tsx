@@ -125,7 +125,7 @@ const Groups: React.FC = () => {
                   key={roomName}
                   onClick={() => handleJoinRoom(roomName)} // Join individual room
                 >
-                  console.log{roomName};
+                
                   {/* Group Avatar */}
                   <div className="group-avatar">
                     {roomName.charAt(0).toUpperCase()} {/* First letter of the room name */}
