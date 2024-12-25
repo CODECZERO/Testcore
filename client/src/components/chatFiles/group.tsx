@@ -116,6 +116,7 @@ const Groups: React.FC = () => {
         chatRooms.map((room: any) => {
           // Extract and display only the first room name
           const roomNames = room.chatData.map((data: any) => data.roomName);
+         
           return (
             <div key={room._id}>
               {roomNames.map((roomName: string) => (
@@ -124,6 +125,7 @@ const Groups: React.FC = () => {
                   key={roomName}
                   onClick={() => handleJoinRoom(roomName)} // Join individual room
                 >
+                  console.log{roomName};
                   {/* Group Avatar */}
                   <div className="group-avatar">
                     {roomName.charAt(0).toUpperCase()} {/* First letter of the room name */}

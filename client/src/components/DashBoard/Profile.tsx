@@ -1,14 +1,11 @@
 import React, { useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../store";
 import "../styles/Profile.css"; // Import styles for animation and layout
 import Pic from "../../Assets/Pic.png"; // Profile placeholder
 import Radio from "./Radio";
 
 const Profile: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false); // Manage menu visibility
-  const userInfo = useSelector((state: RootState) => state.user.userInfo);
-
+  
   const toggleMenu = () => {
     setMenuOpen(!menuOpen); // Toggle the dropdown menu
   };

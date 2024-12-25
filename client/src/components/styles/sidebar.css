@@ -41,72 +41,101 @@
     background-color: #27374d;
     color: #dde6ed;
 } */
-
+/* Sidebar Initial State */
 .menu {
-    height: 490px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
-    margin-top: 3.5%;
-    width: 15%;
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem 0;
-    box-shadow: inset -4px 0 5px -5px rgb(0, 0, 0); /* Horizontal inset shadow */
+  height: 490px;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  margin-top: 3.5%;
+  width: 60px; /* Reduced width for icons-only state */
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align items to the left */
+  padding: 1rem 0;
+  box-shadow: inset -4px 0 5px -5px rgb(0, 0, 0);
+  transition: width 0.3s ease;
+  overflow: hidden; /* Hide overflowing content */
+}
+
+/* Sidebar Hover State */
+.menu:hover {
+  width: 200px; /* Expanded width to show labels */
 }
 
 
-#AG{
-    color: rgb(255, 183, 49);
+/* Sidebar Logo Styling */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  width: 100%;
 }
 
-#G{
-    color: rgb(17, 17, 17);
+.logo-img {
+  width: 60px; /* Adjust the size */
+  height: auto;
+  object-fit: contain; /* Ensure proper aspect ratio */
 }
 
 
-  
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .logo-icon {
-    font-size: 1.5rem;
-    color: #2d4059;
-  }
-  
-  .logo h2 {
-    color: #2d4059;
-    font-size: 2rem;
-  }
-  
-  .menu--list {
-    padding: 4px;
-    width: 100%;
-  }
-  
+.logo-icon {
+  font-size: 1.5rem;
+  color: #2d4059;
+}
 
-  .item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.5rem 1rem;
-    font-size: 0.8rem;
-    color: #2d4059;
-    text-decoration: none;
-    transition: all 0.1s ease-in;
-    font-weight:550;
-  }
-  
-  .item .icon {
-    font-size: 1.5rem;
-  }
-  
-  .item:hover {
-    color: #4a90e2;
-  }
-  
+.logo h2 {
+  color: #2d4059;
+  font-size: 2rem;
+  white-space: nowrap;
+}
+
+/* Menu List Styling */
+.menu--list {
+  width: 100%;
+}
+
+/* Item Styling for Consistent Alignment */
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  color: #2d4059;
+  text-decoration: none;
+  transition: all 0.3s ease-in-out;
+  font-weight: 550;
+  white-space: nowrap;
+}
+
+.item .icon {
+  font-size: 1.5rem;
+  flex-shrink: 0; /* Prevent icons from shrinking */
+}
+
+/* Show Labels on Hover */
+.menu:hover .item span {
+  display: inline; /* Ensure labels are visible */
+}
+
+.menu:not(:hover) .item span {
+  display: none; /* Hide labels in collapsed state */
+}
+
+/* Hover Effect */
+.item:hover {
+  color: #4a90e2;
+}
+
+/* Alignment Fix for Non-Hovered State */
+.menu:not(:hover) .item {
+  justify-content: center;
+}
+
+/* Improved Alignment for Hovered State */
+.menu:hover .item {
+  justify-content: flex-start;
+}
+
