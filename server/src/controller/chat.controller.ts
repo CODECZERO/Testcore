@@ -78,7 +78,7 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   if (!(createRoom)) throw new ApiError(500, 'unable to create chat group');
 
-  await cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
+   await cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
     roomData.roomName,
     JSON.stringify(createRoom?._id),
   );
