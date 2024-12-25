@@ -2,7 +2,7 @@ import  { useState } from 'react';
 import CreateChat from "./createChat.tsx";
 import JoinChat from "./joinChat.tsx";
 import Groups from "./group.tsx";
-import "../chatFiles/styles2/sidebar.css";
+import "../chatFiles/styles2/sidebaR.css";
 
 interface SidebarProps {
     isCreateChatVisible: boolean;
@@ -10,7 +10,7 @@ interface SidebarProps {
 }
 
 
-const Sidebar: React.FC<SidebarProps> = ({ isCreateChatVisible }) => {
+const SidebaR: React.FC<SidebarProps> = ({ isCreateChatVisible }) => {
     const [roomName, setRoomName] = useState(
         localStorage.getItem("roomName") || ""
       );
@@ -52,4 +52,4 @@ const Sidebar: React.FC<SidebarProps> = ({ isCreateChatVisible }) => {
     );
 }
 
-export default Sidebar;
+export default SidebaR;
