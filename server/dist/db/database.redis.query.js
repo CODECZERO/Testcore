@@ -53,14 +53,14 @@ const cacheSearch = (tokenID) => __awaiter(void 0, void 0, void 0, function* () 
         throw new ApiError(500, error);
     }
 });
-const cacheSearchForChatRoom = (CollegeName, ClassRoomName) => __awaiter(void 0, void 0, void 0, function* () {
+const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         //this function spilt the college name and branch name
-        if (!CollegeName || !ClassRoomName)
+        if (!roomName)
             throw new ApiError(500, "Invalid room name format"); //if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = yield client.hGet(CollegeName, ClassRoomName); //if the college and branch name is provied then search theme in redis 
-        //cache , the cache uses Hashe datatype as the one College can have many Brach
+        const roomSearch = yield client.hGet(roomName, roomName); //if the  name is provied then search theme in redis 
+        //cache , the cache uses Hashe datatype
         //the output will be like this 
         /*
             "CollegeName":{
@@ -74,7 +74,7 @@ const cacheSearchForChatRoom = (CollegeName, ClassRoomName) => __awaiter(void 0,
         */
         if (!roomSearch)
             return null; //if data is not present return null as the further error handling can be implemented
-        return roomSearch; //retunr the hashset or id of the chatroom and futher operation can be performed on it.
+        return roomSearch; //return the hashset or id of the chatroom and futher operation can be performed on it.
     }
     catch (error) {
         throw new ApiError(500, error);
@@ -82,21 +82,16 @@ const cacheSearchForChatRoom = (CollegeName, ClassRoomName) => __awaiter(void 0,
 });
 const cacheUpdateForChatRoom = (roomName, roomID) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        //using regex to spilt.
-        //eg College/BranchName
-        const CollegeName = roomName.match(/^\w+/); //College
-        const ClassRoomName = roomName.match(/(?<=\/)\w+$/); //BrachName
-        //this function spilt the college name and branch name
-        if (!CollegeName || !ClassRoomName)
+        if (!roomName)
             throw new ApiError(500, "Invalid room name format"); //if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = yield client.hSet(CollegeName[0], ClassRoomName[0], roomID);
+        const roomSearch = yield client.hSet(roomName, roomName, roomID);
         //the data will store like this 
         /*
-            "CollegeName":{
-                "BranchName1":"MongodbId Of that chat room",
-                "BranchName2":"MongodbId Of that chat room",
-                "BranchName3":"MongodbId Of that chat room",
+            "roomName":{
+                "roomName1":"MongodbId Of that chat room",
+                "roomName2":"MongodbId Of that chat room",
+                "roomName3":"MongodbId Of that chat room",
             }
         */
         if (!roomSearch)

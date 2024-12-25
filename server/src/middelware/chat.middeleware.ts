@@ -10,9 +10,9 @@ interface Requestany extends Request {
 
 
 const SearchChatRoom = AsyncHandler(async (req: Requestany, res: Response, next: NextFunction) => {//this function check if chat room exists for that college and branch
-    const roomID = await cacheSearchForChatRoom(req.params.College, req.params.Branch);//check for chat room in chace
+    const roomID = await cacheSearchForChatRoom(req.params.roomName);//check for chat room in cache
     if (!(roomID)) throw new ApiError(404, "chat room not found, make sure it's register");
-    const roomName = `${req.params.College}/${req.params.Branch}`;//room name would be collegeName/branch
+    const roomName = req.params.roomName;//room name would be collegeName/branch
     req.chatRoomData = { roomID, roomName };//then return that data in req.chatRoomData object
     next();
 });
