@@ -79,12 +79,12 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
   if (!(createRoom)) throw new ApiError(500, 'unable to create chat group');
 
   await Promise.all([//updating data as it concurrently
-    await cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
+    cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
       roomData.roomName,
       JSON.stringify(createRoom?._id),
     ),
-    
-    await User.updateOne({//after finding room it will help user to join the room and update value in database
+
+     User.updateOne({//after finding room it will help user to join the room and update value in database
       sqlId: Id
     }, { $addToSet: { chatRoomIDs: user._id } }),
   ])
