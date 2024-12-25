@@ -86,7 +86,7 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
      User.updateOne({//after finding room it will help user to join the room and update value in database
       sqlId: Id
-    }, { $addToSet: { chatRoomIDs: user._id } }),
+    }, { $addToSet: { chatRoomIDs: createRoom._id } }),
   ])
 
   return res.status(200).json(new ApiResponse(200, createRoom));//return data
