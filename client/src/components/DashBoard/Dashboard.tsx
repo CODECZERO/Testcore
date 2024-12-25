@@ -2,6 +2,7 @@ import Content from "./Content";
 import Profile from "./Profile";
 import SideBar from "./SideBar";
 import '../styles/Dashboard.css';
+import Footer from "../Footer";
 
 
 
@@ -19,6 +20,7 @@ const Dashboard: React.FC = () => {
     <Profile/>
    </div>
    </div>
+    <Footer/>
    </>
   )
 };
