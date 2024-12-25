@@ -1,0 +1,13 @@
+body::-webkit-scrollbar {
+    width: 4px;
+    scroll-snap-type: y;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #d6e5f5;
+    border-radius: 4px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background: #357ab7;
+}
