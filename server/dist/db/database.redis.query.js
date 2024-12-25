@@ -73,7 +73,7 @@ const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, f
             output-MongodbID of that chat room
         */
         if (!roomSearch)
-            return new ApiResponse(404, { roomName }, "Chat room not found"); //if data is not present return null as the further error handling can be implemented
+            return null; //if data is not present return null as the further error handling can be implemented
         return roomSearch; //retunr the hashset or id of the chatroom and futher operation can be performed on it.
     }
     catch (error) {
