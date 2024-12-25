@@ -51,8 +51,8 @@ const cacheSearchForChatRoom = async (roomName:string) => {//this function takes
         //this function spilt the college name and branch name
         if (!roomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = await client.hGet(roomName,roomName);//if the college and branch name is provied then search theme in redis 
-        //cache , the cache uses Hashe datatype as the one College can have many Brach
+        const roomSearch = await client.hGet(roomName,roomName);//if the  name is provied then search theme in redis 
+        //cache , the cache uses Hashe datatype
         //the output will be like this 
         /*
             "CollegeName":{
@@ -65,7 +65,7 @@ const cacheSearchForChatRoom = async (roomName:string) => {//this function takes
             output-MongodbID of that chat room
         */
         if (!roomSearch) return null;//if data is not present return null as the further error handling can be implemented
-        return roomSearch;//retunr the hashset or id of the chatroom and futher operation can be performed on it.
+        return roomSearch;//return the hashset or id of the chatroom and futher operation can be performed on it.
     } catch (error) {
         throw new ApiError(500, error);
     }

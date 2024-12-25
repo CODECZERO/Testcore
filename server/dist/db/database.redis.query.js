@@ -59,8 +59,8 @@ const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, f
         if (!roomName)
             throw new ApiError(500, "Invalid room name format"); //if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = yield client.hGet(roomName, roomName); //if the college and branch name is provied then search theme in redis 
-        //cache , the cache uses Hashe datatype as the one College can have many Brach
+        const roomSearch = yield client.hGet(roomName, roomName); //if the  name is provied then search theme in redis 
+        //cache , the cache uses Hashe datatype
         //the output will be like this 
         /*
             "CollegeName":{
@@ -74,7 +74,7 @@ const cacheSearchForChatRoom = (roomName) => __awaiter(void 0, void 0, void 0, f
         */
         if (!roomSearch)
             return null; //if data is not present return null as the further error handling can be implemented
-        return roomSearch; //retunr the hashset or id of the chatroom and futher operation can be performed on it.
+        return roomSearch; //return the hashset or id of the chatroom and futher operation can be performed on it.
     }
     catch (error) {
         throw new ApiError(500, error);
