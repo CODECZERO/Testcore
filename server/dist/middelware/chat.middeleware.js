@@ -12,6 +12,7 @@ import { ApiError } from "../util/apiError.js";
 import { cacheSearchForChatRoom } from "../db/database.redis.query.js";
 const SearchChatRoom = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const roomID = yield cacheSearchForChatRoom(req.params.roomName[0]); //check for chat room in chace
+    console.log(roomID);
     if (!(roomID))
         throw new ApiError(404, "chat room not found, make sure it's register");
     const roomName = req.params.roomName; //room name would be collegeName/branch
