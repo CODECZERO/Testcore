@@ -76,7 +76,7 @@ const cacheUpdateForChatRoom = async (roomName: string, roomID: string) => {//th
 
         if (!roomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = await client.hSet(roomName,roomID,roomID);
+        const roomSearch = await client.hSet(roomName,roomName,roomID);
         //the data will store like this 
         /*
             "roomName":{
