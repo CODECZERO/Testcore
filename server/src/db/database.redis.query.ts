@@ -46,13 +46,13 @@ const cacheSearch = async (tokenID: string) => {//this function to search tokenI
     }
 }
 
-const cacheSearchForChatRoom = async (CollegeName: string, ClassRoomName: string) => {//this function takes room name from user and search it on redis 
+const cacheSearchForChatRoom = async (roomName:string) => {//this function takes room name from user and search it on redis 
     try {
         //this function spilt the college name and branch name
-        if (!CollegeName || !ClassRoomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
+        if (!roomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = await client.hGet(CollegeName, ClassRoomName);//if the college and branch name is provied then search theme in redis 
-        //cache , the cache uses Hashe datatype as the one College can have many Brach
+        const roomSearch = await client.hGet(roomName,roomName);//if the  name is provied then search theme in redis 
+        //cache , the cache uses Hashe datatype
         //the output will be like this 
         /*
             "CollegeName":{
@@ -65,7 +65,7 @@ const cacheSearchForChatRoom = async (CollegeName: string, ClassRoomName: string
             output-MongodbID of that chat room
         */
         if (!roomSearch) return null;//if data is not present return null as the further error handling can be implemented
-        return roomSearch;//retunr the hashset or id of the chatroom and futher operation can be performed on it.
+        return roomSearch;//return the hashset or id of the chatroom and futher operation can be performed on it.
     } catch (error) {
         throw new ApiError(500, error);
     }
@@ -73,21 +73,16 @@ const cacheSearchForChatRoom = async (CollegeName: string, ClassRoomName: string
 
 const cacheUpdateForChatRoom = async (roomName: string, roomID: string) => {//this function is used to update value in chache
     try {
-        //using regex to spilt.
-        //eg College/BranchName
-        const CollegeName = roomName.match(/^\w+/);//College
-        const ClassRoomName = roomName.match(/(?<=\/)\w+$/);//BrachName
-        //this function spilt the college name and branch name
 
-        if (!CollegeName || !ClassRoomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
+        if (!roomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = await client.hSet(CollegeName[0], ClassRoomName[0], roomID);
+        const roomSearch = await client.hSet(roomName,roomName,roomID);
         //the data will store like this 
         /*
-            "CollegeName":{
-                "BranchName1":"MongodbId Of that chat room",
-                "BranchName2":"MongodbId Of that chat room",
-                "BranchName3":"MongodbId Of that chat room",
+            "roomName":{
+                "roomName1":"MongodbId Of that chat room",
+                "roomName2":"MongodbId Of that chat room",
+                "roomName3":"MongodbId Of that chat room",
             }
         */
         if (!roomSearch) throw new ApiError(500, "Room not found");

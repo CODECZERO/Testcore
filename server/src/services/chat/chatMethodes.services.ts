@@ -41,7 +41,6 @@ const receiveMessage = async (ws: CustomWebSocket): Promise<void> => {
         await rabbitmq.channel.consume(rabbitmq.queue.queue, (message: ConsumeMessage | null) => {
             if (message) {
                 broadcastMessage(message, ws.roomName!).catch(console.error);
-                rabbitmq.channel.ack(message);
             }
         });
     } catch (error) {

@@ -79,7 +79,7 @@ const getTimeTable = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
     if (!Class || !name)
         throw new ApiError(400, "Invalid data"); //if not provided then throw error
     const findtimetable = yield TimeTable.findOne({
-        Class: Class,
+        Class: Class.toLowerCase(),
         CollegeName: name.college.name
     });
     if (!findtimetable)
