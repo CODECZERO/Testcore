@@ -55,7 +55,7 @@ const createChatRoom = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
         roomData.roomName, JSON.stringify(createRoom === null || createRoom === void 0 ? void 0 : createRoom._id)),
         User.updateOne({
             sqlId: Id
-        }, { $addToSet: { chatRoomIDs: user._id } }),
+        }, { $addToSet: { chatRoomIDs: createRoom._id } }),
     ]);
     return res.status(200).json(new ApiResponse(200, createRoom)); //return data
 }));
