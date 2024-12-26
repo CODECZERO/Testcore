@@ -52,7 +52,8 @@ const CreateSubject = AsyncHandler(async (req: Request, res: Response) => {
         //@ts-ignore
         data: {
             subjectCode: subject.subjectCode,
-            subjectName: subject.subjectName
+            subjectName: subject.subjectName,
+            subjectVerify:true
         }
     });
     if (!createSubject) throw new ApiError(500, "Something went wrrong while creating subject");//check if the subject is create and throw error if doesn't
