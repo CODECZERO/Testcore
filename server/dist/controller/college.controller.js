@@ -45,7 +45,8 @@ const CreateSubject = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 
         //@ts-ignore
         data: {
             subjectCode: subject.subjectCode,
-            subjectName: subject.subjectName
+            subjectName: subject.subjectName,
+            subjectVerify: true
         }
     });
     if (!createSubject)
