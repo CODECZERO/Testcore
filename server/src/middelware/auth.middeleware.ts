@@ -61,7 +61,7 @@ const verifyexamData = AsyncHandler(async (req: RequestWithCookies, res: Respons
     //this function is used for finding data realted exam
     try {//write user verify logic here
         const token = req.cookies?.ExamToken || req.body;
-        const userTkone = req.cookies?.accesToken;
+        const userTkone = req.cookies?.accessToken;
         if (!token || !userTkone) throw new ApiError(400, "Token not provided");
         // Verify the token here
         const secert: any = process.env.ATS;
