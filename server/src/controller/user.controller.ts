@@ -90,7 +90,7 @@ const login = AsyncHandler(async (req: Request, res: Response) => {
     await updateOp(data, role);//pass the role to user it's necessary
     const { password: _, ...userData } = findUser;//removing user password form find user
 
-    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accesToken", accessToken, options).json(
+    return res.status(200).cookie("refreshToken", refreshToken, options).cookie("accessToken", accessToken, options).json(
         new ApiResponse(200, { userData, trackerUpdate, accessToken }, "Login in successfully")
     )
 

@@ -53,7 +53,7 @@ const verifyexamData = AsyncHandler((req, res, next) => __awaiter(void 0, void 0
     //this function is used for finding data realted exam
     try { //write user verify logic here
         const token = ((_b = req.cookies) === null || _b === void 0 ? void 0 : _b.ExamToken) || req.body;
-        const userTkone = (_c = req.cookies) === null || _c === void 0 ? void 0 : _c.accesToken;
+        const userTkone = (_c = req.cookies) === null || _c === void 0 ? void 0 : _c.accessToken;
         if (!token || !userTkone)
             throw new ApiError(400, "Token not provided");
         // Verify the token here
