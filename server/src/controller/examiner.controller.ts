@@ -68,9 +68,9 @@ const scheuldeExam = AsyncHandler(async (req: Requestany, res: Response) => {//t
             //
             subjectID: getsubject.Id,
             examName: createExamdata.examName,
-            date: createExamdata.date,
-            examStart: createExamdata.examStart,
-            examEnd: createExamdata.examEnd,
+            date: new Date(createExamdata.date),
+            examStart: new Date(createExamdata.examStart),
+            examEnd: new Date(createExamdata.examEnd),
             examDuration: createExamdata.examDuration,
             examinerID: Id
         },
