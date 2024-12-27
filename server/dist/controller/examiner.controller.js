@@ -34,7 +34,7 @@ const scheuldeExam = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0
             date: new Date(createExamdata.date),
             examStart: new Date(createExamdata.examStart),
             examEnd: new Date(createExamdata.examEnd),
-            examDuration: new Date(createExamdata.examDuration),
+            examDuration: createExamdata.examDuration,
             examinerID: Id
         },
         select: {

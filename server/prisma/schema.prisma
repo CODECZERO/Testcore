@@ -70,7 +70,7 @@ model Exam {
   date         DateTime
   examStart    DateTime
   examEnd      DateTime
-  examDuration DateTime
+  examDuration Int
   examinerID   String
 
   examiner       Examiner        @relation(fields: [examinerID], references: [Id])
