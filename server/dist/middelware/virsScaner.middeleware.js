@@ -7,10 +7,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import AsyncHandler from "../util/ayscHandler";
-import { ApiError } from "../util/apiError";
+import AsyncHandler from "../util/ayscHandler.js";
+import { ApiError } from "../util/apiError.js";
 import fs from "fs";
-import scanFile from "../util/anitvriusScaner";
+import scanFile from "../util/anitvriusScaner.js";
 export const ScanForVirus = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const filePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path; //takes file path 
