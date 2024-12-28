@@ -28,12 +28,10 @@ interface Requestany extends Request {
     user?: any
 }
 
-interface RequestWithImage extends Requestany {
-    customFiles?: {
-        ProfileImage?: ProfileImageFile[];
-    };
+interface RequestWithImage extends Request {
+    file?: Express.Multer.File;
+    user?: any; // Assuming you have a user type
 }
-
 type user = {
     Id: string,
     email: string,
@@ -137,7 +135,7 @@ const signup = AsyncHandler(async (req: Request, res: Response) => {
 const updatePassword = AsyncHandler(async (req: Requestany, res: Response) => {
     //updates password of user based on the roles
 
-    const { email, role } = req.user;//taking email,role,passwrod from user
+    const { email, role } = req.user||req.body;//taking email,role,passwrod from user
     const { password } = req.body;
     if (!(password && role && email)) return res.status(400).json("password is not provided");//if not found then return error
     const hashedPassword = await bcrypt.hash(password, 10);//hash password
@@ -151,7 +149,7 @@ const updatePassword = AsyncHandler(async (req: Requestany, res: Response) => {
 
 //
 const updateProfileImage = AsyncHandler(async (req: RequestWithImage, res: Response) => {//update profile image of user based on the role
-    const fileURI = req.customFiles?.ProfileImage?.[0]?.path;
+    const fileURI = req.file?.path;
     const userData: user = req.user || {};
 
     if (!fileURI) return res.status(400).json(new ApiError(400, "please provide images"));
