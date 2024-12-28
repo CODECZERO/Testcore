@@ -1,8 +1,8 @@
-import AsyncHandler from "../util/ayscHandler";
-import { ApiError } from "../util/apiError";
+import AsyncHandler from "../util/ayscHandler.js";
+import { ApiError } from "../util/apiError.js";
 import { Request,Response,NextFunction } from "express";
 import fs from "fs";
-import scanFile from "../util/anitvriusScaner";
+import scanFile from "../util/anitvriusScaner.js";
 
 // Extend the Express Request interface
 interface CustomRequest extends Request {
