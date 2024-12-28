@@ -86,11 +86,16 @@ const createChatRoom = AsyncHandler(async (req: Requestany, res: Response) => {/
 
   if (!(createRoom)) throw new ApiError(500, 'unable to create chat group');
 
-  await cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
-    roomData.roomName,
-    JSON.stringify(createRoom?._id),
-  );
+  await Promise.all([//updating data as it concurrently
+    cacheUpdateForChatRoom(//updating data in cahce so it's , easly accessed
+      roomData.roomName,
+      JSON.stringify(createRoom?._id),
+    ),
 
+     User.updateOne({//after finding room it will help user to join the room and update value in database
+      sqlId: Id
+    }, { $addToSet: { chatRoomIDs: createRoom._id } }),
+  ])
 
   return res.status(200).json(new ApiResponse(200, createRoom));//return data
 });
@@ -211,7 +216,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;&nbsp;&nbsp;&nbsp;- Updates the `ChatModel` collection to reflect the removal of the user from the chat room.&nbsp;&nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="112">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="117">
 
 ---
 
@@ -256,7 +261,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;&nbsp;&nbsp;&nbsp;-  Returns the total number of users in the chat room and their respective details.&nbsp;&nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="90">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="95">
 
 ---
 
@@ -332,7 +337,7 @@ Workflow:&nbsp;&nbsp;
 
 &nbsp;
 
-<SwmSnippet path="/server/src/controller/chat.controller.ts" line="164">
+<SwmSnippet path="/server/src/controller/chat.controller.ts" line="169">
 
 ---
 
@@ -557,11 +562,257 @@ The `verifyExamData` function is a middleware designed to validate and fetch exa
 
 - Ensures that only valid and authenticated users can access exam information.
 
+### User API Documentation
+
+\## Base URL
+
+`api/v1/user`
+
+\---
+
+**1. Signup**
+
+**Endpoint:** `api/v1/user/signup`&nbsp;&nbsp;
+
+**Method:** POST&nbsp;&nbsp;
+
+**Description:** Registers a new user with sanitized and validated input data.&nbsp;&nbsp;
+
+**Middleware Used:** `validateAndSanitize`&nbsp;&nbsp;
+
+\- Ensures all input data is sanitized to prevent malicious code or SQL injection.
+
+**Input:**
+
+\- `name` (string): User’s name.
+
+\- `email` (string): User’s email address.
+
+\- `password` (string): User’s password.
+
+\- `phoneNumber` (string): User’s phone number.
+
+\- `address` (string): User’s address.
+
+\- `role` (string): Role of the user (e.g., `Student`, `Admin`, etc.).
+
+**Process:**
+
+1\. Middleware sanitizes the input.
+
+2\. Checks if the user with the given role exists in the database.
+
+3\. If not found, creates a hashed password and generates an accessToken.
+
+4\. Maps the user to the MongoDB database.
+
+5\. Returns the created user data and accessToken.
+
+\---
+
+\### **2. Get College**
+
+**Endpoint:** `api/v1/user/signup`&nbsp;&nbsp;
+
+**Method:** POST&nbsp;&nbsp;
+
+**Description:** Retrieves a list of colleges if the user’s role is `Student`.
+
+**Process:**
+
+1\. Checks if the user’s role is `Student`.
+
+2\. Calls `findCollege` method to query all colleges from the database.
+
+3\. Returns the list of colleges.
+
+\---**3. Login**
+
+**Endpoint:** `api/v1/user/login`&nbsp;&nbsp;
+
+**Method:** POST&nbsp;&nbsp;
+
+**Description:** Authenticates a user with email, role, and password.
+
+**Input:**
+
+\- `role` (string): Role of the user.
+
+\- `email` (string): User’s email address.
+
+\- `password` (string): User’s password.
+
+**Process:**
+
+1\. Finds the user in the database based on role and email.
+
+2\. If not found, returns "User not found."
+
+3\. Compares the provided password with the hashed password in the database.
+
+4\. If correct, returns user data and accessToken.
+
+5\. If incorrect, returns "Password is incorrect" and updates tracker data (IP address and browser) in MongoDB.
+
+\---
+
+&nbsp;**4. Update Password**
+
+**Endpoint:** `api/v1/user/userData`&nbsp;&nbsp;
+
+**Method:** PUT&nbsp;&nbsp;
+
+**Description:** Updates or resets the user’s password.
+
+**Input:**
+
+\- `email` (string): User’s email address.
+
+\- `role` (string): User’s role.
+
+\- `password` (string): New password.
+
+**Process:**
+
+1\. Verifies data from accessToken or user input.
+
+2\. Verifies the old password.
+
+3\. Updates the password in the database.
+
+4\. Returns the updated user data.
+
+\---
+
+&nbsp;**5. Session Active**
+
+**Endpoint:** `api/v1/user/userData`&nbsp;&nbsp;
+
+**Method:** GET&nbsp;&nbsp;
+
+**Description:** Checks if the user is active using accessToken.
+
+**Input:**
+
+\- `accessToken` (string): Token to identify the user.
+
+**Process:**
+
+1\. Finds the user in the database using accessToken.
+
+2\. Checks if the user is active.
+
+3\. If active, returns `true`.
+
+4\. If inactive, returns `false`.
+
+**Use Case:** Allows quick login for already authenticated users.
+
+\---
+
+**6. Get Class**
+
+**Endpoint:** `api/v1/user/class`&nbsp;&nbsp;
+
+**Method:** GET&nbsp;&nbsp;
+
+**Description:** Retrieves a list of all classes in the database.
+
+**Process:**
+
+1\. Fetches all class records from the database.
+
+2\. Returns the list of classes.
+
+\---
+
+**7. Create Class**
+
+**Endpoint:** `api/v1/user/class`&nbsp;&nbsp;
+
+**Method:** POST&nbsp;&nbsp;
+
+**Description:** Creates a new class in the database.
+
+**Input:**
+
+\`\`\`json
+
+{
+
+&nbsp;&nbsp;&nbsp;&nbsp;"Classname": "Sybsc"
+
+}
+
+\`\`\`
+
+**Process:**
+
+1\. Takes the class name as input.
+
+2\. Creates the class in the MongoDB database.
+
+3\. Returns the created class data.
+
+\---
+
+\### **8. Get Profile Image**
+
+**Endpoint:** `api/v1/user/profile`&nbsp;&nbsp;
+
+**Method:** GET&nbsp;&nbsp;
+
+**Description:** Retrieves the user’s profile image.
+
+**Input:**
+
+\- `accessToken` (string): Token to identify the user.
+
+**Process:**
+
+1\. Finds the user in the database using accessToken.
+
+2\. Returns the user’s profile image.
+
+**Note:** Only the user can access their profile image.
+
+\---
+
+\### **9. Update Profile Image**
+
+**Endpoint:** `api/v1/user/profile`&nbsp;&nbsp;
+
+**Method:** POST&nbsp;&nbsp;
+
+**Description:** Uploads or updates the user’s profile image.
+
+**Input:**
+
+\- `ProfileImage` (file): A single image file (JPEG, PNG, GIF, or WEBP format, max size: 10MB).
+
+**Process:**
+
+1\. Accepts an image from the user’s form with the `ProfileImage` attribute.
+
+2\. Checks if the file contains any viruses or malware.
+
+3\. If the file is clean, uploads it to Cloudinary cloud storage.
+
+4\. Maps the image URL with the user’s ID or email in MongoDB.
+
+5\. Returns the uploaded image URL.
+
+**Note:** If a virus is detected, the file is removed, and a "Malware detected" message is returned.
+
+\---
+
+&nbsp;
+
 &nbsp;
 
 &nbsp;
 
-## **1)Student Api**
+## **Student Api**
 
 The **Student API** provides endpoints for operations that can be performed by students, such as viewing exam information, accessing timetables, and submitting exams. This API is structured to ensure efficient and secure data access.
 
