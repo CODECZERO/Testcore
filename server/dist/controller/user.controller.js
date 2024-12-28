@@ -99,7 +99,7 @@ const signup = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, func
 //
 const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     //updates password of user based on the roles
-    const { email, role } = req.user; //taking email,role,passwrod from user
+    const { email, role } = req.user || req.body; //taking email,role,passwrod from user
     const { password } = req.body;
     if (!(password && role && email))
         return res.status(400).json("password is not provided"); //if not found then return error
@@ -114,8 +114,8 @@ const updatePassword = AsyncHandler((req, res) => __awaiter(void 0, void 0, void
 }));
 //
 const updateProfileImage = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
-    const fileURI = (_c = (_b = (_a = req.customFiles) === null || _a === void 0 ? void 0 : _a.ProfileImage) === null || _b === void 0 ? void 0 : _b[0]) === null || _c === void 0 ? void 0 : _c.path;
+    var _a;
+    const fileURI = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
     const userData = req.user || {};
     if (!fileURI)
         return res.status(400).json(new ApiError(400, "please provide images"));
