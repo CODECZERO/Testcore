@@ -1,6 +1,8 @@
 ---
 title: API of Testcore
 ---
+&nbsp;
+
 # **TestCore API Structure**
 
 The TestCore API is divided into the following subsystems:
@@ -656,7 +658,7 @@ The `verifyExamData` function is a middleware designed to validate and fetch exa
 
 \---
 
-&nbsp;**4. Update Password**
+**4. Update Password**
 
 **Endpoint:** `api/v1/user/userData`&nbsp;&nbsp;
 
@@ -684,7 +686,7 @@ The `verifyExamData` function is a middleware designed to validate and fetch exa
 
 \---
 
-&nbsp;**5. Session Active**
+**5. Session Active**
 
 **Endpoint:** `api/v1/user/userData`&nbsp;&nbsp;
 
@@ -1265,5 +1267,148 @@ Notes:
 \- Success responses are wrapped in the `ApiResponse` format.
 
 &nbsp;
+
+### **College API Documentation**
+
+#### **Main Endpoint**:
+
+`api/v1/college`
+
+---
+
+### **Endpoints**
+
+#### **1. Get Timetables for a College**
+
+**Endpoint**: `/api/v1/college/subject`\
+**Method**: `GET`
+
+**Description**:\
+Retrieves the timetables for a particular college. The system searches the database for timetables that match the specified college name and returns all related timetables.
+
+**Parameters**:
+
+- **collegeName** (string) – The name of the college whose timetables need to be retrieved.
+
+**Response**:
+
+- An array of timetable objects related to the specified college.
+
+---
+
+#### **2. Add Subject Details for a Timetable**
+
+**Endpoint**: `/api/v1/college/subject`\
+**Method**: `POST`
+
+**Description**:\
+Creates a new timetable entry by adding subject details. This includes all the relevant information for a specific subject within the timetable.
+
+---
+
+#### **3. Approve or Update Timetable**
+
+**Endpoint**: `/api/v1/college/subject`\
+**Method**: `PUT`
+
+**Description**:\
+Approves a timetable created by an examiner. The timetable has a `state` attribute that can be set to either `true` or `false`. If the state is `true`, the timetable is visible to students; if `false`, it remains hidden.
+
+**Input Payload**:
+
+```json
+{
+  "timetableId": "Unique ID of the timetable",
+  "state": true
+}
+
+
+```
+
+**Response**:
+
+- A success message confirming that the timetable was approved, or an error message if an issue occurred.
+
+  ---
+
+#### **4. Create a Subject**
+
+**Endpoint**: `/api/v1/college/createSubject`\
+**Method**: `POST`
+
+**Description**:\
+Allows a college to create a new subject for students and examiners. If the subject is created by the college, its default `state` is set to `true`, making it visible to students and examiners immediately.
+
+**Input Payload**:
+
+```json
+{
+  "subjectCode": "Subject Code",
+  "subjectName": "Subject Name"
+}
+
+```
+
+**Response**:
+
+- A success message confirming subject creation, or an error if subject creation fails.
+
+---
+
+&nbsp;5. Get All Students in a College
+
+Endpoint: /api/v1/college/student
+
+Method: GET
+
+Description:
+
+Fetches the total number of students and their details associated with a college.
+
+Response:
+
+&nbsp;&nbsp;&nbsp;&nbsp;A list of student objects with relevant information.
+
+---
+
+6\. Approve a Student
+
+Endpoint: /api/v1/college/student
+
+Method: PUT
+
+Description:
+
+Approves a student, making them visible to examiners, colleges, and other systems as an enrolled student.
+
+Input Payload:
+
+{
+
+&nbsp;&nbsp;"studentId": "Unique ID of the student",
+
+&nbsp;&nbsp;"approved": true
+
+}
+
+Response:
+
+&nbsp;&nbsp;&nbsp;&nbsp;A success message confirming that the student was approved, or an error message if approval fails.
+
+---
+
+7\. Get All Examiners in a College
+
+Endpoint: /api/v1/college/examiner
+
+Method: GET
+
+Description:
+
+Fetches all examiner details associated with a college.
+
+Response:
+
+&nbsp;&nbsp;&nbsp;&nbsp;A list of examiner objects with relevant details.
 
 <SwmMeta version="3.0.0" repo-id="Z2l0aHViJTNBJTNBVGVzdGNvcmUlM0ElM0FDT0RFQ1pFUk8=" repo-name="Testcore"><sup>Powered by [Swimm](https://app.swimm.io/)</sup></SwmMeta>
