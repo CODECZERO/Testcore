@@ -43,6 +43,6 @@ ENV NODE_ENV=production
 
 # Expose the application port
 EXPOSE 10000
-
+RUN ls
 # Start Nginx and the Node.js app
 CMD ["sh", "-c", "service nginx start && node dist/index.js"]
