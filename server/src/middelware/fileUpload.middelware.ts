@@ -20,7 +20,8 @@ const ensureFolder = async (filePath: string) => {
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
-      const folderExistPath = path.resolve(__dirname, './public');
+      const folderExistPath = path.resolve(__dirname, '.');
+      console.log(folderExistPath)
       await ensureFolder(folderExistPath);
       console.log("Resolved image path:", folderExistPath); // Log the resolved path
       cb(null, folderExistPath);
