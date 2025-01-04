@@ -6,7 +6,6 @@ import fs from "fs";
 const ensureFolder = async (filePath: string) => {
   try {
     if (fs.existsSync(filePath)) {
-      console.dir(filePath, "exists");
       return true;
     }
     await fs.promises.mkdir(filePath, { recursive: true });
@@ -21,9 +20,7 @@ const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
       const folderExistPath = path.resolve('./public');
-      console.log(folderExistPath)
       await ensureFolder(folderExistPath);
-      console.log("Resolved image path:", folderExistPath); // Log the resolved path
       cb(null, folderExistPath);
     } catch (error:any) {
       cb(error,"");
