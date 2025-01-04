@@ -19,7 +19,8 @@ const ensureFolder =(filePath: string) => {
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const folderExistPath = path.resolve(path.dirname("../public/images"));
-    ensureFolder(folderExistPath);
+    const filedata= ensureFolder(folderExistPath);
+    console.log(filedata);
     cb(null, folderExistPath);
   },
   filename: function (req, file, cb) {
