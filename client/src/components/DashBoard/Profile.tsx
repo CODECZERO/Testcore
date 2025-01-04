@@ -1,21 +1,28 @@
-import '../styles/Profile.css';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store';
-import Pic from '../../Assets/Pic.png'
+import React, { useState } from "react";
+import "../styles/Profile.css"; // Import styles for animation and layout
+import Pic from "../../Assets/Pic.png"; // Profile placeholder
+import Radio from "./Radio";
 
-const Profile = () => {
-  const userInfo = useSelector((state: RootState) => state.user.userInfo);
+const Profile: React.FC = () => {
+  const [menuOpen, setMenuOpen] = useState(false); // Manage menu visibility
+  
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen); // Toggle the dropdown menu
+  };
+
   return (
-    <div className="profile-card">
-      <img 
-        src={Pic}
-        alt="Profile Avatar" 
-      />
-      <div className="profile-info">
-        <span className="profile-name">{userInfo?.name}</span>
-        <br></br>
-        <span className="profile-role">Student</span>
+    <div className="profile-container">
+      <div
+        className={`profile-avatar ${menuOpen ? "menu-open" : ""}`} // Add 'menu-open' class when menu is open
+        onClick={toggleMenu}
+      >
+        <img src={Pic} alt="Profile Avatar" />
       </div>
+      {menuOpen && (
+        <div className="dropdown-menu">
+          <Radio />
+        </div>
+      )}
     </div>
   );
 };
