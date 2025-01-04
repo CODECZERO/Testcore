@@ -6,7 +6,6 @@ import fs from "fs";
 const ensureFolder = async (filePath: string) => {
   try {
     if (fs.existsSync(filePath)) {
-      console.dir(filePath, "exists");
       return true;
     }
     await fs.promises.mkdir(filePath, { recursive: true });
@@ -20,10 +19,8 @@ const ensureFolder = async (filePath: string) => {
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
-      const folderExistPath = path.resolve(__dirname, '.');
-      console.log(folderExistPath)
+      const folderExistPath = path.resolve('./public');
       await ensureFolder(folderExistPath);
-      console.log("Resolved image path:", folderExistPath); // Log the resolved path
       cb(null, folderExistPath);
     } catch (error:any) {
       cb(error,"");
@@ -49,3 +46,4 @@ export const upload = multer({
   fileFilter,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB of image size
 });
+
