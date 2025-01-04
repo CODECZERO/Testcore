@@ -9,7 +9,7 @@ const ensureFolder =(filePath: string) => {
     if (fs.existsSync(filePath)) {
       return true;
     }
-    await fs.promises.mkdir(filePath, { recursive: true });
+    fs.mkdirSync(filePath, { recursive: true });
     return true;
   } catch (error) {
     return error;
