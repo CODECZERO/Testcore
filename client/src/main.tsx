@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -14,13 +12,13 @@ import FrontPage from './components/LoginSign/FrontPage.tsx';
 import Login from './components/LoginSign/SignUp.tsx';
 import Help from './components/DashBoard/Help.tsx';
 import SessionCheck from './components/SessionCheck.tsx';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './App.css'
 import Chat from './components/chatFiles/Chat.tsx';
 import { ChatWrapper } from "./components/chatFiles/ChatWrapper.tsx";
-
 import RestoreUser from './components/RestoreUser.tsx';
 import { RoomProvider } from './components/chatFiles/RoomContext.tsx';
+import CreateTimetable from './components/ExaminerFunctions/CreateTimeTable.tsx';
+import CreateExam from './components/ExaminerFunctions/CreateExam.tsx';
 
 
 
@@ -51,24 +49,33 @@ const router = createBrowserRouter([
     path: "/messages",
     element: <Chat />,
   },
- 
+
+  {
+    path: "/create-timetable",
+    element: <CreateTimetable />,
+  },
+
   {
     path: "/Help",
     element: <Help />,
   },
- 
+  {
+    path: "/CreateExam",
+    element: <CreateExam />,
+  },
+
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-        <RoomProvider> 
-            <ChatWrapper>
-        <RouterProvider router={router} />
-            <RestoreUser /> 
+        <RoomProvider>
+          <ChatWrapper>
+            <RouterProvider router={router} />
+            <RestoreUser />
           </ChatWrapper>
-          </RoomProvider>
+        </RoomProvider>
       </QueryClientProvider>
     </Provider>
   </React.StrictMode>
