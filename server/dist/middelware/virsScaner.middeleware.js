@@ -13,9 +13,7 @@ import fs from "fs";
 import scanFile from "../util/anitvriusScaner.js";
 export const ScanForVirus = AsyncHandler((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const filePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path; //takes file path ]
-    console.log(req + "\n");
-    console.log(req.file);
+    const filePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path; //takes file path 
     if (!filePath)
         throw new ApiError(400, "File address not provided");
     const scanResult = yield scanFile(filePath); //put the file through virus scan
