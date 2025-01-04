@@ -20,7 +20,7 @@ const ensureFolder = async (filePath: string) => {
 const storage = multer.diskStorage({
   destination: async function (req, file, cb) {
     try {
-      const folderExistPath = path.resolve(__dirname, '.');
+      const folderExistPath = path.resolve('./public');
       console.log(folderExistPath)
       await ensureFolder(folderExistPath);
       console.log("Resolved image path:", folderExistPath); // Log the resolved path
@@ -49,3 +49,4 @@ export const upload = multer({
   fileFilter,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB of image size
 });
+
