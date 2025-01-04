@@ -10,9 +10,7 @@ interface CustomRequest extends Request {
 }
 
 export const ScanForVirus = AsyncHandler(async (req: CustomRequest, res: Response, next: NextFunction) => {//this function scans the file which are uploaded on the server
-    const filePath = req.file?.path;//takes file path ]
-    console.log(req+"\n")
-    console.log(req.file);
+    const filePath = req.file?.path;//takes file path 
     if (!filePath) throw new ApiError(400, "File address not provided");
 
     const scanResult= await scanFile(filePath);//put the file through virus scan
