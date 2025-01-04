@@ -4,7 +4,7 @@ import fs from "fs";
 
 
 //a function to ensure that folder exist 
-const ensureFolder = async (filePath: string) => {
+const ensureFolder =(filePath: string) => {
   try {
     if (fs.existsSync(filePath)) {
       return true;
@@ -19,7 +19,7 @@ const ensureFolder = async (filePath: string) => {
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const folderExistPath = path.resolve(path.dirname("../public/images"));
-    await ensureFolder(folderExistPath);
+    ensureFolder(folderExistPath);
     cb(null, folderExistPath);
   },
   filename: function (req, file, cb) {
