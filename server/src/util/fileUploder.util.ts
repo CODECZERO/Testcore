@@ -1,25 +1,42 @@
-import { v2 as fileServer} from "cloudinary";
+import { v2 as fileServer } from "cloudinary";
 import fs from "fs";
-fileServer.config({//config key for fileServer to access the server
-    cloud_name:process.env.CLOUDNAME,
-    api_key:process.env.CLOUDAPIKEY,
-    api_secret:process.env.CLOUDAPISECRET
-})
+import dotenv from "dotenv";
 
-//this function is going to upload file on server but before that we are going to store it on local server and then upload it to cloud server
-const uploadFile=async(localFilePath:any)=>{
+// Load environment variables from .env file
+dotenv.config();
+
+// Configure Cloudinary
+fileServer.config({
+    cloud_name: process.env.CLOUDNAME,
+    api_key: process.env.CLOUDAPIKEY,
+    api_secret: process.env.CLOUDAPISECRET
+});
+
+// Function to upload file to Cloudinary
+const uploadFile = async (localFilePath: string): Promise<string | null> => {
     try {
-        if(!localFilePath)return null;//checking if file path is therer
-        const upload=await fileServer.uploader.upload(localFilePath,{//uploading it on server
-            resource_type:"auto"
+        if (!localFilePath) return null; // Check if file path is provided
+
+        // Upload file to Cloudinary
+        const upload = await fileServer.uploader.upload(localFilePath, {
+            resource_type: "auto"
         });
-        fs.unlinkSync(localFilePath);//removing it from local file
-        return upload.url;//reutnring it's link
-    } catch (error) {
+
+        // Remove file from local server
         fs.unlinkSync(localFilePath);
+
+        // Return the URL of the uploaded file
+        return upload.url;
+    } catch (error) {
+        console.error("Error uploading file:", error);
+
+        // Remove file from local server in case of error
+        if (fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath);
+        }
+
         return null;
     }
-}
+};
 
-export {uploadFile}
-
+export { uploadFile };
