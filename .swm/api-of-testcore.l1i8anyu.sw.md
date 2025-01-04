@@ -1268,7 +1268,7 @@ Notes:
 
 &nbsp;
 
-### **College API Documentation**
+## **College API Documentation**
 
 #### **Main Endpoint**:
 
