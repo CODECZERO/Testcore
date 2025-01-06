@@ -9,24 +9,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { v2 as fileServer } from "cloudinary";
 import fs from "fs";
+import dotenv from "dotenv";
+// Load environment variables from .env file
+dotenv.config();
+// Configure Cloudinary
 fileServer.config({
     cloud_name: process.env.CLOUDNAME,
     api_key: process.env.CLOUDAPIKEY,
     api_secret: process.env.CLOUDAPISECRET
 });
-//this function is going to upload file on server but before that we are going to store it on local server and then upload it to cloud server
+// Function to upload file to Cloudinary
 const uploadFile = (localFilePath) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         if (!localFilePath)
-            return null; //checking if file path is therer
+            return null; // Check if file path is provided
+        // Upload file to Cloudinary
         const upload = yield fileServer.uploader.upload(localFilePath, {
             resource_type: "auto"
         });
-        fs.unlinkSync(localFilePath); //removing it from local file
-        return upload.url; //reutnring it's link
+        // Remove file from local server
+        fs.unlinkSync(localFilePath);
+        // Return the URL of the uploaded file
+        return upload.url;
     }
     catch (error) {
-        fs.unlinkSync(localFilePath);
+        console.error("Error uploading file:", error);
+        // Remove file from local server in case of error
+        if (fs.existsSync(localFilePath)) {
+            fs.unlinkSync(localFilePath);
+        }
         return null;
     }
 });
