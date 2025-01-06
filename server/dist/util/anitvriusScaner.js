@@ -10,15 +10,40 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
-const VIRUSTOTALKEY = process.env.VIRUSTOTALAPI;
-const scanFile = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
+const uploadFile = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const form = new FormData();
         form.append('file', fs.createReadStream(filePath));
         const response = yield axios.post('https://www.virustotal.com/api/v3/files', form, {
-            headers: Object.assign(Object.assign({}, form.getHeaders()), { 'x-apikey': VIRUSTOTALKEY })
+            headers: Object.assign({ accept: 'application/json', 'content-type': 'multipart/form-data', 'x-apikey': process.env.VIRUSTOTALAPI }, form.getHeaders())
         });
-        const { malicious, suspicious } = response.data.data.attributes.last_analysis_stats;
+        return response.data;
+    }
+    catch (error) {
+        return error;
+    }
+});
+const getFiledata = (Id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const response = yield axios.get(`https://www.virustotal.com/api/v3/analyses/${Id}`, {
+            headers: {
+                accept: 'application/json',
+                'x-apikey': process.env.VIRUSTOTALAPI,
+            }
+        });
+        if (!response)
+            return "No response from VirusTotal";
+        return response.data.data;
+    }
+    catch (error) {
+        return error;
+    }
+});
+const scanFile = (filePath) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const uploadFileData = yield uploadFile(filePath);
+        const fileData = yield getFiledata(uploadFileData.data.id);
+        const { malicious, suspicious } = fileData.attributes.stats;
         // Determine if the file is malware
         const isMalware = malicious > 0 || suspicious > 0;
         return isMalware;
