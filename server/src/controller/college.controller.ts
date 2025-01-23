@@ -121,9 +121,7 @@ const TimeTableSearch = AsyncHandler(async (req: Requestany, res: Response) => {
         
 
         const getTimeTable = await TimeTable.find({//finds time table of the college by using it's name only college can those timetable without approvable
-            $match: {
                 CollegeName: CollegeData.name//search using college name
-            }
         })
 
         if (!getTimeTable) return res.status(200).json(new ApiResponse(200, "There is no timetable at this time"));//if there is no timetable then send ok reponse
