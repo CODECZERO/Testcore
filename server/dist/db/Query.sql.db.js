@@ -204,7 +204,7 @@ const getSubject = (subjectCode, subjectName) => __awaiter(void 0, void 0, void 
 });
 const findStudnet = (studnetData) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield prisma.student.findMany({
+        return yield prisma.student.findMany({
             where: {
                 collegeID: studnetData === null || studnetData === void 0 ? void 0 : studnetData.Id
             },
