@@ -85,7 +85,11 @@ const getExaminer = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0,
         throw new ApiError(400, "invlaid request");
     const findExaminer = yield prisma.examiner.findMany({
         where: {
-            college: Id
+            college: {
+                some: {
+                    Id: Id
+                }
+            }
         },
         select: {
             Id: true,
