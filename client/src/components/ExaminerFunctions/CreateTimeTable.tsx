@@ -48,6 +48,7 @@ function CreateTimetable() {
       if (response.status === 201) {
         setSuccessMessage('Timetable created successfully!');
         setError('');
+        console.log(response.data);
       }
     } catch (err) {
       // Handle error response safely

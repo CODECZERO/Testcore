@@ -1,183 +1,222 @@
 /* General Container Styling */
 .chat-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: calc(95vh - 20px); /* Fit within the viewport with some padding */
-    width: 100%; /* Ensure full width */
-    max-width: 700px; /* Center and limit the container width */
-    margin: 25px auto; /* Add some margin at the top and bottom */
-    background-color: #f4f8fc;
-    border: 1px solid #d1e1f0;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif;
-    overflow: hidden; /* Prevent overflow issues */
-  }
-  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(95vh - 20px); /* Fit within the viewport with some padding */
+  width: 100%; /* Ensure full width */
+  max-width: 700px; /* Center and limit the container width */
+  margin: 25px auto; /* Add some margin at the top and bottom */
+  background-color: #f4f8fc;
+  border: 1px solid #d1e1f0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+  overflow: hidden; /* Prevent overflow issues */
+}
+
 /* Chat Header */
 .chat-header {
-    background-color: #2c82e5;
-    color: white;
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Vertically center the content */
-    justify-content: space-between; /* Push content to the sides */
-    padding: 1rem;
-    font-size: 1.25rem;
-    font-weight: bold;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-  }
-  
-  /* Chat Header Icon */
-  .chat-header .icons {
-    font-size: 1.6rem; /* Adjust the icon size */
-    color: white; /* Match the header text color */
-    cursor: pointer; /* Add a pointer cursor on hover */
-    margin-left: 10px; /* Add some spacing between the title and the icon */
-    transition: transform 0.3s ease; /* Add a hover effect */
-  }
-  
-  .iconss{
-    font-size: 1.1rem; /* Adjust the icon size */
-    color: white; /* Match the header text color */
-    cursor: pointer; /* Add a pointer cursor on hover */
-    transition: transform 0.3s ease;
-  }
-
-  .iconss:hover{
-    transform: scale(1.2); 
-  }
-
-.iconsss{
-    font-size: 1.3rem; 
-    color: rgb(33, 29, 29);
-   margin-right: 10px ;
-   cursor: pointer;
-   transition: transform 0.3s ease;
-   
-}
-.iconsss:hover{
-   transform: scale(1.2);
-   
+  background-color: #3288ea;
+  color: white;
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Vertically center the content */
+  justify-content: space-between; /* Push content to the sides */
+  padding: 0.55rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom-right-radius: 10px;
+  border-bottom-left-radius: 10px;
 }
 
-  .chat-header .icons:hover {
-    transform: scale(1.2); /* Slightly enlarge the icon on hover */
-  }
-  
-  /* Messages Section */
-  .messages {
-    flex: 1;
-    padding: 1rem;
-    overflow-y: auto; /* Enable scrolling for overflowing messages */
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    background-color: #ffffff;
-  }
+/* Chat Header Icon */
+.chat-header .icons {
+  font-size: 1.6rem; /* Adjust the icon size */
+  color: white; /* Match the header text color */
+  cursor: pointer; /* Add a pointer cursor on hover */
+  margin-left: 10px; /* Add some spacing between the title and the icon */
+  transition: transform 0.3s ease; /* Add a hover effect */
+}
 
+/* Chat Header Icon Hover Effects */
+.iconss, .iconsss {
+  font-size: 1.1rem; /* Adjust the icon size */
+  color: white; /* Match the header text color */
+  cursor: pointer; /* Add a pointer cursor on hover */
+  transition: transform 0.3s ease;
+}
 
+.iconss:hover, .iconsss:hover {
+  transform: scale(1.2);
+}
+
+.iconsss {
+  font-size: 1.3rem; 
+  color: rgb(33, 29, 29);
+  margin-right: 10px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.iconsss:hover {
+  transform: scale(1.2);
+}
+
+/* Messages Section */
+.messages {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto; /* Enable scrolling for overflowing messages */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: #ffffff;
+}
 
 .messages::-webkit-scrollbar-thumb {
   background-color: #d0e0f3;
-  border-radius: 7px ;
-  }
+  border-radius: 7px;
+}
 
 .messages::-webkit-scrollbar {
   width: 4px;
-  }
+}
 
 .messages::-webkit-scrollbar-thumb:hover {
   background-color: #4a90e2;
+}
+
+/* Sent and Received Message Styles */
+.messages .message {
+  display: flex;
+  align-items: center;
+  max-width: 70%;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  word-wrap: break-word;
+}
+
+.messages .sent {
+  align-self: flex-end;
+  background-color: #4a90e2;
+  color: white;
+}
+
+.messages .received {
+  align-self: flex-start;
+  background-color: #e6e6e6;
+  color: #2d4059;
+}
+
+.messages .text {
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Enable Notifications Button */
+.enable-notifications-btn {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  transition: background-color 0.3s ease;
+  width: 26%;
+}
+
+.enable-notifications-btn:hover {
+  background-color: #357acb;
+}
+
+.notifications-status {
+  color: #2d4059;
+  font-size: 0.9rem;
+  text-align: flex-end;
+}
+
+/* Input Section */
+.input-container {
+  display: flex;
+  align-items: center;
+  padding: 0.65rem;
+  background-color: #f4f8fc;
+
+}
+
+.message-input {
+  flex: 1;
+  padding: 0.4rem 1rem;
+  border: 1px solid #d1e1f0;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  outline: none;
+  margin-right: 0.5rem;
+}
+
+.message-input:focus {
+  border-color: #4a90e2;
+}
+
+.send-btn {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.send-btn:hover {
+  background-color: #357acb;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .chat-container {
+    margin: 15px; /* Reduce margins for smaller screens */
+    height: calc(90vh - 10px); /* Reduce height slightly */
   }
-  
-  /* Sent and Received Message Styles */
-  .messages .message {
-    display: flex;
-    align-items: center;
-    max-width: 70%;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    word-wrap: break-word;
+
+  .chat-header {
+    font-size: 1rem; /* Smaller font size */
+    padding: 0.8rem; /* Reduce padding */
   }
-  
-  .messages .sent {
-    align-self: flex-end;
-    background-color: #4a90e2;
-    color: white;
+
+  .messages {
+    padding: 0.8rem; /* Reduce padding */
   }
-  
-  .messages .received {
-    align-self: flex-start;
-    background-color: #e6e6e6;
-    color: #2d4059;
-  }
-  
-  .messages .text {
-    font-size: 0.9rem;
-    line-height: 1.4;
-  }
-  
-  /* Enable Notifications Button */
-  .enable-notifications-btn {
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    margin-bottom: 1rem;
-    transition: background-color 0.3s ease;
-    width: 26%;
-  }
-  
-  .enable-notifications-btn:hover {
-    background-color: #357acb;
-  }
-  
-  .notifications-status {
-    color: #2d4059;
-    font-size: 0.9rem;
-    text-align: flex-end;
-  }
-  
-  /* Input Section */
+
   .input-container {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background-color: #f4f8fc;
-    border-top: 1px solid #d1e1f0;
+    padding: 0.8rem; /* Reduce padding */
   }
-  
+
   .message-input {
-    flex: 1;
-    padding: 0.5rem 1rem;
-    border: 1px solid #d1e1f0;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    outline: none;
-    margin-right: 0.5rem;
+    font-size: 0.85rem; /* Reduce input font size */
   }
-  
-  .message-input:focus {
-    border-color: #4a90e2;
-  }
-  
+
   .send-btn {
-    background-color: #4a90e2;
-    color: white;
-    border: none;
-    border-radius: 20px;
-    padding: 0.5rem 1.5rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 0.85rem; /* Reduce button font size */
+    padding: 0.4rem 1.2rem; /* Reduce button size */
   }
-  
-  .send-btn:hover {
-    background-color: #357acb;
+
+  .enable-notifications-btn {
+    width: 40%; /* Make button wider on mobile */
   }
-  
+}
+
+@media (max-width: 480px) {
+  .message-input, .send-btn {
+    font-size: 0.8rem; /* Smaller font size on very small screens */
+  }
+
+  .send-btn {
+    padding: 0.4rem 1rem; /* Reduce padding on very small screens */
+  }
+}

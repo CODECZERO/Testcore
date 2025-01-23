@@ -1,3 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@300..900&family=Ga+Maamli&family=Playwrite+DE+Grund:wght@100..400&family=Rubik+Glitch&display=swap');
+
+*{
+  font-family: "Frank Ruhl Libre", serif;
+}
+
+
 .dashboard{
   display: flex;
   gap: 20px;
@@ -15,3 +22,75 @@ display: flex;
 justify-content: space-between;
 }
 
+
+/* Sidebar Styling */
+.dashboard > .sidebar {
+  flex: 0 0 250px; /* Sidebar occupies fixed width */
+  max-width: 250px;
+  transition: all 0.3s ease;
+}
+
+
+/* Profile Section */
+.dashboard--content > .profile {
+  margin-top: auto; /* Align the Profile section to the bottom */
+}
+
+/* Footer Styling */
+.footer {
+  width: 100%;
+  text-align: center;
+  padding: 1rem 0;
+  background-color: #f4f4f4;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .dashboard {
+    flex-direction: column; /* Stack sidebar and content vertically */
+  }
+
+  .dashboard > .sidebar {
+    flex: 0 0 60px; /* Reduce sidebar width */
+    max-width: 60px;
+  }
+
+  .dashboard--content {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard > .sidebar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+    background-color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+  }
+
+  .dashboard > .sidebar.active {
+    transform: translateX(0); /* Show sidebar when active */
+  }
+
+  .dashboard--content {
+    margin-left: 0; /* Adjust margin for hidden sidebar */
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard--content {
+    padding: 0.25rem;
+    margin-left: 15%;
+    padding-left: 10%;
+  }
+
+  .footer {
+    font-size: 0.8rem; /* Reduce footer text size */
+  }
+}

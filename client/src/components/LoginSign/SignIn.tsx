@@ -15,7 +15,6 @@ interface FormData {
   address: string;
   role: UserRole;
   password: string;
-
   collegeID?: string;
 }
 

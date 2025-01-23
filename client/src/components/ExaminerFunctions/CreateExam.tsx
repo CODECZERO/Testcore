@@ -1,12 +1,10 @@
-// Import necessary libraries and modules
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import axios from 'axios';
-
+import ClassList from './ClassList';
 
 const BackendUrl = "https://testcore-qmyu.onrender.com";
 
 const CreateExam: React.FC = () => {
-    // State to store input data and feedback
     const [examData, setExamData] = useState({
         questionPaperData: '',
         examDetails: ''
@@ -14,23 +12,46 @@ const CreateExam: React.FC = () => {
     const [response, setResponse] = useState<any | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Handle input changes
     const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setExamData({ ...examData, [name]: value });
     };
 
-    // Handle form submission
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setError(null);
         setResponse(null);
 
+        if (!examData.questionPaperData.trim() || !examData.examDetails.trim()) {
+            setError("All fields are required.");
+            return;
+        }
+
         try {
-            const res = await axios.post(`${BackendUrl}/api/exam/question-paper`, {
-                questionPaperData: examData.questionPaperData,
-                examData: examData.examDetails
+            const accessToken = localStorage.getItem("accessToken");
+            if (!accessToken) {
+                setError("User not authenticated. Please log in.");
+                return;
+            }
+
+            console.log("Payload being sent:", {
+                QuestionPaperData: examData.questionPaperData,
+                examData: examData.examDetails,
             });
+
+            const res = await axios.post(
+                `${BackendUrl}/api/v1/examiner/questionPaper`,
+                {
+                    questionPaperData: examData.questionPaperData,
+                    examData: examData.examDetails,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }
+            );
 
             if (res.status === 201) {
                 setResponse(res.data);
@@ -38,17 +59,14 @@ const CreateExam: React.FC = () => {
         } catch (err) {
             if (axios.isAxiosError(err)) {
                 if (err.response) {
-                    // Server responded with a status other than 200 range
-                    setError(err.response.data);
+                    setError(err.response.data.message || "Invalid request.");
                 } else if (err.request) {
-                    // Request was made but no response received
-                    setError('No response from server. Please try again later.');
+                    setError("No response from server. Please try again.");
                 } else {
-                    // Something happened while setting up the request
-                    setError('Error: ' + err.message);
+                    setError("Error: " + err.message);
                 }
             } else {
-                setError('An unknown error occurred.');
+                setError("An unknown error occurred.");
             }
         }
     };
@@ -95,6 +113,8 @@ const CreateExam: React.FC = () => {
                     <p>{error}</p>
                 </div>
             )}
+
+            <ClassList/>
         </div>
     );
 };
