@@ -93,7 +93,11 @@ const getExaminer = AsyncHandler(async (req: Requestany, res: Response) => {//ge
 
     const findExaminer = await prisma.examiner.findMany({//find examiner
         where: {
-            college: Id
+            college:{
+                some:{
+                    Id:Id
+                }
+            }
         },
         select: {
             Id: true,
@@ -114,7 +118,7 @@ const getExaminer = AsyncHandler(async (req: Requestany, res: Response) => {//ge
 const TimeTableSearch = AsyncHandler(async (req: Requestany, res: Response) => {//search's time table for college
     try {
         const CollegeData = req.user;//take college name by using it's access token
-
+        
 
         const getTimeTable = await TimeTable.find({//finds time table of the college by using it's name only college can those timetable without approvable
             $match: {
