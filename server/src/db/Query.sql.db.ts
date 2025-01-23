@@ -216,7 +216,7 @@ const getSubject = async (subjectCode: string, subjectName: string) => {//this f
 
 const findStudnet = async (studnetData: { Id: string }) => {//findt students for college
     try {
-        await prisma.student.findMany({//find all the studnet 
+       return await prisma.student.findMany({//find all the studnet 
             where: {
                 collegeID: studnetData?.Id
             },
@@ -234,8 +234,6 @@ const findStudnet = async (studnetData: { Id: string }) => {//findt students for
     } catch (error) {
         throw new ApiError(500, error)
     }
-
-
 }
 
 const getQuestionPaper = async (examId: string) => {//get question paper form data base
