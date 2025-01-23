@@ -16,7 +16,7 @@ import { TimeTable } from "../models/timetable.model.nosql.js";
 const getSubjects = AsyncHandler((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const subject = req.body; //taking subject name and code 
     let subjects;
-    if (!subject) { //if it doesn't exist then return whole table or subject name or code is not provide then return all
+    if (!subject.subjectCode && !subject.subjectName) { //if it doesn't exist then return whole table or subject name or code is not provide then return all
         subjects = yield prisma.subject.findMany({
             select: {
                 Id: true,
