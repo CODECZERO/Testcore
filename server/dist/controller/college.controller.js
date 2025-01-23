@@ -108,9 +108,7 @@ const TimeTableSearch = AsyncHandler((req, res) => __awaiter(void 0, void 0, voi
     try {
         const CollegeData = req.user; //take college name by using it's access token
         const getTimeTable = yield TimeTable.find({
-            $match: {
-                CollegeName: CollegeData.name //search using college name
-            }
+            CollegeName: CollegeData.name //search using college name
         });
         if (!getTimeTable)
             return res.status(200).json(new ApiResponse(200, "There is no timetable at this time")); //if there is no timetable then send ok reponse
