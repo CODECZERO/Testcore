@@ -23,7 +23,7 @@ type timetable = {
 const getSubjects = AsyncHandler(async (req: Request, res: Response) => {//get subject for college
     const subject: subject = req.body;//taking subject name and code 
     let subjects;
-    if (!subject) {//if it doesn't exist then return whole table or subject name or code is not provide then return all
+    if (!subject.subjectCode&&!subject.subjectName) {//if it doesn't exist then return whole table or subject name or code is not provide then return all
         subjects = await prisma.subject.findMany({//try puting pagenation here and function like it because , it can increase load on database
             select: {
                 Id: true,
