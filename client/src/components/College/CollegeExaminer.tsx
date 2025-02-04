@@ -19,12 +19,13 @@ const CollegeExaminer: React.FC = () => {
         const fetchExaminers = async () => {
             try {
                 const authToken = localStorage.getItem("accessToken");
-                const response = await axios.get(`${BackendUrl}/api/v1/examiner`, {
+                const response = await axios.get(`${BackendUrl}/api/v1/college/examiner`, {
                     headers: {
-                        Authorization: `Bearer ${authToken}` // Replace <your_token_here> with the actual token
+                        Authorization: `Bearer ${authToken}` 
                     }
                 });
-                setExaminers(response.data);
+                setExaminers(response.data.data);
+                console.log(response.data);
                 setLoading(false);
                 
             } catch (err: any) {
