@@ -3,21 +3,20 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import CollegeExaminer from './CollegeExaminer';
-import CollegeTimetables from './CollegeTimeTable';
-
-import CollegeTimetableComponent from './ApproveTimetable';
+import CollegeTimetable from './CollegeTimeTable';
+import ApproveTimetable from './ApproveTimetable';
 
 const BackendUrl = 'https://testcore-qmyu.onrender.com';
 
 const CollegeStudents = () => {
     interface Student {
-        Id: number;
+        Id: string;
         name: string;
         email: string;
-        department: string;
+        phoneNumber: string;
     }
 
-    const [students, setStudents] = useState<Student[]>([]);
+    const [student, setStudent] = useState<Student[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -26,12 +25,12 @@ const CollegeStudents = () => {
         const fetchStudents = async () => {
             try {
                 const authToken = localStorage.getItem("accessToken");
-                const response = await axios.get(`${BackendUrl}/api/v1/student`, {
+                const response = await axios.get(`${BackendUrl}/api/v1/college/student`, {
                     headers: {
                         Authorization: `Bearer ${authToken}`, // Replace <your_token_here> with the actual token
                     }
                 });
-                setStudents(response.data);
+                setStudent(response.data.data);
                 console.log(response.data);
                 setLoading(false);
             } catch (err) {
@@ -49,13 +48,14 @@ const CollegeStudents = () => {
     return (
         <div>
             <h1>College Students</h1>
-            {students.length > 0 ? (
+            {student.length > 0 ? (
                 <ul>
-                    {students.map((student) => (
+                    {student.map((student) => (
                         <li key={student.Id}>
+                            <p>ID: {student.Id}</p>
                             <p>Name: {student.name}</p>
                             <p>Email: {student.email}</p>
-                            <p>Department: {student.department}</p>
+                            <p>Number: {student.phoneNumber}</p>
                         </li>
                     ))}
                 </ul>
@@ -63,8 +63,8 @@ const CollegeStudents = () => {
                 <p>No students found.</p>
             )}
             <CollegeExaminer/>
-            <CollegeTimetables/>
-           <CollegeTimetableComponent/>
+            <CollegeTimetable/>
+           <ApproveTimetable/>
         </div>
     );
 };

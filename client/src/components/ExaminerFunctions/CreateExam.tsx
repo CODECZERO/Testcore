@@ -1,120 +1,102 @@
-import React, { useState, ChangeEvent, FormEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ClassList from './ClassList';
 
-const BackendUrl = "https://testcore-qmyu.onrender.com";
+const BackendUrl = 'https://testcore-qmyu.onrender.com';
 
-const CreateExam: React.FC = () => {
-    const [examData, setExamData] = useState({
-        questionPaperData: '',
-        examDetails: ''
-    });
-    const [response, setResponse] = useState<any | null>(null);
-    const [error, setError] = useState<string | null>(null);
+const CreateExam = () => {
+    const [examId, setExamId] = useState('');
+    const [questionPapers, setQuestionPapers] = useState([]);
+    const [newQuestionPaper, setNewQuestionPaper] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+    const [message, setMessage] = useState('');
 
-    const handleChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        setExamData({ ...examData, [name]: value });
-    };
-
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        setError(null);
-        setResponse(null);
-
-        if (!examData.questionPaperData.trim() || !examData.examDetails.trim()) {
-            setError("All fields are required.");
+    // Fetch question papers
+    const fetchQuestionPapers = async () => {
+        if (!examId) {
+            setError('Exam ID is required');
             return;
         }
+        setLoading(true);
+        setError('');
 
         try {
-            const accessToken = localStorage.getItem("accessToken");
-            if (!accessToken) {
-                setError("User not authenticated. Please log in.");
-                return;
-            }
-
-            console.log("Payload being sent:", {
-                QuestionPaperData: examData.questionPaperData,
-                examData: examData.examDetails,
+            const authToken = localStorage.getItem("accessToken");
+            const response = await axios.get(`${BackendUrl}/api/v1/examiner/questionPaper`, {
+                params: { examID: examId },
+                headers: { Authorization: `Bearer ${authToken}` }
             });
-
-            const res = await axios.post(
-                `${BackendUrl}/api/v1/examiner/questionPaper`,
-                {
-                    questionPaperData: examData.questionPaperData,
-                    examData: examData.examDetails,
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessToken}`,
-                    },
-                }
-            );
-
-            if (res.status === 201) {
-                setResponse(res.data);
-            }
+            setQuestionPapers(response.data.data);
         } catch (err) {
-            if (axios.isAxiosError(err)) {
-                if (err.response) {
-                    setError(err.response.data.message || "Invalid request.");
-                } else if (err.request) {
-                    setError("No response from server. Please try again.");
-                } else {
-                    setError("Error: " + err.message);
-                }
-            } else {
-                setError("An unknown error occurred.");
-            }
+            setError('Failed to fetch question papers.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Create a new question paper
+    const createQuestionPaper = async () => {
+        if (!newQuestionPaper) {
+            setError('Question paper data is required');
+            return;
+        }
+        setLoading(true);
+        setError('');
+        setMessage('');
+
+        try {
+            const authToken = localStorage.getItem("accessToken");
+            const response = await axios.post(`${BackendUrl}/api/v1/examiner/questionPaper`, {
+                examData: { examID: examId }, 
+                QuestionPaperData: newQuestionPaper
+            }, {
+                headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' }
+            });
+            setMessage('Question paper created successfully!');
+            fetchQuestionPapers();
+        } catch (err) {
+            setError('Failed to create question paper.');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
-        <div className="create-exam">
-            <h2>Create Exam</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="questionPaperData">Question Paper Data:</label>
-                    <textarea
-                        id="questionPaperData"
-                        name="questionPaperData"
-                        value={examData.questionPaperData}
-                        onChange={handleChange}
-                        required
-                    ></textarea>
-                </div>
+        <div>
+            <h2>Examiner Question Paper Management</h2>
+            <input
+                type="text"
+                placeholder="Enter Exam ID"
+                value={examId}
+                onChange={(e) => setExamId(e.target.value)}
+            />
+            <button onClick={fetchQuestionPapers} disabled={loading}>
+                {loading ? 'Loading...' : 'Fetch Question Papers'}
+            </button>
 
-                <div className="form-group">
-                    <label htmlFor="examDetails">Exam Details:</label>
-                    <textarea
-                        id="examDetails"
-                        name="examDetails"
-                        value={examData.examDetails}
-                        onChange={handleChange}
-                        required
-                    ></textarea>
-                </div>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {message && <p style={{ color: 'green' }}>{message}</p>}
 
-                <button type="submit">Create Exam</button>
-            </form>
+            <h3>Create Question Paper</h3>
+            <textarea
+                placeholder="Enter question paper content"
+                value={newQuestionPaper}
+                onChange={(e) => setNewQuestionPaper(e.target.value)}
+            ></textarea>
+            <button onClick={createQuestionPaper} disabled={loading}>
+                {loading ? 'Submitting...' : 'Create Question Paper'}
+            </button>
 
-            {response && (
-                <div className="success-message">
-                    <h3>Exam Created Successfully!</h3>
-                    <pre>{JSON.stringify(response, null, 2)}</pre>
-                </div>
-            )}
-
-            {error && (
-                <div className="error-message">
-                    <h3>Error Creating Exam</h3>
-                    <p>{error}</p>
-                </div>
-            )}
-
-            <ClassList/>
+            <h3>Available Question Papers</h3>
+            <ul>
+                {questionPapers.length > 0 ? (
+                    questionPapers.map((paper, index) => (
+                        <li key={index}>{JSON.stringify(paper)}</li>
+                    ))
+                ) : (
+                    <p>No question papers found.</p>
+                )}
+            </ul>
         </div>
     );
 };
