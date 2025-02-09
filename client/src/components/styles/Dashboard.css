@@ -1,13 +1,18 @@
 body::-webkit-scrollbar {
     width: 4px;
     scroll-snap-type: y;
+    animation-timeline:scroll() ;
 }
 
 body::-webkit-scrollbar-thumb {
     background: #d6e5f5;
     border-radius: 4px;
+    animation-timeline: scroll();
 }
 
 body::-webkit-scrollbar-thumb:hover {
     background: #357ab7;
+    animation-timeline: scroll();
 }
+
+  

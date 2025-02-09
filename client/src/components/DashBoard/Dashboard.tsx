@@ -17,8 +17,10 @@ const Dashboard: React.FC = () => {
         } }/>
    <div className="dashboard--content">
     <Content/>
-    <Profile/>
    </div>
+   <div className="dashboard--profile">     
+    <Profile/>
+    </div>
    </div>
     <Footer/>
    </>

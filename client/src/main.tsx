@@ -19,6 +19,10 @@ import RestoreUser from './components/RestoreUser.tsx';
 import { RoomProvider } from './components/chatFiles/RoomContext.tsx';
 import CreateTimetable from './components/ExaminerFunctions/CreateTimeTable.tsx';
 import CreateExam from './components/ExaminerFunctions/CreateExam.tsx';
+import ForgetPassword from './components/LoginSign/ForgetPassword.tsx';
+import ProfileAccount from './components/DashBoard/ProfileAccount.tsx';
+import { ProfilePictureProvider } from './components/Users/ProfileContext.tsx';
+import CollegeStudents from './components/College/CollegeStudents.tsx';
 
 
 
@@ -63,6 +67,14 @@ const router = createBrowserRouter([
     path: "/CreateExam",
     element: <CreateExam />,
   },
+  {
+    path: "/Profileaccount",
+    element: <ProfileAccount />,
+  },
+  {
+    path: "/CollegeStudents",
+    element: <CollegeStudents />,
+  },
 
 ]);
 
@@ -70,13 +82,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
+      <ProfilePictureProvider>
         <RoomProvider>
           <ChatWrapper>
             <RouterProvider router={router} />
             <RestoreUser />
           </ChatWrapper>
         </RoomProvider>
+      </ProfilePictureProvider>
       </QueryClientProvider>
-    </Provider>
+    </Provider> 
   </React.StrictMode>
 );

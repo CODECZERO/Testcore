@@ -238,7 +238,7 @@ console.log(response.data);
 
           {/* Submit and Sign-Up Buttons */}
     
-<button className="button3">Forgot Password?</button>
+<button className="button3"   >Forgot Password?</button>
         </form>
       </div>
     </div>

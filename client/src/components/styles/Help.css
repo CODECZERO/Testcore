@@ -1,6 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Ga+Maamli&family=Playwrite+DE+Grund:wght@100..400&family=Rubik+Glitch&display=swap');
 
-
 .container {
     width: 100%;
     height: 100vh;
@@ -12,19 +11,18 @@
     background-size: 60px 60px;
     background-position: -5px -5px;
     overflow: hidden;
-  }
-  
+}
 
 .parent-container {
-    font-family: "Rubik Glitch" , system-ui;
+    font-family: "Rubik Glitch", system-ui;
     letter-spacing: 1px;
     background: transparent;
     display: flex;
-    justify-content: center; /* Center horizontally */
-    align-items: center;    /* Center vertically */
-  }
-  
-  .forms {
+    justify-content: center;
+    align-items: center;
+}
+
+.forms {
     position: relative;
     word-spacing: 7px;
     display: flex;
@@ -39,9 +37,23 @@
     backdrop-filter: blur(4px); /* Blurs background behind the card */
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37); /* Subtle shadow for depth */
     border: 1px solid rgba(255, 255, 255, 0.18); /* Frosted border */
-  }
-  
-  .forms .titles {
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .forms {
+        width: 90%; /* Adjust width for smaller screens */
+        padding: 15px; /* Reduce padding for compact layout */
+    }
+
+    .forms .titles {
+        font-size: 24px; /* Reduce font size for smaller screens */
+        padding-left: 0;
+        text-align: center; /* Center-align the titles */
+    }
+}
+
+.forms .titles {
     color: royalblue;
     font-size: 30px;
     font-weight: 600;
@@ -51,32 +63,39 @@
     align-items: center;
     padding-left: 55px;
     justify-content: center;
-  }
-  
-.inputs{
+}
+
+.inputs {
     outline: 0;
-    font-family: "Rubik Glitch" , system-ui;
+    font-family: "Rubik Glitch", system-ui;
     letter-spacing: 0.5px;
     border: 1px solid rgb(93, 91, 91);
     padding: 2px 10px;
     border-radius: 10px;
     width: 90%;
     height: 40px;
-  }
-  
-  .forms textarea {
+}
+
+.forms textarea {
     border-radius: 8px;
     height: 100px;
     width: 90%;
-    font-family: "Rubik Glitch" , system-ui;
+    font-family: "Rubik Glitch", system-ui;
     resize: none;
     outline: 0;
     padding: 7px 12px;
     border: 1px solid rgb(219, 213, 213);
-  }
-  
-  .forms button {
-    font-family: "Rubik Glitch" , system-ui;
+}
+
+/* Responsive textareas */
+@media (max-width: 480px) {
+    .forms textarea {
+        height: 80px; /* Reduce height for smaller screens */
+    }
+}
+
+.forms button {
+    font-family: "Rubik Glitch", system-ui;
     align-self: center;
     letter-spacing: 0.5px;
     padding: 8px;
@@ -90,9 +109,16 @@
     cursor: pointer;
     margin-top: 2px;
     margin-right: 7px;
-  }
-  
-  .forms button:hover {
+}
+
+/* Responsive button */
+@media (max-width: 768px) {
+    .forms button {
+        width: 100%; /* Make button full-width on smaller screens */
+        margin-right: 0;
+    }
+}
+
+.forms button:hover {
     background-color: #003399; /* Darker blue on hover */
-  }
-  
+}
