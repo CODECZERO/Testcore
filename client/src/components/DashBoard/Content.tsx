@@ -7,6 +7,8 @@ import { BiBookAlt, BiMessage, BiStats } from 'react-icons/bi';
 import TimeTablePopup from '../StudentFunctions/TimeTable';
 import GetExam from '../StudentFunctions/GetExam';
 import Schedule from '../ExaminerFunctions/Schedule';
+import ClassList from '../ExaminerFunctions/ClassList';
+import CreateClass from '../ExaminerFunctions/CreateClass';
 
 const Content: React.FC = () => {
   const navigate = useNavigate(); // Initialize the navigation hook
@@ -16,12 +18,17 @@ const Content: React.FC = () => {
   const [isTimeTablePopupOpen, setIsTimeTablePopupOpen] = useState(false);
   const [isExamSchedulerOpen, setIsExamSchedulerOpen] = useState(false);
   const [isGetExamOpen, setIsGetExamOpen] = useState<boolean>(false);
+  const [isCreateClassOpen, setIsCreateClassOpen] = useState<boolean>(false);
+
 
   const openTimeTablePopup = () => setIsTimeTablePopupOpen(true);
   const closeTimeTablePopup = () => setIsTimeTablePopupOpen(false);
 
   const openExamScheuler = () => setIsExamSchedulerOpen(true);
   const closeExamScheuler = () => setIsExamSchedulerOpen(false);
+
+  const openCreateClass = () => setIsCreateClassOpen(true);
+  const closeCreateClass = () => setIsCreateClassOpen(false);
 
   useEffect(() => {
     // Logic to display cards based on user role
@@ -54,16 +61,18 @@ const Content: React.FC = () => {
       case 'College':
         setCardsToDisplay([
           <Card
-            key="assignments"
-            title="Assignments"
-            description="Manage assignments and deadlines for students."
+            key="Examiner and Students"
+            title="Examiner and Students"
+            description="Manage Examiner and Students for students."
             icon={<BiBookAlt />}
+            onClick={() => navigate('/CollegeStudents')} 
           />,
           <Card
             key="messages"
             title="Messages"
             description="Communicate with students and staff."
             icon={<BiMessage />}
+
           />,
         ]);
         break;
@@ -92,6 +101,13 @@ const Content: React.FC = () => {
             onClick={() => navigate('/CreateExam')}
            
           />,
+          <Card
+            key="Create Class"
+            title="Create Class"
+            description="Create an Class for Students"
+            icon={<BiMessage />}
+            onClick={openCreateClass}
+          />,
         ]);
         break;
 
@@ -101,6 +117,7 @@ const Content: React.FC = () => {
   }, [userRole, navigate]);
 
   return (
+    <>
     <div className="content-container">
       <ContentHeader />
 
@@ -122,8 +139,16 @@ const Content: React.FC = () => {
         isOpen={isExamSchedulerOpen}
         onClose={closeExamScheuler}
       />
+
+      <CreateClass
+         isOpen={isCreateClassOpen}
+        onClose={closeCreateClass}
+      />
       
+  
+
     </div>
+    </>
   );
 };
 

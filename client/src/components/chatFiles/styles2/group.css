@@ -42,9 +42,6 @@
     white-space: nowrap;
 }
 
-
-
-
 /* Styling for No Rooms Available */
 .no-rooms {
     font-size: 1.2rem;
@@ -69,7 +66,6 @@
     padding-right: 5px; /* Prevent content from being hidden behind scrollbar */
     width: 100%; /* Ensure it stays within the sidebar */
     box-sizing: border-box; /* Prevent overflow of padding */
-
 }
 
 /* Add custom scrollbar for better visibility (optional) */
@@ -84,4 +80,46 @@
 
 .groups-list-container::-webkit-scrollbar-thumb:hover {
     background: #357ab7;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    /* Adjust the group-item's padding on smaller screens */
+    .group-item {
+        padding: 10px 14px; /* Reduce padding */
+    }
+
+    /* Group Avatar size */
+    .group-avatar {
+        width: 35px;
+        height: 35px;
+        font-size: 16px; /* Smaller avatar for mobile */
+    }
+
+    /* Group Name styling on smaller screens */
+    .group-name {
+        font-size: 0.9rem; /* Smaller text for mobile */
+    }
+}
+
+/* Very Small Screen (e.g., mobile in portrait) */
+@media (max-width: 480px) {
+    .group-item {
+        padding: 8px 12px; /* Further reduce padding for tiny screens */
+    }
+
+    .group-avatar {
+        width: 30px;
+        height: 30px;
+        font-size: 14px; /* Smaller avatar for very small screens */
+    }
+
+    .group-name {
+        font-size: 0.8rem; /* Smaller text for very small screens */
+    }
+
+    /* Adjust group list container height */
+    .groups-list-container {
+        max-height: 70vh; /* Reduce height further for very small screens */
+    }
 }

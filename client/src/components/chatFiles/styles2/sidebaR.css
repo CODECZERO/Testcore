@@ -1,35 +1,153 @@
+/* Sidebar Styling */
+.sidebar {
+  width: 100%; /* Full width by default */
+  background-color: #ffffff;
+  border-right: 1px solid #d1e1f0;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  height: calc(85vh - 20px); 
+  max-width: 300px; /* Maximum width */
+  margin: 50px auto;
+  border-radius: 3%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2d4059;
+  margin-bottom: 20px; /* Space below the header */
+}
+
+/* Sidebar Section Title */
+.sidebar-section h3 {
+  font-size: 1.2rem;
+  color: #4a90e2;
+  margin: 0px 0px 25px 0px; /* Adjusted margin */
+  font-weight: bold;
+}
+
+/* Groups List Container */
+.groups-list-container {
+  height: 70%; /* Adjusted height to fit better */
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto; /* Add vertical scrolling */
+  scroll-snap-type: y mandatory; /* Add scroll snap functionality */
+}
+
+/* Individual Group Item Styling */
+.group-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 12px 16px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease-in-out;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Hover effect for group items */
+.group-item:hover {
+  background-color: #e1e1e1;
+}
+
+/* Avatar Styling for Groups */
+.group-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #4a90e2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 1rem;
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
+}
+
+/* Group Name Styling */
+.group-name {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  /* Adjust Sidebar width for tablets */
   .sidebar {
-    width: 20%;
-    background-color: #ffffff;
-    border-right: 1px solid #d1e1f0;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    height: calc(85vh - 20px); 
-    width: 100%; 
-    max-width: 300px;
-    margin: 50px auto;
-    border-radius: 3%;
+      width: 100%;
+      padding: 0.5rem; /* Reduce padding */
+      margin: 20px auto;
   }
-  
+
   .sidebar-header {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #2d4059;
+      font-size: 1.25rem; /* Smaller font for smaller screens */
   }
-  
-  
+
   .sidebar-section h3 {
-    font-size: 1.5rem;
-    color: #4a90e2;
-    margin: 0px 0px 35px 0px;
+      font-size: 1rem; /* Adjust section title size */
   }
-  
+
   .groups-list-container {
-    height: 76%;
-    display: flex;
-    flex-direction: column;
-    scroll-snap-type: y;
+      height: 65%; /* Adjust the groups container height */
   }
-   
-   
+
+  /* Group Item Adjustments for smaller screens */
+  .group-item {
+      padding: 10px 14px;
+  }
+
+  .group-avatar {
+      width: 35px;
+      height: 35px;
+      font-size: 16px;
+  }
+
+  .group-name {
+      font-size: 0.9rem; /* Smaller text for group names */
+  }
+}
+
+/* Very Small Screen (e.g., mobile in portrait) */
+@media (max-width: 480px) {
+  .sidebar {
+      padding: 0.25rem; /* Reduce padding for very small screens */
+  }
+
+  .sidebar-header {
+      font-size: 1rem; /* Smaller font for very small screens */
+  }
+
+  .sidebar-section h3 {
+      font-size: 0.9rem; /* Adjust section title for smaller screens */
+  }
+
+  .groups-list-container {
+      height: 60%; /* Adjust height further for tiny screens */
+  }
+
+  .group-item {
+      padding: 8px 12px; /* Reduce padding for tiny screens */
+  }
+
+  .group-avatar {
+      width: 30px;
+      height: 30px;
+      font-size: 14px; /* Smaller avatar for tiny screens */
+  }
+
+  .group-name {
+      font-size: 0.8rem; /* Even smaller text for group names */
+  }
+}
