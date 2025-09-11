@@ -36,7 +36,7 @@ RUN yes | npx prisma generate
 # Copy application files
 COPY dist ./dist
 # Copy Nginx configuration file
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY ./nginx.conf /etc/nginx/nginx.conf
 
 # Set environment variables
 ENV NODE_ENV=production
