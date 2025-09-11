@@ -21,6 +21,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 # Verify Node.js and npm installation
 RUN node -v && npm -v
 
+RUN pwd
+
 # Set the working directory
 WORKDIR /app
 
@@ -32,7 +34,8 @@ COPY prisma ./prisma
 RUN npm install
 #running prisma to create schema and skiping yes otpions
 RUN yes | npx prisma generate
-
+RUN pwd
+RUN ls
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
 
