@@ -1,9 +1,0 @@
-import { Router } from "express";
-import { getExam, getQuestionPaperForStundet, getResult, getTimeTable, giveExam } from "../controller/student.controller.js";
-import { verifyData, verifyexamData } from "../middelware/auth.middeleware.js";
-const router = Router();
-router.route("/Exam").post(verifyexamData, getExam).put(verifyexamData, giveExam);
-router.route("/TimeTable").post(verifyData, getTimeTable);
-router.route("/Result").post(verifyexamData, getResult);
-router.route("/Question").post(verifyexamData, getQuestionPaperForStundet);
-export default router;

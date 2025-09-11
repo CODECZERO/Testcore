@@ -33,10 +33,11 @@ RUN npm install
 #running prisma to create schema and skiping yes otpions
 RUN yes | npx prisma generate
 
-# Copy application files
-COPY dist ./dist
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy application files
+COPY dist ./dist
 
 # Set environment variables
 ENV NODE_ENV=production
