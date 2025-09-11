@@ -23,6 +23,7 @@ RUN node -v && npm -v
 
 # Set the working directory
 WORKDIR /app
+RUN ls
 
 # Copy application dependencies
 COPY package*.json ./
