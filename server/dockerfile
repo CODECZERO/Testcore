@@ -23,7 +23,6 @@ RUN node -v && npm -v
 
 # Set the working directory
 WORKDIR /app
-RUN ls
 
 # Copy application dependencies
 COPY package*.json ./
@@ -38,8 +37,9 @@ RUN yes | npx prisma generate
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy application files
+RUN ls -l
 COPY dist ./dist
-
+RUN ls -l
 # Set environment variables
 ENV NODE_ENV=production
 
