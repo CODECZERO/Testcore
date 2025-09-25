@@ -7,15 +7,12 @@ RUN apk add --no-cache \
     python3 \
     py3-pip \
     nginx \
-    nodejs \
-    npm \
     build-base \
-    && rm -rf /var/cache/apk/*
+    && curl -fsSLO --compressed "https://unofficial-builds.nodejs.org/download/release/v22.11.0/node-v22.11.0-linux-x64-musl.tar.xz" \
+    && tar -xJf "node-v22.11.0-linux-x64-musl.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
+    && rm "node-v22.11.0-linux-x64-musl.tar.xz" \
+    && ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
-# Install Node.js (Using NodeSource)
-RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
-    RUN apt-get install -y nodejs
-    
 # Verify Node.js and npm installation
 RUN node -v && npm -v
 
