@@ -9,7 +9,7 @@ RUN apk add --no-cache \
     bash \
     make \
     cmake \
-    ninja
+    ninja  \
     python3 \
     py3-pip \
     nginx \
