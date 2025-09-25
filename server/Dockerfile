@@ -49,4 +49,5 @@ ENV NODE_ENV=production
 # Expose the application port
 EXPOSE 10000
 # Start Nginx and the Node.js app
-CMD ["sh", "-c", "service nginx start && node dist/index.js"]
+CMD ["sh", "-c", "nginx -g 'daemon off;' & node dist/index.js"]
+
