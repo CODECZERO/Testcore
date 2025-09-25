@@ -1,18 +1,16 @@
-FROM ubuntu:22.04
-ENV DEBIAN_FRONTEND=noninteractive
+FROM alpine:latest
 
-# Install system dependencies including Python and pip
-RUN apt-get update && apt-get install -y \
+# Install system dependencies
+RUN apk add --no-cache \
     curl \
-    gnupg \
-    build-essential \
     bash \
-    software-properties-common \
     python3 \
-    python3-pip \
+    py3-pip \
     nginx \
-    && rm -rf /var/lib/apt/lists/*
-
+    nodejs \
+    npm \
+    build-base \
+    && rm -rf /var/cache/apk/*
 
 # Install Node.js (Using NodeSource)
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
