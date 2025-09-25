@@ -3,11 +3,16 @@ FROM alpine:latest
 # Install system dependencies
 RUN apk add --no-cache \
     curl \
+    build-base \
+    linux-headers \
+    git \
     bash \
+    make \
+    cmake \
+    ninja
     python3 \
     py3-pip \
     nginx \
-    build-base \
     && curl -fsSLO --compressed "https://unofficial-builds.nodejs.org/download/release/v22.11.0/node-v22.11.0-linux-x64-musl.tar.xz" \
     && tar -xJf "node-v22.11.0-linux-x64-musl.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
     && rm "node-v22.11.0-linux-x64-musl.tar.xz" \
