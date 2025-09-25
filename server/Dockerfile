@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies including Python and pip
@@ -21,6 +21,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash -
 # Verify Node.js and npm installation
 RUN node -v && npm -v
 
+RUN pwd
+
 # Set the working directory
 WORKDIR /app
 
@@ -32,13 +34,15 @@ COPY prisma ./prisma
 RUN npm install
 #running prisma to create schema and skiping yes otpions
 RUN yes | npx prisma generate
-
+RUN pwd
+RUN ls
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy application files
+RUN ls -l
 COPY dist ./dist
-
+RUN ls -l
 # Set environment variables
 ENV NODE_ENV=production
 
