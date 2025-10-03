@@ -15,7 +15,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ children }) => {
     const [socket, setSocket] = useState<WebSocket | null>(null);
 
     useEffect(() => {
-        const ws = new WebSocket("wss://testcore-qmyu.onrender.com/ws1/");
+        const ws = new WebSocket("wss://testcore-3en7.onrender.com/ws1/");
 
         setSocket(ws);
 
