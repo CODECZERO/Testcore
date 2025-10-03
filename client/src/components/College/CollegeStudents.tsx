@@ -6,7 +6,7 @@ import CollegeExaminer from './CollegeExaminer';
 import CollegeTimetable from './CollegeTimeTable';
 import ApproveTimetable from './ApproveTimetable';
 
-const BackendUrl = 'https://testcore-qmyu.onrender.com';
+const BackendUrl = 'https://testcore-3en7.onrender.com';
 
 const CollegeStudents = () => {
     interface Student {
