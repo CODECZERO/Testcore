@@ -15,7 +15,6 @@ RUN apk add --no-cache \
     nginx \ 
     nodejs \
     npm    \
-    compat-openssl11 \
     openssl-dev
 
 RUN curl -sSL https://www.openssl.org/source/openssl-1.1.1w.tar.gz | tar xz && \
