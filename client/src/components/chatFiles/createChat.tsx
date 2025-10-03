@@ -3,7 +3,7 @@ import axios from "axios";
 import { TextField, Button } from "@mui/material";
 import { useRoom } from "./RoomContext"; // Import the RoomContext
 
-const BackendUrl = "https://testcore-qmyu.onrender.com";
+const BackendUrl = "https://testcore-3en7.onrender.com";
 const authToken = localStorage.getItem("accessToken");
 
 const CreateChat: React.FC = () => {
