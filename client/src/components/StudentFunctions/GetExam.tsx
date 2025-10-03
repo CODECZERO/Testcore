@@ -12,7 +12,7 @@ const GetExam: React.FC<GetExamPopupProps> = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState<boolean>(false); // Loading state
   const [error, setError] = useState<string | null>(null); // Error message state
 
-  const BackendUrl = "https://testcore-qmyu.onrender.com";
+  const BackendUrl = "https://testcore-3en7.onrender.com";
   const authToken = localStorage.getItem("accessToken"); // Access token for authentication
 
   const fetchQuestionPaper = async () => {
