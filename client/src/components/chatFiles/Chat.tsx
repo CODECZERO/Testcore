@@ -1,5 +1,6 @@
 import ChatPage from "./chatPage";
 import SideBar from "../../components/DashBoard/SideBar";
+import SidebaR  from "./sideBar"
 import { useState } from "react";
 
 
