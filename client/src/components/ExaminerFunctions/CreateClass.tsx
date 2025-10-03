@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import ReusablePopup from '../StudentFunctions/PopUp'; // Import the popup component
 
-const BackendUrl = "https://testcore-qmyu.onrender.com";
+const BackendUrl = "https://testcore-3en7.onrender.com";
 
 
 interface CreateClassProps {
