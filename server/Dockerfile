@@ -15,7 +15,8 @@ RUN apk add --no-cache \
     nginx \ 
     nodejs \
     npm    \
-    openssl-dev
+    openssl-dev \
+    libssl1.1
 
 
 # Verify Node.js and npm installation
