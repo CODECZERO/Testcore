@@ -15,7 +15,8 @@ RUN apk add --no-cache \
     nginx \ 
     nodejs \
     npm    \
-    openssl-dev \
+    compat-openssl11 \
+    openssl-dev
     libssl1.1
 
 
