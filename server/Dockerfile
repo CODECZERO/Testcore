@@ -9,27 +9,29 @@ RUN apk add --no-cache \
     bash \
     make \
     cmake \
-    ninja  \
+    ninja \
     python3 \
     py3-pip \
-    nginx \ 
+    nginx \
     nodejs \
-    npm    \
+    npm \
     openssl-dev \
     perl \
-    perl-utils \
+    perl-utils
 
+# Build and install OpenSSL 1.1.1w
 RUN curl -sSL https://www.openssl.org/source/openssl-1.1.1w.tar.gz | tar xz && \
     cd openssl-1.1.1w && \
     ./Configure linux-x86_64 \
         --prefix=/usr/local/openssl-1.1 \
         --openssldir=/usr/local/openssl-1.1 \
         shared && \
-    make -j$(nproc) && \
+    make -j"$(nproc)" && \
     make install_sw && \
     ln -s /usr/local/openssl-1.1/lib/libssl.so.1.1 /usr/lib/ && \
     ln -s /usr/local/openssl-1.1/lib/libcrypto.so.1.1 /usr/lib/ && \
     cd .. && rm -rf openssl-1.1.1w
+
     
 RUN /usr/local/openssl-1.1/bin/openssl version
 
