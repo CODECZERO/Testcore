@@ -6,7 +6,7 @@ interface ClassItem {
   name: string;
 }
 
-const BackendUrl = "https://testcore-qmyu.onrender.com";
+const BackendUrl = "https://testcore-3en7.onrender.com";
 
 const ClassList: React.FC = () => {
   const [classes, setClasses] = useState<ClassItem[]>([]); // State to store class data
