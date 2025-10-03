@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/CreateAccount.css'; // CSS file for styles
 
-const Backend_URL = `https://testcore-qmyu.onrender.com`;
+const Backend_URL = `https://testcore-3en7.onrender.com`;
 
 type UserRole = 'Student' | 'College' | 'Examiner';
 
