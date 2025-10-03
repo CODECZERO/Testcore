@@ -13,7 +13,9 @@ RUN apk add --no-cache \
     ninja  \
     python3 \
     py3-pip \
-    nginx \
+    nginx \ 
+    nodejs \
+    npm \
     && curl -fsSLO --compressed "https://unofficial-builds.nodejs.org/download/release/v22.11.0/node-v22.11.0-linux-x64-musl.tar.xz" \
     && tar -xJf "node-v22.11.0-linux-x64-musl.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
     && rm "node-v22.11.0-linux-x64-musl.tar.xz" \
