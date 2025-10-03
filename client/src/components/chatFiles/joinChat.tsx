@@ -3,7 +3,7 @@ import axios from "axios";
 import { useRoom } from "./RoomContext"; // Import RoomContext for global room management
 import "./styles2/JoinChat.css"
 
-const BackendUrl = "https://testcore-qmyu.onrender.com";
+const BackendUrl = "https://testcore-3en7.onrender.com";
 const authToken = localStorage.getItem("accessToken");
 
 interface JoinChatProps {
