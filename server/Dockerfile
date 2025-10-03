@@ -18,6 +18,13 @@ RUN apk add --no-cache \
     compat-openssl11 \
     openssl-dev
 
+RUN curl -sSL https://www.openssl.org/source/openssl-1.1.1w.tar.gz | tar xz && \
+    cd openssl-1.1.1w && \
+    ./config --prefix=/usr/local/openssl-1.1 --openssldir=/usr/local/openssl-1.1 shared && \
+    make -j$(nproc) && \
+    make install && \
+    ln -s /usr/local/openssl-1.1/lib/libssl.so.1.1 /usr/lib/ && \
+    ln -s /usr/local/openssl-1.1/lib/libcrypto.so.1.1 /usr/lib/
 
 # Verify Node.js and npm installation
 RUN node -v && npm -v
