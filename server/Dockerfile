@@ -51,7 +51,7 @@ COPY prisma ./prisma
 #installing packages
 RUN npm install
 #running prisma to create schema and skiping yes otpions
-RUN yes | npx prisma generate
+RUN npx prisma migrate deploy
 RUN pwd
 RUN ls
 # Copy Nginx configuration file
