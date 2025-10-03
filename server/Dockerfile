@@ -14,7 +14,9 @@ RUN apk add --no-cache \
     py3-pip \
     nginx \ 
     nodejs \
-    npm
+    npm    \
+    openssl-dev
+
 
 # Verify Node.js and npm installation
 RUN node -v && npm -v
