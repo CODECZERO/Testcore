@@ -14,7 +14,7 @@ const TimeTablePopup: React.FC<TimeTablePopupProps> = ({ isOpen, onClose }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const BackendUrl = "https://testcore-qmyu.onrender.com";
+  const BackendUrl = "https://testcore-3en7.onrender.com";
   const tabId = window.name;
   const userId = localStorage.getItem(`userId_${tabId}`) || "";
   const authToken = localStorage.getItem("accessToken");
