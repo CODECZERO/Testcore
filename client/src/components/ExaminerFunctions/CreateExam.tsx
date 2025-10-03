@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const BackendUrl = 'https://testcore-qmyu.onrender.com';
+const BackendUrl = 'https://testcore-3en7.onrender.com';
 
 const CreateExam = () => {
     const [examId, setExamId] = useState('');
