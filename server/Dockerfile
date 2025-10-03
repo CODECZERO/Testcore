@@ -8,7 +8,6 @@ RUN apk add --no-cache \
     git \
     bash \
     make \
-    openssl1.1-compat\
     cmake \
     ninja  \
     python3 \
