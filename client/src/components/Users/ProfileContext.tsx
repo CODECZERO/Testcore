@@ -3,7 +3,7 @@ import axios from "axios";
 
 const ProfilePictureContext = createContext<any>(null);
 
-const BackendUrl = "https://testcore-qmyu.onrender.com";
+const BackendUrl = "https://testcore-3en7.onrender.com";
 
 interface ProfilePictureProviderProps {
   children: React.ReactNode;
