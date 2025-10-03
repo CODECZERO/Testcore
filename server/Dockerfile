@@ -38,9 +38,7 @@ RUN ls
 COPY nginx.conf /etc/nginx/nginx.conf
 
 # Copy application files
-RUN ls -l
 COPY dist ./dist
-RUN ls -l
 # Set environment variables
 ENV NODE_ENV=production
 
