@@ -16,7 +16,7 @@ RUN apk add --no-cache \
     nodejs \
     npm    \
     compat-openssl11 \
-    openssl-dev
+    openssl-dev \
     libssl1.1
 
 
