@@ -2,7 +2,7 @@ import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import styled from "styled-components";
 
-const BackendUrl = "https://testcore-qmyu.onrender.com"; // Replace with your actual backend URL
+const BackendUrl = "https://testcore-3en7.onrender.com"; // Replace with your actual backend URL
 
 const ForgetPassword = () => {
   const [formData, setFormData] = useState({
