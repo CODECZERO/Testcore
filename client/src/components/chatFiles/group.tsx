@@ -10,7 +10,7 @@ import { RootState } from '../store';
 import { useRoom } from './RoomContext'; // Import RoomContext to update the room name when joining
 import Loader from '../Loader';
 
-const BackendUrl = "https://testcore-qmyu.onrender.com";
+const BackendUrl = "https://testcore-3en7.onrender.com";
 const authToken = localStorage.getItem('accessToken');
 
 const Groups: React.FC = () => {
