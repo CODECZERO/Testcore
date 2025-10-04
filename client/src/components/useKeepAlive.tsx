@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import axios from 'axios';
 
 const BACKEND_URL = 'https://testcore-3en7.onrender.com';
-const PING_INTERVAL = 60000; // 1 minute in milliseconds
+const PING_INTERVAL = 6000; // 1 minute in milliseconds
 
 export const useKeepAlive = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
