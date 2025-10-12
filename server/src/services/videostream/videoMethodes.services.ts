@@ -1,89 +1,106 @@
 import { UniError } from "../../util/UniErrorHandler.js";
 import { Router, WebRtcTransport, Worker } from "mediasoup/node/lib/types.js";
-import { createTransportForService, createWorkerForService, createRouterForService } from "./videoCoreMethode.services.js";
+import { 
+    createTransportForService, 
+    createWorkerForService, 
+    createRouterForService 
+} from "./videoCoreMethode.services.js";
 import { WebSocket } from "ws";
 
 class VideoMethode {
-    private router: Router;
-    private worker: Worker;
+    private router: Router | undefined;
+    private worker: Worker | undefined;
 
     constructor() {
-        this.router = undefined as any;
-        this.worker = undefined as any;
+        this.router = undefined;
+        this.worker = undefined;
     }
 
-    public getRouterRtpCapabilities = async (ws: WebSocket, router: Router) => {
+    /**
+     * Start connection - Initialize worker and router
+     */
+    public startConnection = async (): Promise<Router> => {
         try {
-            if (!router || !ws) throw new UniError("websocket or router is not provied")
-            ws.send(JSON.stringify(router.rtpCapabilities));
-        } catch (error) {
-            throw new UniError(`error while geting routercapablilities ${error}`);
-        }
-    }
-
-    public createTransportForService = async (router: Router, sender: boolean, producerTransport?: WebRtcTransport, consumerTransport?: WebRtcTransport) => {
-        try {
-            const transport = await createTransportForService(router);
-            if (sender) {
-                producerTransport = transport;
-
-            }
-            return consumerTransport = transport;
-        } catch (error) {
-            throw new UniError(`error while creatin tranport for service ${error}`);
-        }
-    }
-
-    public connectTransport = async (sender: boolean, dtlsParameters?: any, producerTransport?: WebRtcTransport, consumerTransport?: WebRtcTransport) => {
-       try {
-         if (sender) {
-             return await producerTransport?.connect({ dtlsParameters });
-         }
-         return await consumerTransport?.connect({ dtlsParameters });
-       } catch (error) {
-            throw new UniError(`error in connection transport ${error}`)
-       }
-    }
-
-    public producer = async (producerTransport: WebRtcTransport, kind: any, rtpParameters: any) => {
-        try {
-            const producerData = await producerTransport.produce({
-                kind,
-                rtpParameters
-            });
-            return producerData;
-        } catch (error) {
-            throw new UniError(`error in producer ${error}`)
-        }
-    }
-
-    public consumer = async (consumerTransport: WebRtcTransport, router: Router, producerId: any, rtpCapabilities: any) => {
-        try {
-            if (!router.canConsume) throw new UniError("unable to consume data");
-            router.canConsume({ producerId: producerId, rtpCapabilities });
-
-            const consumer= await consumerTransport.consume({
-                producerId,
-                rtpCapabilities,
-                paused: false
-            });
-            return consumer;
-        } catch (error) {
-            throw new UniError(`error in consumer ${error}`);
-        }
-    }
-
-    public startConnection = async () => {
-        try {
+            console.log('🚀 Starting video service...');
+            
             this.worker = await createWorkerForService();
             this.router = await createRouterForService(this.worker);
+            
+            console.log('✅ Video service started');
             return this.router;
         } catch (error) {
-            throw new UniError(`error while connecting to server ${error}`);
+            throw new UniError(`Error while connecting to server: ${error}`);
         }
-    }
+    };
+
+    /**
+     * Get router RTP capabilities and send to client
+     */
+    public getRouterRtpCapabilities = async (ws: WebSocket, router: Router): Promise<void> => {
+        try {
+            if (!router || !ws) {
+                throw new UniError("WebSocket or router not provided");
+            }
+
+            if (ws.readyState !== WebSocket.OPEN) {
+                throw new UniError("WebSocket is not open");
+            }
+
+            ws.send(JSON.stringify({
+                action: "rtpCapabilities",
+                rtpCapabilities: router.rtpCapabilities
+            }));
+        } catch (error) {
+            throw new UniError(`Error while getting router capabilities: ${error}`);
+        }
+    };
+
+    /**
+     * Create transport for service
+     */
+    public createTransportForService = async (router: Router): Promise<WebRtcTransport> => {
+        try {
+            if (!router) {
+                throw new UniError("Router not provided");
+            }
+
+            const transport = await createTransportForService(router);
+            return transport;
+        } catch (error) {
+            throw new UniError(`Error while creating transport for service: ${error}`);
+        }
+    };
+
+    /**
+     * Close connection - Clean up worker and router
+     */
+    public closeConnection = async (): Promise<void> => {
+        try {
+            console.log('🛑 Closing video service...');
+
+            if (this.router) {
+                this.router.close();
+                this.router = undefined;
+            }
+
+            if (this.worker) {
+                this.worker.close();
+                this.worker = undefined;
+            }
+
+            console.log('✅ Video service closed');
+        } catch (error) {
+            throw new UniError(`Error while closing connection: ${error}`);
+        }
+    };
+
+    /**
+     * Check if service is initialized
+     */
+    public isInitialized = (): boolean => {
+        return !!(this.worker && this.router);
+    };
 }
 
 const videoMethode = new VideoMethode();
-
 export default videoMethode;

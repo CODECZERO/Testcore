@@ -26,7 +26,7 @@ const connectAll = async () => {
         await connectReids();
         console.log("Redis is Runing");
         await runVideoServer();
-        console.log("runing video server")
+        console.log("runing video server");
 
     } catch (error) {
         throw new ApiError(500, `Service is down ${error}`);
