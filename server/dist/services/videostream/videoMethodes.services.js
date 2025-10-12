@@ -17,10 +17,8 @@ class VideoMethode {
          */
         this.startConnection = () => __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log('🚀 Starting video service...');
                 this.worker = yield createWorkerForService();
                 this.router = yield createRouterForService(this.worker);
-                console.log('✅ Video service started');
                 return this.router;
             }
             catch (error) {
@@ -67,7 +65,6 @@ class VideoMethode {
          */
         this.closeConnection = () => __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log('🛑 Closing video service...');
                 if (this.router) {
                     this.router.close();
                     this.router = undefined;
@@ -76,7 +73,6 @@ class VideoMethode {
                     this.worker.close();
                     this.worker = undefined;
                 }
-                console.log('✅ Video service closed');
             }
             catch (error) {
                 throw new UniError(`Error while closing connection: ${error}`);

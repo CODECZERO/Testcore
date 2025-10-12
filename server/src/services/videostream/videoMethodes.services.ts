@@ -21,12 +21,10 @@ class VideoMethode {
      */
     public startConnection = async (): Promise<Router> => {
         try {
-            console.log('🚀 Starting video service...');
             
             this.worker = await createWorkerForService();
             this.router = await createRouterForService(this.worker);
             
-            console.log('✅ Video service started');
             return this.router;
         } catch (error) {
             throw new UniError(`Error while connecting to server: ${error}`);
@@ -76,7 +74,6 @@ class VideoMethode {
      */
     public closeConnection = async (): Promise<void> => {
         try {
-            console.log('🛑 Closing video service...');
 
             if (this.router) {
                 this.router.close();
@@ -88,7 +85,6 @@ class VideoMethode {
                 this.worker = undefined;
             }
 
-            console.log('✅ Video service closed');
         } catch (error) {
             throw new UniError(`Error while closing connection: ${error}`);
         }
