@@ -9,79 +9,85 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { UniError } from "../../util/UniErrorHandler.js";
 import { createTransportForService, createWorkerForService, createRouterForService } from "./videoCoreMethode.services.js";
+import { WebSocket } from "ws";
 class VideoMethode {
     constructor() {
-        this.getRouterRtpCapabilities = (ws, router) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                if (!router || !ws)
-                    throw new UniError("websocket or router is not provied");
-                ws.send(JSON.stringify(router.rtpCapabilities));
-            }
-            catch (error) {
-                throw new UniError(`error while geting routercapablilities ${error}`);
-            }
-        });
-        this.createTransportForService = (router, sender, producerTransport, consumerTransport) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const transport = yield createTransportForService(router);
-                if (sender) {
-                    producerTransport = transport;
-                }
-                return consumerTransport = transport;
-            }
-            catch (error) {
-                throw new UniError(`error while creatin tranport for service ${error}`);
-            }
-        });
-        this.connectTransport = (sender, dtlsParameters, producerTransport, consumerTransport) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                if (sender) {
-                    return yield (producerTransport === null || producerTransport === void 0 ? void 0 : producerTransport.connect({ dtlsParameters }));
-                }
-                return yield (consumerTransport === null || consumerTransport === void 0 ? void 0 : consumerTransport.connect({ dtlsParameters }));
-            }
-            catch (error) {
-                throw new UniError(`error in connection transport ${error}`);
-            }
-        });
-        this.producer = (producerTransport, kind, rtpParameters) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                const producerData = yield producerTransport.produce({
-                    kind,
-                    rtpParameters
-                });
-                return producerData;
-            }
-            catch (error) {
-                throw new UniError(`error in producer ${error}`);
-            }
-        });
-        this.consumer = (consumerTransport, router, producerId, rtpCapabilities) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                if (!router.canConsume)
-                    throw new UniError("unable to consume data");
-                router.canConsume({ producerId: producerId, rtpCapabilities });
-                const consumer = yield consumerTransport.consume({
-                    producerId,
-                    rtpCapabilities,
-                    paused: false
-                });
-                return consumer;
-            }
-            catch (error) {
-                throw new UniError(`error in consumer ${error}`);
-            }
-        });
+        /**
+         * Start connection - Initialize worker and router
+         */
         this.startConnection = () => __awaiter(this, void 0, void 0, function* () {
             try {
+                console.log('🚀 Starting video service...');
                 this.worker = yield createWorkerForService();
                 this.router = yield createRouterForService(this.worker);
+                console.log('✅ Video service started');
                 return this.router;
             }
             catch (error) {
-                throw new UniError(`error while connecting to server ${error}`);
+                throw new UniError(`Error while connecting to server: ${error}`);
             }
         });
+        /**
+         * Get router RTP capabilities and send to client
+         */
+        this.getRouterRtpCapabilities = (ws, router) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                if (!router || !ws) {
+                    throw new UniError("WebSocket or router not provided");
+                }
+                if (ws.readyState !== WebSocket.OPEN) {
+                    throw new UniError("WebSocket is not open");
+                }
+                ws.send(JSON.stringify({
+                    action: "rtpCapabilities",
+                    rtpCapabilities: router.rtpCapabilities
+                }));
+            }
+            catch (error) {
+                throw new UniError(`Error while getting router capabilities: ${error}`);
+            }
+        });
+        /**
+         * Create transport for service
+         */
+        this.createTransportForService = (router) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                if (!router) {
+                    throw new UniError("Router not provided");
+                }
+                const transport = yield createTransportForService(router);
+                return transport;
+            }
+            catch (error) {
+                throw new UniError(`Error while creating transport for service: ${error}`);
+            }
+        });
+        /**
+         * Close connection - Clean up worker and router
+         */
+        this.closeConnection = () => __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log('🛑 Closing video service...');
+                if (this.router) {
+                    this.router.close();
+                    this.router = undefined;
+                }
+                if (this.worker) {
+                    this.worker.close();
+                    this.worker = undefined;
+                }
+                console.log('✅ Video service closed');
+            }
+            catch (error) {
+                throw new UniError(`Error while closing connection: ${error}`);
+            }
+        });
+        /**
+         * Check if service is initialized
+         */
+        this.isInitialized = () => {
+            return !!(this.worker && this.router);
+        };
         this.router = undefined;
         this.worker = undefined;
     }
