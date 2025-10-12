@@ -14,21 +14,59 @@ import { nanoid } from "nanoid";
 // ============= STATE MANAGEMENT =============
 const rooms = new Map();
 const peers = new Map();
+const performanceMetrics = {
+    totalConnections: 0,
+    activeConnections: 0,
+    totalRooms: 0,
+    activeRooms: 0,
+    totalTransports: 0,
+    totalProducers: 0,
+    totalConsumers: 0,
+    averageConnectionTime: 0,
+    averageVideoLatency: 0,
+    errorCount: 0
+};
 const port = process.env.WEBSOCKETPORTVIDEO ? Number(process.env.WEBSOCKETPORTVIDEO) : 9022;
 const wss = new WebSocketServer({ port });
+// ============= PERFORMANCE MONITORING =============
+function updateMetrics() {
+    performanceMetrics.activeConnections = peers.size;
+    performanceMetrics.activeRooms = rooms.size;
+    let totalTransports = 0;
+    let totalProducers = 0;
+    let totalConsumers = 0;
+    peers.forEach(peer => {
+        peer.transports.forEach(transportData => {
+            totalTransports++;
+            totalProducers += transportData.producers.size;
+            totalConsumers += transportData.consumers.size;
+        });
+    });
+    performanceMetrics.totalTransports = totalTransports;
+    performanceMetrics.totalProducers = totalProducers;
+    performanceMetrics.totalConsumers = totalConsumers;
+}
+function logPerformance(action, peerId, duration, details) {
+    console.log(`📊 [${peerId}] ${action}: ${duration}ms${details ? ` - ${JSON.stringify(details)}` : ''}`);
+}
 // ============= HELPER FUNCTIONS =============
 function getOrCreateRoom(roomId) {
     return __awaiter(this, void 0, void 0, function* () {
+        const startTime = Date.now();
         let room = rooms.get(roomId);
         if (!room) {
             const router = yield videoMethode.startConnection();
             room = {
                 id: roomId,
                 router,
-                peers: new Map()
+                peers: new Map(),
+                createdAt: Date.now()
             };
             rooms.set(roomId, room);
-            console.log(`📦 Room created: ${roomId}`);
+            performanceMetrics.totalRooms++;
+            performanceMetrics.activeRooms++;
+            const duration = Date.now() - startTime;
+            logPerformance('Room created', roomId, duration);
         }
         return room;
     });
@@ -37,34 +75,48 @@ function broadcastToRoom(roomId, excludePeerId, message) {
     const room = rooms.get(roomId);
     if (!room)
         return;
+    let sentCount = 0;
     room.peers.forEach((peer, peerId) => {
         if (peerId !== excludePeerId && peer.ws.readyState === WebSocket.OPEN) {
             try {
                 peer.ws.send(JSON.stringify(message));
+                sentCount++;
             }
             catch (error) {
                 console.error(`❌ Error broadcasting to peer ${peerId}:`, error);
+                performanceMetrics.errorCount++;
             }
         }
     });
+    if (sentCount > 0) {
+        console.log(`📡 Broadcast to ${sentCount} peers in room ${roomId}`);
+    }
 }
 function cleanupPeer(peerId) {
     const peer = peers.get(peerId);
     if (!peer)
         return;
     const room = rooms.get(peer.roomId);
-    console.log(`🧹 Cleaning up peer: ${peerId}`);
+    const cleanupStart = Date.now();
     // Close all transports, producers, and consumers
+    let closedTransports = 0;
+    let closedProducers = 0;
+    let closedConsumers = 0;
     peer.transports.forEach((transportData) => {
+        closedTransports++;
         transportData.producers.forEach(producer => {
             producer.close();
+            closedProducers++;
             broadcastToRoom(peer.roomId, peerId, {
                 action: "producerClosed",
                 producerId: producer.id,
                 peerId: peerId
             });
         });
-        transportData.consumers.forEach(consumer => consumer.close());
+        transportData.consumers.forEach(consumer => {
+            consumer.close();
+            closedConsumers++;
+        });
         transportData.transport.close();
     });
     // Remove peer from room
@@ -78,21 +130,30 @@ function cleanupPeer(peerId) {
         if (room.peers.size === 0) {
             room.router.close();
             rooms.delete(peer.roomId);
-            console.log(`🗑️  Room deleted: ${peer.roomId}`);
+            performanceMetrics.activeRooms--;
         }
     }
     peers.delete(peerId);
-    console.log(`✅ Peer cleaned up: ${peerId}`);
+    performanceMetrics.activeConnections--;
+    const cleanupDuration = Date.now() - cleanupStart;
+    logPerformance('Peer cleanup', peerId, cleanupDuration, {
+        closedTransports,
+        closedProducers,
+        closedConsumers
+    });
 }
 // ============= MAIN SERVER =============
 const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        console.log('🚀 Starting many-to-many video server...');
+        console.log('🚀 Starting optimized video server with metrics...');
         wss.on('connection', (ws, req) => {
             const peerId = nanoid(16);
-            console.log(`🔌 New connection: ${peerId}`);
+            const connectionStart = Date.now();
+            performanceMetrics.totalConnections++;
+            performanceMetrics.activeConnections++;
             let currentPeer = null;
             ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
+                const messageStart = Date.now();
                 try {
                     const messageData = JSON.parse(message);
                     console.log(`📨 [${peerId}] ${messageData.actionType}`);
@@ -100,6 +161,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                         case "join": {
                             if (!messageData.roomId) {
                                 ws.send(JSON.stringify({ error: "roomId required" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const room = yield getOrCreateRoom(messageData.roomId);
@@ -107,11 +169,13 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 id: peerId,
                                 ws,
                                 roomId: messageData.roomId,
-                                transports: new Map()
+                                transports: new Map(),
+                                joinedAt: Date.now(),
+                                lastActivity: Date.now()
                             };
                             peers.set(peerId, currentPeer);
                             room.peers.set(peerId, currentPeer);
-                            // Get existing producers with optimization
+                            // Get existing producers with performance tracking
                             const existingProducers = [];
                             room.peers.forEach((peer, pId) => {
                                 if (pId !== peerId) {
@@ -132,37 +196,51 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 peerId: peerId,
                                 roomId: messageData.roomId,
                                 peers: Array.from(room.peers.keys()).filter(id => id !== peerId),
-                                existingProducers
+                                existingProducers,
+                                metrics: {
+                                    roomPeers: room.peers.size,
+                                    totalProducers: existingProducers.length
+                                }
                             }));
                             // Broadcast new peer after sending response
                             broadcastToRoom(messageData.roomId, peerId, {
                                 action: "newPeer",
                                 peerId: peerId
                             });
-                            console.log(`✅ [${peerId}] Joined room: ${messageData.roomId}`);
+                            const joinDuration = Date.now() - messageStart;
+                            logPerformance('Peer joined', peerId, joinDuration, {
+                                roomId: messageData.roomId,
+                                existingProducers: existingProducers.length
+                            });
                             break;
                         }
                         case "getRouterRtpCapabilities": {
                             if (!currentPeer) {
                                 ws.send(JSON.stringify({ error: "Must join room first" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const room = rooms.get(currentPeer.roomId);
                             if (!room) {
                                 ws.send(JSON.stringify({ error: "Room not found" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             yield videoMethode.getRouterRtpCapabilities(ws, room.router);
+                            const duration = Date.now() - messageStart;
+                            logPerformance('RTP capabilities sent', peerId, duration);
                             break;
                         }
                         case "createTransport": {
                             if (!currentPeer) {
                                 ws.send(JSON.stringify({ error: "Must join room first" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const room = rooms.get(currentPeer.roomId);
                             if (!room) {
                                 ws.send(JSON.stringify({ error: "Room not found" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const transportId = nanoid(12);
@@ -170,9 +248,11 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                             currentPeer.transports.set(transportId, {
                                 transport,
                                 producers: new Map(),
-                                consumers: new Map()
+                                consumers: new Map(),
+                                createdAt: Date.now()
                             });
-                            // Optimized transport parameters
+                            performanceMetrics.totalTransports++;
+                            // Optimized transport parameters with STUN servers
                             const transportParams = {
                                 id: transport.id,
                                 iceParameters: transport.iceParameters,
@@ -180,7 +260,8 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 dtlsParameters: transport.dtlsParameters,
                                 iceServers: [
                                     { urls: 'stun:stun.l.google.com:19302' },
-                                    { urls: 'stun:stun1.l.google.com:19302' }
+                                    { urls: 'stun:stun1.l.google.com:19302' },
+                                    { urls: 'stun:stun2.l.google.com:19302' }
                                 ]
                             };
                             ws.send(JSON.stringify({
@@ -188,31 +269,41 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 Id: transportId,
                                 transportParams
                             }));
-                            console.log(`✅ [${peerId}] Transport created: ${transportId}`);
+                            const duration = Date.now() - messageStart;
+                            logPerformance('Transport created', peerId, duration, { transportId });
                             break;
                         }
                         case "connectTransport": {
                             if (!currentPeer || !messageData.Id || !messageData.dtlsParameters) {
                                 ws.send(JSON.stringify({ error: "Invalid parameters" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const transportData = currentPeer.transports.get(messageData.Id);
                             if (!transportData) {
                                 ws.send(JSON.stringify({ error: "Transport not found" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             try {
                                 yield transportData.transport.connect({
                                     dtlsParameters: messageData.dtlsParameters
                                 });
+                                transportData.connectedAt = Date.now();
+                                const connectionTime = transportData.connectedAt - transportData.createdAt;
                                 ws.send(JSON.stringify({
                                     action: "transportConnected",
                                     Id: messageData.Id
                                 }));
-                                console.log(`✅ [${peerId}] Transport connected: ${messageData.Id}`);
+                                const duration = Date.now() - messageStart;
+                                logPerformance('Transport connected', peerId, duration, {
+                                    transportId: messageData.Id,
+                                    connectionTime
+                                });
                             }
                             catch (error) {
                                 console.error(`❌ [${peerId}] Transport connect error:`, error);
+                                performanceMetrics.errorCount++;
                                 ws.send(JSON.stringify({
                                     error: `Transport connect failed: ${error instanceof Error ? error.message : String(error)}`
                                 }));
@@ -222,21 +313,27 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                         case "produce": {
                             if (!currentPeer || !messageData.Id || !messageData.kind || !messageData.rtpParameters) {
                                 ws.send(JSON.stringify({ error: "Invalid parameters" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const transportData = currentPeer.transports.get(messageData.Id);
                             if (!transportData) {
                                 ws.send(JSON.stringify({ error: "Transport not found" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             try {
                                 const producer = yield transportData.transport.produce({
                                     kind: messageData.kind,
                                     rtpParameters: messageData.rtpParameters,
-                                    // Optimize for low latency
-                                    appData: { source: messageData.kind }
+                                    appData: {
+                                        source: messageData.kind,
+                                        peerId: peerId,
+                                        createdAt: Date.now()
+                                    }
                                 });
                                 transportData.producers.set(producer.id, producer);
+                                performanceMetrics.totalProducers++;
                                 // Broadcast new producer immediately
                                 broadcastToRoom(currentPeer.roomId, peerId, {
                                     action: "newProducer",
@@ -249,10 +346,15 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                     producerId: producer.id,
                                     kind: producer.kind
                                 }));
-                                console.log(`🎥 [${peerId}] Produced ${messageData.kind}: ${producer.id}`);
+                                const duration = Date.now() - messageStart;
+                                logPerformance('Producer created', peerId, duration, {
+                                    kind: messageData.kind,
+                                    producerId: producer.id
+                                });
                             }
                             catch (error) {
                                 console.error(`❌ [${peerId}] Produce error:`, error);
+                                performanceMetrics.errorCount++;
                                 ws.send(JSON.stringify({
                                     error: `Produce failed: ${error instanceof Error ? error.message : String(error)}`
                                 }));
@@ -262,16 +364,19 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                         case "consume": {
                             if (!currentPeer || !messageData.Id || !messageData.producerId || !messageData.rtpCapabilities) {
                                 ws.send(JSON.stringify({ error: "Invalid parameters" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const room = rooms.get(currentPeer.roomId);
                             if (!room) {
                                 ws.send(JSON.stringify({ error: "Room not found" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const transportData = currentPeer.transports.get(messageData.Id);
                             if (!transportData) {
                                 ws.send(JSON.stringify({ error: "Transport not found" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             try {
@@ -282,6 +387,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 });
                                 if (!canConsume) {
                                     ws.send(JSON.stringify({ error: "Cannot consume this producer" }));
+                                    performanceMetrics.errorCount++;
                                     return;
                                 }
                                 // Create consumer with optimized settings
@@ -289,13 +395,15 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                     producerId: messageData.producerId,
                                     rtpCapabilities: messageData.rtpCapabilities,
                                     paused: false, // Start immediately for faster rendering
-                                    // Optimize for low latency
                                     appData: {
                                         source: 'remote',
-                                        producerId: messageData.producerId
+                                        producerId: messageData.producerId,
+                                        peerId: peerId,
+                                        createdAt: Date.now()
                                     }
                                 });
                                 transportData.consumers.set(consumer.id, consumer);
+                                performanceMetrics.totalConsumers++;
                                 // Send consumed response immediately
                                 ws.send(JSON.stringify({
                                     action: "consumed",
@@ -304,19 +412,34 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                     kind: consumer.kind,
                                     rtpParameters: consumer.rtpParameters
                                 }));
-                                console.log(`📺 [${peerId}] Consumed: ${consumer.id} (${consumer.kind})`);
+                                const duration = Date.now() - messageStart;
+                                logPerformance('Consumer created', peerId, duration, {
+                                    kind: consumer.kind,
+                                    consumerId: consumer.id
+                                });
                             }
                             catch (error) {
                                 console.error(`❌ [${peerId}] Consume error:`, error);
+                                performanceMetrics.errorCount++;
                                 ws.send(JSON.stringify({
                                     error: `Consume failed: ${error instanceof Error ? error.message : String(error)}`
                                 }));
                             }
                             break;
                         }
+                        case "getMetrics": {
+                            updateMetrics();
+                            ws.send(JSON.stringify({
+                                action: "metrics",
+                                metrics: performanceMetrics,
+                                timestamp: Date.now()
+                            }));
+                            break;
+                        }
                         case "closeProducer": {
                             if (!currentPeer || !messageData.producerId) {
                                 ws.send(JSON.stringify({ error: "Invalid parameters" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             let producerClosed = false;
@@ -326,6 +449,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                     producer.close();
                                     td.producers.delete(messageData.producerId);
                                     producerClosed = true;
+                                    performanceMetrics.totalProducers--;
                                 }
                             });
                             if (producerClosed) {
@@ -344,14 +468,22 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                         case "closeTransport": {
                             if (!currentPeer || !messageData.Id) {
                                 ws.send(JSON.stringify({ error: "Invalid parameters" }));
+                                performanceMetrics.errorCount++;
                                 return;
                             }
                             const transportData = currentPeer.transports.get(messageData.Id);
                             if (transportData) {
-                                transportData.producers.forEach(p => p.close());
-                                transportData.consumers.forEach(c => c.close());
+                                transportData.producers.forEach(p => {
+                                    p.close();
+                                    performanceMetrics.totalProducers--;
+                                });
+                                transportData.consumers.forEach(c => {
+                                    c.close();
+                                    performanceMetrics.totalConsumers--;
+                                });
                                 transportData.transport.close();
                                 currentPeer.transports.delete(messageData.Id);
+                                performanceMetrics.totalTransports--;
                             }
                             ws.send(JSON.stringify({
                                 action: "transportClosed",
@@ -371,26 +503,42 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                             ws.send(JSON.stringify({
                                 error: "Unknown action type"
                             }));
+                            performanceMetrics.errorCount++;
                     }
                 }
                 catch (error) {
                     console.error(`❌ [${peerId}] Error:`, error);
+                    performanceMetrics.errorCount++;
                     ws.send(JSON.stringify({
                         error: `Error: ${error instanceof Error ? error.message : String(error)}`
                     }));
                 }
             }));
             ws.on('close', () => {
-                console.log(`🔌 [${peerId}] Connection closed`);
+                const connectionDuration = Date.now() - connectionStart;
+                logPerformance('Connection closed', peerId, connectionDuration);
                 if (currentPeer) {
                     cleanupPeer(peerId);
                 }
             });
             ws.on('error', (error) => {
                 console.error(`❌ [${peerId}] WebSocket error:`, error);
+                performanceMetrics.errorCount++;
             });
         });
-        console.log(`✅ Many-to-Many Video Server running on port ${port}`);
+        // Performance monitoring interval
+        setInterval(() => {
+            updateMetrics();
+            console.log('📊 Server Metrics:', {
+                activeConnections: performanceMetrics.activeConnections,
+                activeRooms: performanceMetrics.activeRooms,
+                totalTransports: performanceMetrics.totalTransports,
+                totalProducers: performanceMetrics.totalProducers,
+                totalConsumers: performanceMetrics.totalConsumers,
+                errorCount: performanceMetrics.errorCount
+            });
+        }, 30000); // Log metrics every 30 seconds
+        console.log(`✅ Optimized Video Server running on port ${port} with performance monitoring`);
     }
     catch (error) {
         console.error("❌ Failed to start video server:", error);
