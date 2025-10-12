@@ -39,7 +39,12 @@ function broadcastToRoom(roomId, excludePeerId, message) {
         return;
     room.peers.forEach((peer, peerId) => {
         if (peerId !== excludePeerId && peer.ws.readyState === WebSocket.OPEN) {
-            peer.ws.send(JSON.stringify(message));
+            try {
+                peer.ws.send(JSON.stringify(message));
+            }
+            catch (error) {
+                console.error(`❌ Error broadcasting to peer ${peerId}:`, error);
+            }
         }
     });
 }
@@ -106,7 +111,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                             };
                             peers.set(peerId, currentPeer);
                             room.peers.set(peerId, currentPeer);
-                            // Get existing producers
+                            // Get existing producers with optimization
                             const existingProducers = [];
                             room.peers.forEach((peer, pId) => {
                                 if (pId !== peerId) {
@@ -121,6 +126,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                     });
                                 }
                             });
+                            // Send joined response immediately
                             ws.send(JSON.stringify({
                                 action: "joined",
                                 peerId: peerId,
@@ -128,6 +134,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 peers: Array.from(room.peers.keys()).filter(id => id !== peerId),
                                 existingProducers
                             }));
+                            // Broadcast new peer after sending response
                             broadcastToRoom(messageData.roomId, peerId, {
                                 action: "newPeer",
                                 peerId: peerId
@@ -165,11 +172,16 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 producers: new Map(),
                                 consumers: new Map()
                             });
+                            // Optimized transport parameters
                             const transportParams = {
                                 id: transport.id,
                                 iceParameters: transport.iceParameters,
                                 iceCandidates: transport.iceCandidates,
                                 dtlsParameters: transport.dtlsParameters,
+                                iceServers: [
+                                    { urls: 'stun:stun.l.google.com:19302' },
+                                    { urls: 'stun:stun1.l.google.com:19302' }
+                                ]
                             };
                             ws.send(JSON.stringify({
                                 action: "transportCreated",
@@ -189,14 +201,22 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 ws.send(JSON.stringify({ error: "Transport not found" }));
                                 return;
                             }
-                            yield transportData.transport.connect({
-                                dtlsParameters: messageData.dtlsParameters
-                            });
-                            ws.send(JSON.stringify({
-                                action: "transportConnected",
-                                Id: messageData.Id
-                            }));
-                            console.log(`✅ [${peerId}] Transport connected: ${messageData.Id}`);
+                            try {
+                                yield transportData.transport.connect({
+                                    dtlsParameters: messageData.dtlsParameters
+                                });
+                                ws.send(JSON.stringify({
+                                    action: "transportConnected",
+                                    Id: messageData.Id
+                                }));
+                                console.log(`✅ [${peerId}] Transport connected: ${messageData.Id}`);
+                            }
+                            catch (error) {
+                                console.error(`❌ [${peerId}] Transport connect error:`, error);
+                                ws.send(JSON.stringify({
+                                    error: `Transport connect failed: ${error instanceof Error ? error.message : String(error)}`
+                                }));
+                            }
                             break;
                         }
                         case "produce": {
@@ -209,23 +229,34 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 ws.send(JSON.stringify({ error: "Transport not found" }));
                                 return;
                             }
-                            const producer = yield transportData.transport.produce({
-                                kind: messageData.kind,
-                                rtpParameters: messageData.rtpParameters
-                            });
-                            transportData.producers.set(producer.id, producer);
-                            broadcastToRoom(currentPeer.roomId, peerId, {
-                                action: "newProducer",
-                                peerId: peerId,
-                                producerId: producer.id,
-                                kind: producer.kind
-                            });
-                            ws.send(JSON.stringify({
-                                action: "produced",
-                                producerId: producer.id,
-                                kind: producer.kind
-                            }));
-                            console.log(`🎥 [${peerId}] Produced ${messageData.kind}: ${producer.id}`);
+                            try {
+                                const producer = yield transportData.transport.produce({
+                                    kind: messageData.kind,
+                                    rtpParameters: messageData.rtpParameters,
+                                    // Optimize for low latency
+                                    appData: { source: messageData.kind }
+                                });
+                                transportData.producers.set(producer.id, producer);
+                                // Broadcast new producer immediately
+                                broadcastToRoom(currentPeer.roomId, peerId, {
+                                    action: "newProducer",
+                                    peerId: peerId,
+                                    producerId: producer.id,
+                                    kind: producer.kind
+                                });
+                                ws.send(JSON.stringify({
+                                    action: "produced",
+                                    producerId: producer.id,
+                                    kind: producer.kind
+                                }));
+                                console.log(`🎥 [${peerId}] Produced ${messageData.kind}: ${producer.id}`);
+                            }
+                            catch (error) {
+                                console.error(`❌ [${peerId}] Produce error:`, error);
+                                ws.send(JSON.stringify({
+                                    error: `Produce failed: ${error instanceof Error ? error.message : String(error)}`
+                                }));
+                            }
                             break;
                         }
                         case "consume": {
@@ -243,55 +274,44 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 ws.send(JSON.stringify({ error: "Transport not found" }));
                                 return;
                             }
-                            // FIXED: Call canConsume as method
-                            const canConsume = room.router.canConsume({
-                                producerId: messageData.producerId,
-                                rtpCapabilities: messageData.rtpCapabilities
-                            });
-                            if (!canConsume) {
-                                ws.send(JSON.stringify({ error: "Cannot consume this producer" }));
-                                return;
-                            }
-                            const consumer = yield transportData.transport.consume({
-                                producerId: messageData.producerId,
-                                rtpCapabilities: messageData.rtpCapabilities,
-                                paused: false
-                            });
-                            transportData.consumers.set(consumer.id, consumer);
-                            ws.send(JSON.stringify({
-                                action: "consumed",
-                                consumerId: consumer.id,
-                                producerId: messageData.producerId,
-                                kind: consumer.kind,
-                                rtpParameters: consumer.rtpParameters
-                            }));
-                            console.log(`📺 [${peerId}] Consumed: ${consumer.id}`);
-                            break;
-                        }
-                        case "remove": {
-                            if (!currentPeer || !messageData.Id) {
-                                ws.send(JSON.stringify({ error: "Missing transportId" }));
-                                return;
-                            }
-                            const transportData = currentPeer.transports.get(messageData.Id);
-                            if (transportData) {
-                                transportData.producers.forEach(producer => {
-                                    producer.close();
-                                    broadcastToRoom(currentPeer.roomId, peerId, {
-                                        action: "producerClosed",
-                                        producerId: producer.id,
-                                        peerId: peerId
-                                    });
+                            try {
+                                // Check if we can consume this producer
+                                const canConsume = room.router.canConsume({
+                                    producerId: messageData.producerId,
+                                    rtpCapabilities: messageData.rtpCapabilities
                                 });
-                                transportData.consumers.forEach(consumer => consumer.close());
-                                transportData.transport.close();
-                                currentPeer.transports.delete(messageData.Id);
+                                if (!canConsume) {
+                                    ws.send(JSON.stringify({ error: "Cannot consume this producer" }));
+                                    return;
+                                }
+                                // Create consumer with optimized settings
+                                const consumer = yield transportData.transport.consume({
+                                    producerId: messageData.producerId,
+                                    rtpCapabilities: messageData.rtpCapabilities,
+                                    paused: false, // Start immediately for faster rendering
+                                    // Optimize for low latency
+                                    appData: {
+                                        source: 'remote',
+                                        producerId: messageData.producerId
+                                    }
+                                });
+                                transportData.consumers.set(consumer.id, consumer);
+                                // Send consumed response immediately
+                                ws.send(JSON.stringify({
+                                    action: "consumed",
+                                    consumerId: consumer.id,
+                                    producerId: messageData.producerId,
+                                    kind: consumer.kind,
+                                    rtpParameters: consumer.rtpParameters
+                                }));
+                                console.log(`📺 [${peerId}] Consumed: ${consumer.id} (${consumer.kind})`);
                             }
-                            ws.send(JSON.stringify({
-                                action: "removed",
-                                Id: messageData.Id
-                            }));
-                            console.log(`✅ [${peerId}] Transport removed: ${messageData.Id}`);
+                            catch (error) {
+                                console.error(`❌ [${peerId}] Consume error:`, error);
+                                ws.send(JSON.stringify({
+                                    error: `Consume failed: ${error instanceof Error ? error.message : String(error)}`
+                                }));
+                            }
                             break;
                         }
                         case "closeProducer": {

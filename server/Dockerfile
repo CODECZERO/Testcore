@@ -54,7 +54,7 @@ RUN npm install
 #running prisma to create schema and skiping yes otpions
 RUN yes | npx prisma generate
 RUN pwd
-RUN ls
+RUN npx tsc
 # Copy Nginx configuration file
 COPY nginx.conf /etc/nginx/nginx.conf
 
