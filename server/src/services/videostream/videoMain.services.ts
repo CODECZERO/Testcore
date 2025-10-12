@@ -97,7 +97,6 @@ function cleanupPeer(peerId: string) {
     
     const room = rooms.get(peer.roomId);
     
-    console.log(`🧹 Cleaning up peer: ${peerId}`);
 
     // Close all transports, producers, and consumers
     peer.transports.forEach((transportData) => {
@@ -126,23 +125,19 @@ function cleanupPeer(peerId: string) {
         if (room.peers.size === 0) {
             room.router.close();
             rooms.delete(peer.roomId);
-            console.log(`🗑️  Room deleted: ${peer.roomId}`);
         }
     }
     
     peers.delete(peerId);
-    console.log(`✅ Peer cleaned up: ${peerId}`);
 }
 
 // ============= MAIN SERVER =============
 
 const runVideoServer = async () => {
     try {
-        console.log('🚀 Starting many-to-many video server...');
 
         wss.on('connection', (ws: WebSocket, req: any) => {
             const peerId = nanoid(16);
-            console.log(`🔌 New connection: ${peerId}`);
             
             let currentPeer: Peer | null = null;
 
@@ -201,7 +196,6 @@ const runVideoServer = async () => {
                                 peerId: peerId
                             });
 
-                            console.log(`✅ [${peerId}] Joined room: ${messageData.roomId}`);
                             break;
                         }
 
