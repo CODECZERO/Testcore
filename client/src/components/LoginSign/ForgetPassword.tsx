@@ -1,8 +1,7 @@
 import { useState, ChangeEvent, FormEvent } from "react";
-import axios from "axios";
 import styled from "styled-components";
-
-const BackendUrl = "https://testcore-3en7.onrender.com"; // Replace with your actual backend URL
+import apiClient, { getErrorMessage } from "../../services/api.service";
+import { API_ENDPOINTS } from "../../config/api.config";
 
 const ForgetPassword = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +12,7 @@ const ForgetPassword = () => {
 
   const [responseMessage, setResponseMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Handle input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -25,39 +25,31 @@ const ForgetPassword = () => {
     e.preventDefault();
     setResponseMessage(null);
     setErrorMessage(null);
+    setLoading(true);
 
     // Retrieve the access token from localStorage
     const accessToken = localStorage.getItem("accessToken");
 
     if (!accessToken) {
       setErrorMessage("You must be logged in to reset your password.");
+      setLoading(false);
       return;
     }
 
     try {
-      const response = await axios.put(
-        `${BackendUrl}/api/v1/user/userData`,
-        {
-          email: formData.email,
-          role: formData.role,
-          password: formData.password,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`, // Include the token in the Authorization header
-          },
-        }
-      );
+      const response = await apiClient.put(API_ENDPOINTS.USER.USER_DATA, {
+        email: formData.email,
+        role: formData.role,
+        password: formData.password,
+      });
 
       if (response.status === 200) {
         setResponseMessage("Password updated successfully!");
       }
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setErrorMessage(error.response?.data?.message || "Failed to reset password.");
-      } else {
-        setErrorMessage("An unexpected error occurred.");
-      }
+      setErrorMessage(getErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -131,8 +123,8 @@ const ForgetPassword = () => {
           />
         </div>
 
-        <button id="button" type="submit">
-          Submit
+        <button id="button" type="submit" disabled={loading}>
+          {loading ? "Updating..." : "Submit"}
         </button>
 
         {responseMessage && <p className="success-message">{responseMessage}</p>}
@@ -236,6 +228,25 @@ const StyledWrapper = styled.div`
 
   #button:hover {
     background-color: rgb(126, 84, 255);
+  }
+
+  #button:disabled {
+    background-color: rgb(180, 180, 180);
+    cursor: not-allowed;
+  }
+
+  .success-message {
+    color: green;
+    font-size: 0.8em;
+    z-index: 2;
+    margin-top: 10px;
+  }
+
+  .error-message {
+    color: red;
+    font-size: 0.8em;
+    z-index: 2;
+    margin-top: 10px;
   }
 
   .forgotLink {

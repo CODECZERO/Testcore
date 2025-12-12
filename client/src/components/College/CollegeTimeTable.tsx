@@ -1,8 +1,7 @@
-// CollegeTimetableComponent.tsx
 import React, { useState } from 'react';
-import axios from 'axios';
-
-const BackendUrl = "https://testcore-3en7.onrender.com";
+import apiClient, { getErrorMessage } from '../../services/api.service';
+import { API_ENDPOINTS } from '../../config/api.config';
+import '../styles/CollegeFunctions.css';
 
 interface Subject {
   name: string;
@@ -35,11 +34,7 @@ const CollegeTimetable: React.FC = () => {
     setError('');
 
     try {
-        const authToken = localStorage.getItem("accessToken");
-      const response = await axios.get(`${BackendUrl}/api/v1/college/subject`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
+      const response = await apiClient.get(API_ENDPOINTS.COLLEGE.SUBJECT, {
         params: { collegeName },
       });
 
@@ -52,27 +47,23 @@ const CollegeTimetable: React.FC = () => {
           time: item.time || 'N/A',
           state: item.Aprrove || false,
         })));
-        console.log(response.data)
+        console.log(response.data);
       } else {
         throw new Error('Unexpected response format. Expected an array.');
       }
-    } catch (err: any) {
-      console.error('Error fetching timetables:', err); // Log the full error object
-      const errorMessage =
-        err.response?.data?.message ||
-        err.message ||
-        'An unexpected error occurred while fetching timetables.';
-      setError(errorMessage);
+    } catch (err) {
+      console.error('Error fetching timetables:', err);
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="timetable-container">
-      <h1>College Timetable Management</h1>
+    <div className="college-card">
+      <h2>Timetable Management</h2>
 
-      <div className="input-group">
+      <div className="college-search">
         <input
           type="text"
           placeholder="Enter College Name"
@@ -84,42 +75,48 @@ const CollegeTimetable: React.FC = () => {
         </button>
       </div>
 
-      {error && <p className="error-message">{error}</p>}
+      {error && <div className="error-message">{error}</div>}
 
-      <table className="timetable-table">
-        <thead>
-          <tr>
-            <th>Class</th>
-            <th>Subjects</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(timetables) && timetables.length > 0 ? (
-            timetables.map((timetable) => (
-              <tr key={timetable.id}>
-                <td>{timetable.class}</td>
-                <td>{
-                  timetable.subjects && Array.isArray(timetable.subjects)
-                    ? timetable.subjects
+      <div className="table-wrapper">
+        <table className="examiner-table">
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Subjects</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Array.isArray(timetables) && timetables.length > 0 ? (
+              timetables.map((timetable) => (
+                <tr key={timetable.id}>
+                  <td>{timetable.class}</td>
+                  <td>{
+                    timetable.subjects && Array.isArray(timetable.subjects)
+                      ? timetable.subjects
                         .map((subject) => `${subject.name} (${subject.code})`)
                         .join(', ')
-                    : 'N/A'
-                }</td>
-                <td>{timetable.date}</td>
-                <td>{timetable.time}</td>
-                <td>{timetable.state ? 'Approved' : 'Pending'}</td>
+                      : 'N/A'
+                  }</td>
+                  <td>{timetable.date}</td>
+                  <td>{timetable.time}</td>
+                  <td>
+                    <span className={timetable.state ? 'verified-badge' : ''}>
+                      {timetable.state ? 'Approved' : 'Pending'}
+                    </span>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={5} className="loading-text">No timetables available.</td>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={5}>No timetables available.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

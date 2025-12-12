@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import Spreadsheet from './Spreadsheet'; // Import the Spreadsheet component
 import { Matrix } from 'react-spreadsheet'; // Import Matrix type for compatibility
+import apiClient, { getErrorMessage } from '../../services/api.service';
+import { API_ENDPOINTS } from '../../config/api.config';
+import '../styles/ExaminerFunctions.css';
 
 type SpreadsheetData = Matrix<{ value: string } | undefined>; // Allow undefined cells
-const BackendUrl = "https://testcore-3en7.onrender.com";
+
 function CreateTimetable() {
   const [ClassName, setClassName] = useState('');
   const [collegeName, setCollegeName] = useState('');
@@ -14,6 +16,7 @@ function CreateTimetable() {
   ]); // Initial empty subjects with headers
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Handle form input changes
   const handleSubjectChange = (newData: Matrix<{ value: string } | undefined>) => {
@@ -23,10 +26,13 @@ function CreateTimetable() {
     );
     setSubjects(sanitizedData);
   };
-  
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
 
     // Format the subjects data for backend (removing the header row)
     const formattedSubjects = subjects.slice(1).map((row) => ({
@@ -42,7 +48,7 @@ function CreateTimetable() {
 
     try {
       // Make POST request to create timetable
-      const response = await axios.post(`${BackendUrl}/api/v1/examiner/timeTable`, timetableData);
+      const response = await apiClient.post(API_ENDPOINTS.EXAMINER.TIMETABLE, timetableData);
 
       // Handle success response
       if (response.status === 201) {
@@ -51,53 +57,50 @@ function CreateTimetable() {
         console.log(response.data);
       }
     } catch (err) {
-      // Handle error response safely
-      if (axios.isAxiosError(err)) {
-        // Check if the error is an Axios error
-        setError(`Error: ${err.response?.data.message || 'Something went wrong'}`);
-      } else if (err instanceof Error) {
-        // Handle non-Axios errors that are of type Error
-        setError(`Error: ${err.message}`);
-      } else {
-        setError('An unknown error occurred.');
-      }
+      setError(getErrorMessage(err));
       setSuccessMessage('');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
-      <h1>Create Timetable</h1>
+    <div className="examiner-container">
+      <div className="examiner-form">
+        <h2>Create Timetable</h2>
 
-      {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+        {successMessage && <div className="success-message">{successMessage}</div>}
+        {error && <div className="error-message">{error}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Class</label>
-          <input
-            type="text"
-            value={ClassName}
-            onChange={(e) => setClassName(e.target.value)}
-            required
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Class</label>
+            <input
+              type="text"
+              value={ClassName}
+              onChange={(e) => setClassName(e.target.value)}
+              required
+            />
+          </div>
 
-        <div>
-          <label>College Name</label>
-          <input
-            type="text"
-            value={collegeName}
-            onChange={(e) => setCollegeName(e.target.value)}
-            required
-          />
-        </div>
+          <div className="form-group">
+            <label>College Name</label>
+            <input
+              type="text"
+              value={collegeName}
+              onChange={(e) => setCollegeName(e.target.value)}
+              required
+            />
+          </div>
 
-        {/* Pass subjects and handle change to the Spreadsheet component */}
-        <Spreadsheet data={subjects} onChange={handleSubjectChange} />
+          {/* Pass subjects and handle change to the Spreadsheet component */}
+          <Spreadsheet data={subjects} onChange={handleSubjectChange} />
 
-        <button type="submit">Create Timetable</button>
-      </form>
+          <button type="submit" className="examiner-btn" disabled={loading}>
+            {loading ? 'Creating...' : 'Create Timetable'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

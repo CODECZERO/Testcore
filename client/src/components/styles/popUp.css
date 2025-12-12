@@ -1,70 +1,118 @@
+/* ========== POPUP STYLES - CLEAN & ALIGNED ========== */
+
+/* Generic Popup Overlay */
 .popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 1000;
+  padding: 1rem;
 }
 
-.popup-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  position: relative;
+/* Popup Container */
+.popup-container,
+.popup-modal {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 16px;
+  width: 100%;
   max-width: 500px;
-  width: 90%; /* Adjust width for responsiveness */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
-  animation: fadeIn 0.3s ease-in-out; /* Subtle animation */
+  max-height: 85vh;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow-y: auto;
 }
 
-/* Add a fade-in animation */
-@keyframes fadeIn {
-  from {
-      opacity: 0;
-      transform: scale(0.9);
-  }
-  to {
-      opacity: 1;
-      transform: scale(1);
-  }
+.popup-container h2,
+.popup-modal h2 {
+  color: #1a1a2e;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
 }
 
-.popup-close {
+/* Close Button */
+.popup-close,
+.close-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  background: none;
+  top: 1rem;
+  right: 1rem;
+  background: #f1f5f9;
   border: none;
-  font-size: 24px;
+  font-size: 1.25rem;
   cursor: pointer;
-  color: #333;
-  transition: color 0.2s ease;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  transition: all 0.2s ease;
 }
 
-.popup-close:hover {
-  color: red;
+.popup-close:hover,
+.close-button:hover {
+  background: #e2e8f0;
+  color: #ef4444;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .popup-content {
-      max-width: 400px; /* Reduce max-width for smaller screens */
-      padding: 15px; /* Reduce padding */
-  }
-
-  .popup-close {
-      font-size: 20px; /* Adjust font size for smaller screens */
-  }
+/* Form Elements */
+.popup-container input,
+.popup-container select,
+.popup-container textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin-bottom: 0.75rem;
+  transition: all 0.2s ease;
 }
 
+.popup-container input:focus,
+.popup-container select:focus,
+.popup-container textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+/* Popup Button */
+.popup-btn,
+.popup-submit {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.popup-btn:hover,
+.popup-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+}
+
+/* Responsive */
 @media (max-width: 480px) {
-  .popup-content {
-      max-width: 300px; /* Further reduce max-width */
-      padding: 10px; /* Compact padding */
+
+  .popup-container,
+  .popup-modal {
+    padding: 1rem;
+    border-radius: 12px;
   }
 }

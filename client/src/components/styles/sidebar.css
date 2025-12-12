@@ -1,200 +1,186 @@
-/* Sidebar Initial State */
+/* ========== SIDEBAR - CLEAN & ALIGNED ========== */
+
 .menu {
-  height: 490px;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
-  margin-top: 3.5%;
-  width: 60px; /* Collapsed width for icons-only state */
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align items to the left */
-  padding: 1rem 0;
-  box-shadow: inset -4px 0 5px -5px rgba(0, 0, 0, 0.2);
-  transition: width 0.3s ease;
-  overflow: hidden; /* Hide overflowing content */
-  z-index: 1000; /* Ensure sidebar appears above other elements */
+    height: 100vh;
+    width: 60px;
+    background: rgba(255, 255, 255, 0.98);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+    transition: width 0.3s ease;
+    overflow: hidden;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-/* Sidebar Hover State */
 .menu:hover {
-  width: 200px; /* Expanded width to show labels */
+    width: 200px;
 }
 
-/* Sidebar Logo Styling */
+/* Logo */
 .logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-  width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    height: 40px;
 }
 
 .logo-img {
-  width: 40px; /* Adjust size for responsiveness */
-  height: auto;
-  object-fit: contain; /* Ensure proper aspect ratio */
+    width: 32px;
+    height: auto;
 }
 
-.logo-icon {
-  font-size: 1.5rem;
-  color: #2d4059;
-}
-
-.logo h2 {
-  color: #2d4059;
-  font-size: 1.5rem; /* Adjust font size for smaller screens */
-  white-space: nowrap;
-}
-
-/* Menu List Styling */
+/* Menu List */
 .menu--list {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0 0.5rem;
 }
 
-/* Item Styling for Consistent Alignment */
+/* Menu Item */
 .item {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.8rem;
-  color: #2d4059;
-  text-decoration: none;
-  transition: all 0.3s ease-in-out;
-  font-weight: 550;
-  white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    font-size: 0.85rem;
+    color: #4a5568;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+    border-radius: 8px;
 }
 
 .item .icon {
-  font-size: 1.3rem;
-  flex-shrink: 0; /* Prevent icons from shrinking */
+    font-size: 1.2rem;
+    width: 24px;
+    display: flex;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #667eea;
 }
 
 /* Show Labels on Hover */
 .menu:hover .item span {
-  display: inline; /* Ensure labels are visible */
+    display: inline;
 }
 
 .menu:not(:hover) .item span {
-  display: none; /* Hide labels in collapsed state */
+    display: none;
 }
 
 /* Hover Effect */
 .item:hover {
-  color: #4a90e2;
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
 }
 
-/* Alignment Fix for Non-Hovered State */
+/* Alignment */
 .menu:not(:hover) .item {
-  justify-content: center;
+    justify-content: center;
 }
 
-/* Improved Alignment for Hovered State */
 .menu:hover .item {
-  justify-content: flex-start;
-}
-
-/* Responsive Adjustments */
-
-/* Medium Screens */
-@media (max-width: 1024px) {
-  .menu {
-    height: auto; /* Adjust height for responsive behavior */
-    width: 60px; /* Keep compact width */
-    position: fixed; /* Fix sidebar position for scrolling content */
-    left: 0;
-    top: 0;
-    bottom: 0;
-  }
-
-  .dashboard--content {
-    margin-left: 70px; /* Leave space for compact sidebar */
-  }
-}
-
-/* Small Screens */
-@media (max-width: 768px) {
-  .menu {
-    flex-direction: row; /* Convert to a top navbar */
-    height: auto;
-    width: 100%;
-    border-radius: 0;
-    box-shadow: none;
-    position: static; /* Position at the top of the page */
-  }
-
-  .logo {
-    margin-bottom: 0;
     justify-content: flex-start;
-    padding: 0 1rem;
-  }
-
-  .menu--list {
-    flex-direction: row;
-    justify-content: space-around;
-    width: 100%;
-  }
-
-  .item {
-    flex-direction: column; /* Stack icons and labels vertically */
-    gap: 0.3rem;
-    padding: 0.5rem;
-    font-size: 0.7rem; /* Adjust font size for smaller screens */
-  }
-
-  .item .icon {
-    font-size: 1.2rem;
-  }
-
-  .menu:hover {
-    width: 100%; /* Disable hover effect for navbar */
-  }
-
-  .dashboard--content {
-    margin: 0; /* Full-width content below navbar */
-  }
 }
 
-/* Extra Small Screens */
+/* Role Badge */
+.role-badge-sidebar {
+    margin: 0 auto 1rem;
+    text-align: center;
+    font-size: 0.7rem;
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 768px) {
+    .menu {
+        flex-direction: row;
+        height: 56px;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        padding: 0 0.5rem;
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .logo {
+        margin-bottom: 0;
+        width: 40px;
+        height: auto;
+        flex-shrink: 0;
+    }
+
+    .logo-img {
+        width: 28px;
+    }
+
+    .menu--list {
+        flex-direction: row;
+        justify-content: space-around;
+        flex: 1;
+        padding: 0;
+        gap: 0;
+    }
+
+    .item {
+        flex-direction: column;
+        gap: 0.15rem;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.6rem;
+        border-radius: 6px;
+    }
+
+    .item .icon {
+        font-size: 1.1rem;
+        width: auto;
+    }
+
+    .menu:hover {
+        width: 100%;
+    }
+
+    .menu:hover .item span,
+    .menu:not(:hover) .item span {
+        display: inline;
+    }
+
+    .role-badge-sidebar {
+        display: none;
+    }
+}
+
 @media (max-width: 480px) {
+    .menu {
+        bottom: 0;
+        top: auto;
+        height: 56px;
+        border-bottom: none;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    }
 
-  .menu {
-    flex-direction: row; /* Horizontal layout */
-    height: 30px; /* Bottom navigation height */
-    width: 100%;
-    position: fixed;
-    bottom: 0; /* Fixed to the bottom */
-    left: 0;
-    margin: 0;
-    border-radius: 0;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Shadow above the navbar */
-  }
+    .logo {
+        display: none;
+    }
 
-  .menu--list {
-    flex-direction: row; /* Items in a row */
-    justify-content: space-between;
-    gap: 0.5rem; /* Compact spacing */
-  }
+    .item {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.55rem;
+    }
 
-  .item {
-    flex-direction: column; /* Stack icons and labels */
-    padding: 0.4rem;
-    font-size: 0.65rem; /* Smaller font size */
-  }
-
-  .item .icon {
-    font-size: 1rem; /* Adjust icon size */
-  }
-
-  .menu:hover {
-    width: 100%; /* Keep consistent size */
-  }
-
-  .dashboard--content {
-    padding-bottom: 60px; /* Prevent content overlap */
-  }
+    .item .icon {
+        font-size: 1rem;
+    }
 }

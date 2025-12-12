@@ -1,18 +1,124 @@
-body::-webkit-scrollbar {
-    width: 4px;
-    scroll-snap-type: y;
-    animation-timeline:scroll() ;
+/* ========== DASHBOARD LAYOUT - PROPERLY FIT TO WINDOW ========== */
+
+/* Scoped to dashboard only - no global styles */
+.dashboard-wrapper {
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: fixed;
+    top: 0;
+    left: 0;
 }
 
-body::-webkit-scrollbar-thumb {
-    background: #d6e5f5;
-    border-radius: 4px;
-    animation-timeline: scroll();
+/* Main Dashboard Container */
+.dashboard {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    position: relative;
 }
 
-body::-webkit-scrollbar-thumb:hover {
-    background: #357ab7;
-    animation-timeline: scroll();
+/* Dashboard Content Area */
+.dashboard--content {
+    flex: 1;
+    padding: 1.5rem;
+    margin-left: 60px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: margin-left 0.3s ease;
+    height: 100%;
 }
 
-  
+.dashboard:hover .dashboard--content {
+    margin-left: 200px;
+}
+
+/* Profile Sidebar - Hidden */
+.dashboard--profile {
+    display: none;
+}
+
+/* Content Container */
+.content-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-bottom: 2rem;
+}
+
+/* Cards Grid */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-top: 1.5rem;
+}
+
+/* Scrollbar */
+.dashboard--content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dashboard--content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.dashboard--content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+.dashboard--content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* ========== RESPONSIVE ========== */
+
+@media (max-width: 1024px) {
+    .dashboard--content {
+        margin-left: 70px;
+    }
+
+    .dashboard:hover .dashboard--content {
+        margin-left: 70px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-wrapper {
+        position: relative;
+        height: auto;
+        min-height: 100vh;
+        overflow: auto;
+    }
+
+    .dashboard {
+        flex-direction: column;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .dashboard--content {
+        margin-left: 0;
+        margin-top: 56px;
+        padding: 1rem;
+        height: auto;
+        flex: 1;
+    }
+
+    .dashboard:hover .dashboard--content {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard--content {
+        padding: 0.75rem;
+        padding-bottom: 70px;
+    }
+
+    .cards-grid {
+        gap: 0.75rem;
+        grid-template-columns: 1fr;
+    }
+}

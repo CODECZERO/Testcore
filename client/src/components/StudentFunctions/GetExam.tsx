@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import ReusablePopup from './PopUp';
+import apiClient, { getErrorMessage } from '../../services/api.service';
+import { API_ENDPOINTS } from '../../config/api.config';
+import '../styles/StudentFunctions.css';
 
 interface GetExamPopupProps {
   isOpen: boolean;
@@ -8,66 +10,47 @@ interface GetExamPopupProps {
 }
 
 const GetExam: React.FC<GetExamPopupProps> = ({ isOpen, onClose }) => {
-  const [questionPaper, setQuestionPaper] = useState<any>(null); // Stores the fetched question paper
-  const [loading, setLoading] = useState<boolean>(false); // Loading state
-  const [error, setError] = useState<string | null>(null); // Error message state
-
-  const BackendUrl = "https://testcore-3en7.onrender.com";
-  const authToken = localStorage.getItem("accessToken"); // Access token for authentication
+  const [questionPaper, setQuestionPaper] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchQuestionPaper = async () => {
     setLoading(true);
     setError(null);
     setQuestionPaper(null);
 
-    console.log("Fetching question paper...", authToken);
     try {
-      // Send the request to the backend to fetch the question paper
-      const response = await axios.post(
-        `${BackendUrl}/api/v1/student/Question`,
-        {}, 
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${authToken}`, // Pass access token for authentication
-          },
-        }
-      );
-
-      // Set the question paper data in state
+      const response = await apiClient.post(API_ENDPOINTS.STUDENT.QUESTION, {});
       setQuestionPaper(response.data);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch the question paper.');
+    } catch (err) {
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null; // If popup is not open, return nothing
+  if (!isOpen) return null;
 
   return (
     <ReusablePopup isOpen={isOpen} onClose={onClose}>
-      <div>
+      <div className="student-popup-form">
         <h3>Exam Question Paper</h3>
 
-        {/* Button to Fetch Question Paper */}
-        <button onClick={fetchQuestionPaper} disabled={loading}>
+        <button
+          onClick={fetchQuestionPaper}
+          disabled={loading}
+          className="student-btn"
+        >
           {loading ? 'Loading...' : 'Fetch Question Paper'}
         </button>
 
-        {/* Display Loading */}
-        {loading && <p>Loading question paper...</p>}
+        {loading && <p className="loading-text">Loading question paper...</p>}
+        {error && <div className="student-error">{error}</div>}
 
-        {/* Display Error */}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-
-        {/* Display Question Paper Data */}
         {questionPaper && (
-          <div style={{ marginTop: '20px' }}>
+          <div className="question-paper">
             <h4>Question Paper:</h4>
-            <pre style={{ whiteSpace: 'pre-wrap', backgroundColor: '#f4f4f4', padding: '10px' }}>
-              {JSON.stringify(questionPaper, null, 2)}
-            </pre>
+            <pre>{JSON.stringify(questionPaper, null, 2)}</pre>
           </div>
         )}
       </div>

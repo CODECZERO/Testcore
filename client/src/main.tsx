@@ -23,6 +23,9 @@ import ForgetPassword from './components/LoginSign/ForgetPassword.tsx';
 import ProfileAccount from './components/DashBoard/ProfileAccount.tsx';
 import { ProfilePictureProvider } from './components/Users/ProfileContext.tsx';
 import CollegeStudents from './components/College/CollegeStudents.tsx';
+import ExamParticipants from './components/ExaminerFunctions/ExamParticipants.tsx';
+import AccessDenied from './components/Auth/AccessDenied.tsx';
+import { ToastProvider } from './components/UI/Toast';
 
 
 
@@ -75,6 +78,18 @@ const router = createBrowserRouter([
     path: "/CollegeStudents",
     element: <CollegeStudents />,
   },
+  {
+    path: "/forget-password",
+    element: <ForgetPassword />,
+  },
+  {
+    path: "/exam-participants",
+    element: <ExamParticipants />,
+  },
+  {
+    path: "/access-denied",
+    element: <AccessDenied />,
+  },
 
 ]);
 
@@ -82,15 +97,17 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
-      <ProfilePictureProvider>
-        <RoomProvider>
-          <ChatWrapper>
-            <RouterProvider router={router} />
-            <RestoreUser />
-          </ChatWrapper>
-        </RoomProvider>
-      </ProfilePictureProvider>
+        <ToastProvider>
+          <ProfilePictureProvider>
+            <RoomProvider>
+              <ChatWrapper>
+                <RouterProvider router={router} />
+                <RestoreUser />
+              </ChatWrapper>
+            </RoomProvider>
+          </ProfilePictureProvider>
+        </ToastProvider>
       </QueryClientProvider>
-    </Provider> 
+    </Provider>
   </React.StrictMode>
 );

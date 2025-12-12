@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-
-const BackendUrl = 'https://testcore-3en7.onrender.com';
+import apiClient, { getErrorMessage } from '../../services/api.service';
+import { API_ENDPOINTS } from '../../config/api.config';
+import '../styles/CollegeFunctions.css';
 
 const ApproveTimetable = () => {
     const [timetableId, setTimetableId] = useState('');
@@ -20,40 +20,41 @@ const ApproveTimetable = () => {
         setMessage('');
 
         try {
-            const authToken = localStorage.getItem("accessToken");
-            const response = await axios.put(`${BackendUrl}/api/v1/college/subject`, {
+            const response = await apiClient.put(API_ENDPOINTS.COLLEGE.SUBJECT, {
                 timetableId,
                 state: true
-            }, {
-                headers: {
-                    Authorization: `Bearer ${authToken}`,
-                    'Content-Type': 'application/json'
-                }
             });
-            
+
             setMessage(response.data.message || 'Timetable approved successfully!');
         } catch (err) {
-            setError('Failed to approve timetable. Please try again.');
+            setError(getErrorMessage(err));
         } finally {
             setLoading(false);
         }
-       
     };
 
     return (
-        <div>
+        <div className="college-card">
             <h2>Approve Timetable</h2>
-            <input
-                type="text"
-                placeholder="Enter Timetable ID"
-                value={timetableId}
-                onChange={(e) => setTimetableId(e.target.value)}
-            />
-            <button onClick={handleApprove} disabled={loading}>
-                {loading ? 'Approving...' : 'Approve Timetable'}
-            </button>
-            {message && <p style={{ color: 'green' }}>{message}</p>}
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+
+            {message && <div className="success-message">{message}</div>}
+            {error && <div className="error-message">{error}</div>}
+
+            <div className="college-search">
+                <input
+                    type="text"
+                    placeholder="Enter Timetable ID"
+                    value={timetableId}
+                    onChange={(e) => setTimetableId(e.target.value)}
+                />
+                <button
+                    onClick={handleApprove}
+                    disabled={loading}
+                    className="college-btn-success"
+                >
+                    {loading ? 'Approving...' : 'Approve Timetable'}
+                </button>
+            </div>
         </div>
     );
 };

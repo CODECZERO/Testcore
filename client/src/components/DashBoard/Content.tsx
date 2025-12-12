@@ -47,6 +47,7 @@ const Content: React.FC = () => {
             title="Messages"
             description="Check and reply to all your messages easily."
             icon={<BiMessage />}
+            onClick={() => navigate('/messages')}
           />,
           <Card
             key="Get Exams"
@@ -65,14 +66,14 @@ const Content: React.FC = () => {
             title="Examiner and Students"
             description="Manage Examiner and Students for students."
             icon={<BiBookAlt />}
-            onClick={() => navigate('/CollegeStudents')} 
+            onClick={() => navigate('/CollegeStudents')}
           />,
           <Card
             key="messages"
             title="Messages"
             description="Communicate with students and staff."
             icon={<BiMessage />}
-
+            onClick={() => navigate('/messages')}
           />,
         ]);
         break;
@@ -99,7 +100,14 @@ const Content: React.FC = () => {
             description="Create an Exam for Students"
             icon={<BiMessage />}
             onClick={() => navigate('/CreateExam')}
-           
+
+          />,
+          <Card
+            key="Exam Participants"
+            title="Exam Participants"
+            description="View participants and update marks"
+            icon={<BiStats />}
+            onClick={() => navigate('/exam-participants')}
           />,
           <Card
             key="Create Class"
@@ -118,36 +126,36 @@ const Content: React.FC = () => {
 
   return (
     <>
-    <div className="content-container">
-      <ContentHeader />
+      <div className="content-container">
+        <ContentHeader />
 
-      {/* Render the cards based on the role */}
-      <div className="cards-grid">
-        {cardsToDisplay}
+        {/* Render the cards based on the role */}
+        <div className="cards-grid">
+          {cardsToDisplay}
+        </div>
+
+        <TimeTablePopup
+          isOpen={isTimeTablePopupOpen}
+          onClose={closeTimeTablePopup}
+        />
+        <GetExam
+          isOpen={isGetExamOpen}
+          onClose={() => setIsGetExamOpen(false)}
+        />
+
+        <Schedule
+          isOpen={isExamSchedulerOpen}
+          onClose={closeExamScheuler}
+        />
+
+        <CreateClass
+          isOpen={isCreateClassOpen}
+          onClose={closeCreateClass}
+        />
+
+
+
       </div>
-
-      <TimeTablePopup
-        isOpen={isTimeTablePopupOpen}
-        onClose={closeTimeTablePopup}
-      />
-      <GetExam
-        isOpen={isGetExamOpen}
-        onClose={() => setIsGetExamOpen(false)}
-      />
-
-      <Schedule 
-        isOpen={isExamSchedulerOpen}
-        onClose={closeExamScheuler}
-      />
-
-      <CreateClass
-         isOpen={isCreateClassOpen}
-        onClose={closeCreateClass}
-      />
-      
-  
-
-    </div>
     </>
   );
 };

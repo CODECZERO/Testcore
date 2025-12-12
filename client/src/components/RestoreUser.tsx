@@ -4,7 +4,7 @@ import { login } from "./store";
 
 const RestoreUser: React.FC = () => {
   const dispatch = useDispatch();
- 
+
 
   useEffect(() => {
     // Retrieve user session data from localStorage
@@ -24,7 +24,7 @@ const RestoreUser: React.FC = () => {
       const userdata = {
         name: userName || "Unknown User",
         email: userEmail || "unknown@example.com",
-        image: "https://img.freepik.com/premium-vector/default-avatar-profile-icon-social-media-user-image-gray-avatar-icon-blank-profile-silhouette-vector-illustration_561158-3407.jpg",
+        image: "",
         role: userRole,
         phone: userPhone,
         address: userAddress,
@@ -32,7 +32,7 @@ const RestoreUser: React.FC = () => {
 
       // Restore user state in Redux
       dispatch(login(userdata));
-    } 
+    }
   }, [dispatch]);
 
   return null; // This component doesn't render anything

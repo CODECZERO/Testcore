@@ -1,38 +1,31 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { TextField, Button } from "@mui/material";
-import { useRoom } from "./RoomContext"; // Import the RoomContext
-
-const BackendUrl = "https://testcore-3en7.onrender.com";
-const authToken = localStorage.getItem("accessToken");
+import { useRoom } from "./RoomContext";
+import apiClient, { getErrorMessage } from "../../services/api.service";
+import { API_ENDPOINTS } from "../../config/api.config";
 
 const CreateChat: React.FC = () => {
   const [roomName, setRoomNameInput] = useState("");
-  const { setRoomName } = useRoom(); // Get the global setRoomName function from context
+  const [loading, setLoading] = useState(false);
+  const { setRoomName } = useRoom();
 
   const handleCreateRoom = async () => {
     if (!roomName) {
       alert("Room name cannot be empty!");
       return;
     }
-    try {
-      const response = await axios.post(
-        `${BackendUrl}/api/v1/chat/createChat`,
-        { roomName },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
-      );
 
-      setRoomName(roomName); // Update the global room name in the context
+    setLoading(true);
+    try {
+      const response = await apiClient.post(API_ENDPOINTS.CHAT.CREATE, { roomName });
+      setRoomName(roomName);
       alert("Chat room created successfully!");
       console.log(response.data);
     } catch (error) {
       console.error("Error creating chat room:", error);
-      alert("Failed to create chat room.");
+      alert(getErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -45,8 +38,13 @@ const CreateChat: React.FC = () => {
         fullWidth
         required
       />
-      <Button variant="contained" color="primary" onClick={handleCreateRoom}>
-        Create Room
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleCreateRoom}
+        disabled={loading}
+      >
+        {loading ? "Creating..." : "Create Room"}
       </Button>
     </div>
   );

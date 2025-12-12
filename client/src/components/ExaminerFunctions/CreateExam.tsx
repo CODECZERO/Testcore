@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-
-const BackendUrl = 'https://testcore-3en7.onrender.com';
+import React, { useState } from 'react';
+import apiClient, { getErrorMessage } from '../../services/api.service';
+import { API_ENDPOINTS } from '../../config/api.config';
+import '../styles/ExaminerFunctions.css';
 
 const CreateExam = () => {
     const [examId, setExamId] = useState('');
@@ -21,14 +21,12 @@ const CreateExam = () => {
         setError('');
 
         try {
-            const authToken = localStorage.getItem("accessToken");
-            const response = await axios.get(`${BackendUrl}/api/v1/examiner/questionPaper`, {
-                params: { examID: examId },
-                headers: { Authorization: `Bearer ${authToken}` }
+            const response = await apiClient.get(API_ENDPOINTS.EXAMINER.QUESTION_PAPER, {
+                params: { examID: examId }
             });
             setQuestionPapers(response.data.data);
         } catch (err) {
-            setError('Failed to fetch question papers.');
+            setError(getErrorMessage(err));
         } finally {
             setLoading(false);
         }
@@ -45,58 +43,89 @@ const CreateExam = () => {
         setMessage('');
 
         try {
-            const authToken = localStorage.getItem("accessToken");
-            const response = await axios.post(`${BackendUrl}/api/v1/examiner/questionPaper`, {
-                examData: { examID: examId }, 
+            await apiClient.post(API_ENDPOINTS.EXAMINER.QUESTION_PAPER, {
+                examData: { examID: examId },
                 QuestionPaperData: newQuestionPaper
-            }, {
-                headers: { Authorization: `Bearer ${authToken}`, 'Content-Type': 'application/json' }
             });
             setMessage('Question paper created successfully!');
             fetchQuestionPapers();
         } catch (err) {
-            setError('Failed to create question paper.');
+            setError(getErrorMessage(err));
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div>
-            <h2>Examiner Question Paper Management</h2>
-            <input
-                type="text"
-                placeholder="Enter Exam ID"
-                value={examId}
-                onChange={(e) => setExamId(e.target.value)}
-            />
-            <button onClick={fetchQuestionPapers} disabled={loading}>
-                {loading ? 'Loading...' : 'Fetch Question Papers'}
-            </button>
+        <div className="examiner-container">
+            <div className="examiner-form">
+                <h2>Question Paper Management</h2>
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {message && <p style={{ color: 'green' }}>{message}</p>}
+                {error && <div className="error-message">{error}</div>}
+                {message && <div className="success-message">{message}</div>}
 
-            <h3>Create Question Paper</h3>
-            <textarea
-                placeholder="Enter question paper content"
-                value={newQuestionPaper}
-                onChange={(e) => setNewQuestionPaper(e.target.value)}
-            ></textarea>
-            <button onClick={createQuestionPaper} disabled={loading}>
-                {loading ? 'Submitting...' : 'Create Question Paper'}
-            </button>
+                <div className="form-row">
+                    <div className="form-group" style={{ flex: 2 }}>
+                        <input
+                            type="text"
+                            placeholder="Enter Exam ID"
+                            value={examId}
+                            onChange={(e) => setExamId(e.target.value)}
+                        />
+                    </div>
+                    <div className="form-group" style={{ flex: 1 }}>
+                        <button
+                            onClick={fetchQuestionPapers}
+                            disabled={loading}
+                            className="examiner-btn"
+                        >
+                            {loading ? 'Loading...' : 'Fetch Papers'}
+                        </button>
+                    </div>
+                </div>
 
-            <h3>Available Question Papers</h3>
-            <ul>
+                <div className="form-group">
+                    <label>Create Question Paper</label>
+                    <textarea
+                        placeholder="Enter question paper content"
+                        value={newQuestionPaper}
+                        onChange={(e) => setNewQuestionPaper(e.target.value)}
+                        rows={6}
+                    ></textarea>
+                </div>
+
+                <button
+                    onClick={createQuestionPaper}
+                    disabled={loading}
+                    className="examiner-btn"
+                >
+                    {loading ? 'Submitting...' : 'Create Question Paper'}
+                </button>
+
+                <h3 style={{ marginTop: '1.5rem', marginBottom: '1rem' }}>Available Question Papers</h3>
                 {questionPapers.length > 0 ? (
-                    questionPapers.map((paper, index) => (
-                        <li key={index}>{JSON.stringify(paper)}</li>
-                    ))
+                    <div className="table-wrapper">
+                        <table className="examiner-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Content</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {questionPapers.map((paper, index) => (
+                                    <tr key={index}>
+                                        <td>{index + 1}</td>
+                                        <td>{JSON.stringify(paper)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 ) : (
-                    <p>No question papers found.</p>
+                    <p className="loading-text">No question papers found. Enter an Exam ID and fetch.</p>
                 )}
-            </ul>
+            </div>
         </div>
     );
 };

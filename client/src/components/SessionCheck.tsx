@@ -1,25 +1,40 @@
-import React, { useEffect,useState } from 'react'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import Login from './LoginSign/SignUp';
 import Dashboard from './DashBoard/Dashboard';
+import apiClient from '../services/api.service';
+import { API_ENDPOINTS } from '../config/api.config';
 
-const SessionCheck:React.FC=()=>{
-    const [loginData,setLoginData]=useState<any>(false);
-    const data= async()=>{
-        const Data=await axios.get(`https://testcore-3en7.onrender.com/api/v1/user/userData`)
-        if(!Data) setLoginData(false)
-        setLoginData(Data);
-    }
-    useEffect(()=>{
-         data();
-    },[]);
-    return !loginData?(
-        <Login/>
-    ):(
+const SessionCheck: React.FC = () => {
+    const [loginData, setLoginData] = useState<any>(false);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const checkSession = async () => {
+            try {
+                const response = await apiClient.get(API_ENDPOINTS.USER.USER_DATA);
+                if (response.data) {
+                    setLoginData(response.data);
+                } else {
+                    setLoginData(false);
+                }
+            } catch {
+                setLoginData(false);
+            } finally {
+                setLoading(false);
+            }
+        };
+        checkSession();
+    }, []);
+
+    if (loading) return null;
+
+    return !loginData ? (
+        <Login />
+    ) : (
         <>
-            <Dashboard/>
+            <Dashboard />
         </>
-    )
-}
+    );
+};
 
 export default SessionCheck;

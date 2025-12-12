@@ -1,9 +1,8 @@
 import React, { createContext, useContext, useState } from "react";
-import axios from "axios";
+import apiClient, { getErrorMessage } from "../../services/api.service";
+import { API_ENDPOINTS } from "../../config/api.config";
 
 const ProfilePictureContext = createContext<any>(null);
-
-const BackendUrl = "https://testcore-3en7.onrender.com";
 
 interface ProfilePictureProviderProps {
   children: React.ReactNode;
@@ -44,34 +43,24 @@ export const ProfilePictureProvider: React.FC<ProfilePictureProviderProps> = ({ 
         setUploadError("User not authorized. Please log in.");
         return;
       }
-      
-        console.log("Selected file details:", {
-          name: selectedFile.name,
-          type: selectedFile.type,
-          size: selectedFile.size,
-        });
 
-      const response = await axios.post(`${BackendUrl}/api/v1/user/profile`, formData, {
+      console.log("Selected file details:", {
+        name: selectedFile.name,
+        type: selectedFile.type,
+        size: selectedFile.size,
+      });
+
+      const response = await apiClient.post(API_ENDPOINTS.USER.PROFILE, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${accessToken}`, // Include the access token
         },
       });
 
       console.log("Profile picture uploaded successfully:", response.data);
       alert("Profile picture updated successfully!");
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error uploading profile picture:", error);
-      if (error.response) {
-        console.log("Backend error response:", error.response.data);
-      }
-      if (error.response) {
-        setUploadError(error.response.data.message || "Failed to upload profile picture.");
-        
-      } else {
-          
-        setUploadError("An unexpected error occurred.");
-      }
+      setUploadError(getErrorMessage(error));
     } finally {
       setUploading(false);
     }

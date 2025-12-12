@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import axios from "axios";
 import ReusablePopup from "../StudentFunctions/PopUp";
-
-const BackendUrl = "https://testcore-3en7.onrender.com";
+import apiClient, { getErrorMessage } from "../../services/api.service";
+import { API_ENDPOINTS } from "../../config/api.config";
+import "../styles/ExaminerFunctions.css";
 
 interface SchedulePopupProps {
-    isOpen: boolean;
-    onClose: () => void;
-  }
+  isOpen: boolean;
+  onClose: () => void;
+}
+
 const ExamScheduler: React.FC<SchedulePopupProps> = ({ isOpen, onClose }) => {
   const [examData, setExamData] = useState({
     subjectCode: "",
@@ -20,6 +21,7 @@ const ExamScheduler: React.FC<SchedulePopupProps> = ({ isOpen, onClose }) => {
   });
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -30,19 +32,12 @@ const ExamScheduler: React.FC<SchedulePopupProps> = ({ isOpen, onClose }) => {
     e.preventDefault();
     setSuccessMessage("");
     setErrorMessage("");
+    setLoading(true);
 
     try {
-      const authToken = localStorage.getItem("accessToken"); // Assuming auth token is stored locally
-
-      const response = await axios.post(
-        `${BackendUrl}/api/v1/examiner/scheduleExam`,
-        examData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`,
-          },
-        }
+      const response = await apiClient.post(
+        API_ENDPOINTS.EXAMINER.SCHEDULE_EXAM,
+        examData
       );
 
       if (response.status === 201) {
@@ -53,54 +48,46 @@ const ExamScheduler: React.FC<SchedulePopupProps> = ({ isOpen, onClose }) => {
         );
       }
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setErrorMessage(
-          err.response?.data.message || "Failed to schedule the exam. Try again."
-        );
-      } else {
-        setErrorMessage("An unknown error occurred.");
-      }
+      setErrorMessage(getErrorMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <ReusablePopup isOpen={isOpen} onClose={onClose}>
-    <div>
-      <h1>Schedule an Exam</h1>
+      <div className="examiner-form" style={{ padding: '1rem' }}>
+        <h2>Schedule an Exam</h2>
 
-      {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-      {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+        {successMessage && <div className="success-message">{successMessage}</div>}
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            Subject Code:
-            <input
-              type="text"
-              name="subjectCode"
-              value={examData.subjectCode}
-              onChange={handleChange}
-              required
-            />
-          </label>
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Subject Code</label>
+              <input
+                type="text"
+                name="subjectCode"
+                value={examData.subjectCode}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Subject Name</label>
+              <input
+                type="text"
+                name="subjectName"
+                value={examData.subjectName}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
 
-        <div>
-          <label>
-            Subject Name:
-            <input
-              type="text"
-              name="subjectName"
-              value={examData.subjectName}
-              onChange={handleChange}
-              required
-            />
-          </label>
-        </div>
-
-        <div>
-          <label>
-            Exam Name:
+          <div className="form-group">
+            <label>Exam Name</label>
             <input
               type="text"
               name="examName"
@@ -108,64 +95,59 @@ const ExamScheduler: React.FC<SchedulePopupProps> = ({ isOpen, onClose }) => {
               onChange={handleChange}
               required
             />
-          </label>
-        </div>
+          </div>
 
-        <div>
-          <label>
-            Date:
-            <input
-              type="date"
-              name="date"
-              value={examData.date}
-              onChange={handleChange}
-              required
-            />
-          </label>
-        </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Date</label>
+              <input
+                type="date"
+                name="date"
+                value={examData.date}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Duration (minutes)</label>
+              <input
+                type="number"
+                name="examDuration"
+                value={examData.examDuration}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
 
-        <div>
-          <label>
-            Exam Start Time:
-            <input
-              type="time"
-              name="examStart"
-              value={examData.examStart}
-              onChange={handleChange}
-              required
-            />
-          </label>
-        </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Start Time</label>
+              <input
+                type="time"
+                name="examStart"
+                value={examData.examStart}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>End Time</label>
+              <input
+                type="time"
+                name="examEnd"
+                value={examData.examEnd}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
 
-        <div>
-          <label>
-            Exam End Time:
-            <input
-              type="time"
-              name="examEnd"
-              value={examData.examEnd}
-              onChange={handleChange}
-              required
-            />
-          </label>
-        </div>
-
-        <div>
-          <label>
-            Exam Duration (in minutes):
-            <input
-              type="number"
-              name="examDuration"
-              value={examData.examDuration}
-              onChange={handleChange}
-              required
-            />
-          </label>
-        </div>
-
-        <button type="submit">Schedule Exam</button>
-      </form>
-    </div>
+          <button type="submit" className="examiner-btn" disabled={loading}>
+            {loading ? 'Scheduling...' : 'Schedule Exam'}
+          </button>
+        </form>
+      </div>
     </ReusablePopup>
   );
 }

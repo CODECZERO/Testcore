@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-
-const BackendUrl = 'https://testcore-3en7.onrender.com';
+import apiClient, { getErrorMessage } from '../../services/api.service';
+import { API_ENDPOINTS } from '../../config/api.config';
+import '../styles/CollegeFunctions.css';
 
 interface Examiner {
     id: number;
@@ -18,42 +18,37 @@ const CollegeExaminer: React.FC = () => {
     useEffect(() => {
         const fetchExaminers = async () => {
             try {
-                const authToken = localStorage.getItem("accessToken");
-                const response = await axios.get(`${BackendUrl}/api/v1/college/examiner`, {
-                    headers: {
-                        Authorization: `Bearer ${authToken}` 
-                    }
-                });
+                const response = await apiClient.get(API_ENDPOINTS.COLLEGE.EXAMINER);
                 setExaminers(response.data.data);
                 console.log(response.data);
-                setLoading(false);
-                
-            } catch (err: any) {
-                setError(err.message);
+            } catch (err) {
+                setError(getErrorMessage(err));
+            } finally {
                 setLoading(false);
             }
         };
         fetchExaminers();
     }, []);
 
-    if (loading) return <p>Loading...</p>;
-    if (error) return <p>Error: {error}</p>;
+    if (loading) return <div className="college-container"><p className="loading-text">Loading examiners...</p></div>;
+    if (error) return <div className="college-container"><div className="error-message">Error: {error}</div></div>;
 
     return (
-        <div>
-            <h1>College Examiners</h1>
+        <div className="college-card">
+            <h2>College Examiners</h2>
             {examiners.length > 0 ? (
-                <ul>
+                <div className="college-list">
                     {examiners.map((examiner) => (
-                        <li key={examiner.id}>
-                            <p>Name: {examiner.name}</p>
-                            <p>Email: {examiner.email}</p>
-                            <p>Department: {examiner.department}</p>
-                        </li>
+                        <div key={examiner.id} className="college-list-item">
+                            <div className="info">
+                                <span className="name">{examiner.name}</span>
+                                <span className="email">{examiner.email} • {examiner.department}</span>
+                            </div>
+                        </div>
                     ))}
-                </ul>
+                </div>
             ) : (
-                <p>No examiners found.</p>
+                <p className="loading-text">No examiners found.</p>
             )}
         </div>
     );

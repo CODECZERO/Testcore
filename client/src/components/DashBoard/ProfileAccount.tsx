@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Pic from "../../Assets/Pic.png";
 import { BiPlus } from "react-icons/bi";
 import { useProfilePicture } from "../Users/ProfileContext";
@@ -6,6 +7,7 @@ import "../styles/ProfileAccount.css";
 
 const ProfileAccount: React.FC = () => {
   const { handleFileChange, handleUpload } = useProfilePicture();
+  const navigate = useNavigate();
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -13,6 +15,27 @@ const ProfileAccount: React.FC = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
+  };
+
+  const handleChangePassword = () => {
+    navigate("/forget-password");
+  };
+
+  const handleLogout = () => {
+    // Clear all user-related data from localStorage
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("userPhone");
+    localStorage.removeItem("userAddress");
+    // Clear tab-specific userId
+    const tabId = window.name;
+    if (tabId) {
+      localStorage.removeItem(`userId_${tabId}`);
+    }
+    // Navigate to login page
+    navigate("/sign-up");
   };
 
   return (
@@ -39,8 +62,8 @@ const ProfileAccount: React.FC = () => {
             </button>
           </div>
           <div className="other-options">
-            <button>Change Password</button>
-            <button>Logout</button>
+            <button onClick={handleChangePassword}>Change Password</button>
+            <button onClick={handleLogout}>Logout</button>
           </div>
         </div>
       </div>
@@ -49,3 +72,4 @@ const ProfileAccount: React.FC = () => {
 };
 
 export default ProfileAccount;
+

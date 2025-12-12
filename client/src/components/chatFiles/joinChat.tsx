@@ -1,47 +1,59 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useRoom } from "./RoomContext"; // Import RoomContext for global room management
+import { useRoom } from "./RoomContext";
+import apiClient, { getErrorMessage } from "../../services/api.service";
+import { API_ENDPOINTS } from "../../config/api.config";
 import "./styles2/JoinChat.css"
 
-const BackendUrl = "https://testcore-3en7.onrender.com";
-const authToken = localStorage.getItem("accessToken");
-
 interface JoinChatProps {
-  onRoomJoin?: (roomName: string) => void; // Optional callback for parent components
+  onRoomJoin?: (roomName: string) => void;
 }
 
 const JoinChat: React.FC<JoinChatProps> = ({ onRoomJoin }) => {
-  const [college, setCollege] = useState("");
+  const [roomName, setRoomName] = useState("");
   const [feedback, setFeedback] = useState("");
-  const { setRoomName } = useRoom(); // Get the global setRoomName function from context
+  const [loading, setLoading] = useState(false);
+  const { setRoomName: setGlobalRoomName } = useRoom();
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const roomName = `${college}`; // Create the room name from input values
+    if (!roomName.trim()) {
+      setFeedback("Please enter a room name");
+      return;
+    }
+
+    setLoading(true);
 
     try {
-      const response = await axios.post(
-        `${BackendUrl}/api/v1/chat/ChatQuery/${roomName}`,
-        {},
-        { headers: { Authorization: `Bearer ${authToken}` } }
-      );
+      const response = await apiClient.post(API_ENDPOINTS.CHAT.CHAT_QUERY(roomName), {});
 
-      setRoomName(roomName); // Update the global room name in the context
-      if (onRoomJoin) onRoomJoin(roomName); // Notify parent component if callback is provided
+      setGlobalRoomName(roomName);
+      if (onRoomJoin) onRoomJoin(roomName);
 
       console.log("Room Joined in joinchat component:", roomName);
       setFeedback(response.data.message || "Joined room successfully");
-    } catch (error: any) {
-      setFeedback(error.response?.data?.message || "Error while joining room");
+    } catch (error) {
+      setFeedback(getErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
   };
 
-  
-
   return (
-   <>
-   
-   </>
+    <div className="join-chat-container">
+      <form onSubmit={handleJoin} className="join-chat-form">
+        <input
+          type="text"
+          placeholder="Enter room name"
+          value={roomName}
+          onChange={(e) => setRoomName(e.target.value)}
+          className="join-chat-input"
+        />
+        <button type="submit" disabled={loading} className="join-chat-button">
+          {loading ? "Joining..." : "Join Room"}
+        </button>
+      </form>
+      {feedback && <p className="join-chat-feedback">{feedback}</p>}
+    </div>
   );
 };
 

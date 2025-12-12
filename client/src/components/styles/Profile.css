@@ -1,28 +1,19 @@
-/* Profile Container */
+/* ========== PROFILE STYLES - CLEAN & ALIGNED ========== */
+
+/* Profile Container - Hidden on dashboard */
 .profile-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  padding: 1rem;
-  height: 490px; /* Ensures it spans the height of the sidebar */
-  background-color: #f8f9fa; /* Matches the dashboard's aesthetic */
-  border-left: 1px solid #ddd; /* Separates it from the main content */
-  box-sizing: border-box;
-  border-top-left-radius: 20px;
-  margin-top: 70%;
-  border-bottom-left-radius: 20px;
-  z-index: 10; /* Ensure it appears above other content */
+  display: none;
 }
 
-/* Circular Profile Avatar */
+/* Profile Avatar in Header */
 .profile-avatar {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid #ddd;
-  transition: transform 0.3s, box-shadow 0.3s, margin-left 0.3s;
+  border: 2px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .profile-avatar img {
@@ -31,95 +22,89 @@
   object-fit: cover;
 }
 
-/* Hover Effect */
 .profile-avatar:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Avatar Movement When Dropdown is Open */
-.profile-avatar.menu-open {
-  margin-left: 10px; /* Move avatar to the right */
+  border-color: #667eea;
+  transform: scale(1.05);
 }
 
 /* Dropdown Menu */
 .dropdown-menu {
   position: absolute;
-  top: 120px; /* Position below the avatar */
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
   width: 200px;
-  right: 55px; /* Align dropdown to the right */
-  background-color: #0d1117;
-  border: 1px solid #1a1f24;
-  border-radius: 10px;
-  padding: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 0.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-10px); /* Slightly move up for animation */
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+  z-index: 1001;
 }
 
-/* Show Dropdown Menu */
-.profile-container:hover .dropdown-menu,
-.profile-container.menu-open .dropdown-menu {
+.dropdown-menu.show {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0); /* Reset position */
+  transform: translateY(0);
 }
 
-/* Responsive Adjustments */
-@media (max-width: 1024px) {
-  .profile-avatar {
-    width: 35px;
-    height: 35px;
-    border: 1px solid #ccc;
-  }
-
-  .dropdown-menu {
-    width: 180px; /* Slightly narrower on medium screens */
-    top: 50px; /* Adjust position */
-  }
+.dropdown-menu a,
+.dropdown-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem;
+  color: #4a5568;
+  text-decoration: none;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  border: none;
+  background: none;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
 }
 
+.dropdown-menu a:hover,
+.dropdown-menu button:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.dropdown-menu .logout-btn {
+  color: #ef4444;
+}
+
+.dropdown-menu .logout-btn:hover {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .profile-container {
-    top: 15px; /* Slightly closer to the top */
-  }
-
   .profile-avatar {
-    width: 30px;
-    height: 30px;
-    border: 1px solid #aaa;
+    width: 32px;
+    height: 32px;
   }
 
   .dropdown-menu {
-    width: 150px; /* Compact dropdown */
-    top: 45px; /* Adjust for smaller avatars */
-    padding: 8px;
+    width: 180px;
   }
 }
 
 @media (max-width: 480px) {
-  .profile-container {
-    top: 10px; /* Align closer for very small screens */
-  }
-
   .profile-avatar {
-    width: 25px;
-    height: 25px;
+    width: 28px;
+    height: 28px;
   }
 
   .dropdown-menu {
-    width: 140px; /* Further compact dropdown */
-    right: 5px; /* Align closer to the edge */
-    padding: 6px; /* Reduce padding */
-    font-size: 0.85rem; /* Adjust text size */
+    width: 160px;
+    right: -0.5rem;
   }
 }
-
-
-
-
-
-
-
