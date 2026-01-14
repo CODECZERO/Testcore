@@ -1,46 +1,37 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import amqplib from 'amqplib';
 class rabbitMqFunction {
     constructor() {
         this.exchangeName = 'chat_exchagne';
         this.messageTTL = 2 * 24 * 60 * 60 * 1000; // 2 days in milliseconds
         // private queueName = "MessageStore"
-        this.connectRabbitMq = (roomName) => __awaiter(this, void 0, void 0, function* () {
+        this.connectRabbitMq = async (roomName) => {
             if (!this.connection)
-                this.connection = yield amqplib.connect(process.env.RABBITMQURL);
+                this.connection = await amqplib.connect(process.env.RABBITMQURL);
             if (!this.channel) {
-                this.channel = yield this.connection.createChannel();
+                this.channel = await this.connection.createChannel();
                 this.channel.assertExchange(this.exchangeName, 'topic', {
                     durable: true,
                 });
             }
-        });
-        this.publishData = (messageEnc, roomName) => __awaiter(this, void 0, void 0, function* () {
+        };
+        this.publishData = async (messageEnc, roomName) => {
             if (!this.channel) {
-                yield this.connectRabbitMq(roomName);
+                await this.connectRabbitMq(roomName);
             }
-            yield this.channel.publish(this.exchangeName, roomName, Buffer.from(messageEnc), { persistent: true });
-        });
-        this.subData = (roomName) => __awaiter(this, void 0, void 0, function* () {
+            await this.channel.publish(this.exchangeName, roomName, Buffer.from(messageEnc), { persistent: true });
+        };
+        this.subData = async (roomName) => {
             if (!this.channel) {
-                yield this.connectRabbitMq(roomName);
+                await this.connectRabbitMq(roomName);
             }
-            this.queue = yield this.channel.assertQueue(roomName, { exclusive: false, arguments: { 'x-message-ttl': this.messageTTL, } });
-            const message = yield this.channel.bindQueue(this.queue.queue, this.exchangeName, roomName);
+            this.queue = await this.channel.assertQueue(roomName, { exclusive: false, arguments: { 'x-message-ttl': this.messageTTL, } });
+            const message = await this.channel.bindQueue(this.queue.queue, this.exchangeName, roomName);
             return message;
-        });
-        this.closeConnection = () => __awaiter(this, void 0, void 0, function* () {
-            yield this.channel.close();
-            yield this.connection.close();
-        });
+        };
+        this.closeConnection = async () => {
+            await this.channel.close();
+            await this.connection.close();
+        };
     }
 }
 const rabbitmq = new rabbitMqFunction();

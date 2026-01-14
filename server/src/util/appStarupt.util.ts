@@ -19,12 +19,31 @@ const connectAll = async () => {
         //@ts-ignore
         await runWebSocket();
         console.log("Websocket is Runing");
-        await prisma.$connect();
-        console.log("Postgres sql is Runing");
-        mongodbConenction = await connectDb();
-        console.log("Mongodb is Runing");
-        await connectReids();
-        console.log("Redis is Runing");
+
+        // Try to connect to Postgres - continue even if it fails
+        try {
+            await prisma.$connect();
+            console.log("Postgres sql is Runing");
+        } catch (pgError) {
+            console.error(`Database connection fail ${pgError}`);
+        }
+
+        // Try to connect to MongoDB - continue even if it fails
+        try {
+            mongodbConenction = await connectDb();
+            console.log("Mongodb is Runing");
+        } catch (mongoError) {
+            console.error(`MongoDB connection fail ${mongoError}`);
+        }
+
+        // Try to connect to Redis - continue even if it fails
+        try {
+            await connectReids();
+            console.log("Redis is Runing");
+        } catch (redisError) {
+            console.error(`Redis connection fail ${redisError}`);
+        }
+
         await runVideoServer();
         console.log("runing video server");
 
@@ -34,19 +53,44 @@ const connectAll = async () => {
 }
 
 const closeAll = async () => {//this function close all connection in server;
+    // Close Postgres
     try {
         await prisma.$disconnect();
         console.log("postgres sql connection is close");
+    } catch (error) {
+        console.error(`Error closing Postgres: ${error}`);
+    }
+
+    // Close MongoDB
+    try {
         await closeDb(mongodbConenction);
         console.log("mongodb connection is close");
+    } catch (error) {
+        console.error(`Error closing MongoDB: ${error}`);
+    }
+
+    // Close Redis
+    try {
         await closeRedis();
         console.log("Redis connection is close");
+    } catch (error) {
+        console.error(`Error closing Redis: ${error}`);
+    }
+
+    // Close Chat Socket
+    try {
         await closeChatSocket();
         console.log("chat service is close");
+    } catch (error) {
+        console.error(`Error closing chat socket: ${error}`);
+    }
+
+    // Close Video Server
+    try {
         await closeVideoServer();
         console.log("video service is close");
     } catch (error) {
-        throw new ApiError(500, `something went wrong while closeing conenction ${error}`);
+        console.error(`Error closing video server: ${error}`);
     }
 }
 

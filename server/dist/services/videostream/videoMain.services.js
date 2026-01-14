@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { WebSocketServer, WebSocket } from "ws";
 import { UniError } from "../../util/UniErrorHandler.js";
 import videoMethode from "./videoMethodes.services.js";
@@ -50,26 +41,24 @@ function logPerformance(action, peerId, duration, details) {
     console.log(`📊 [${peerId}] ${action}: ${duration}ms${details ? ` - ${JSON.stringify(details)}` : ''}`);
 }
 // ============= HELPER FUNCTIONS =============
-function getOrCreateRoom(roomId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const startTime = Date.now();
-        let room = rooms.get(roomId);
-        if (!room) {
-            const router = yield videoMethode.startConnection();
-            room = {
-                id: roomId,
-                router,
-                peers: new Map(),
-                createdAt: Date.now()
-            };
-            rooms.set(roomId, room);
-            performanceMetrics.totalRooms++;
-            performanceMetrics.activeRooms++;
-            const duration = Date.now() - startTime;
-            logPerformance('Room created', roomId, duration);
-        }
-        return room;
-    });
+async function getOrCreateRoom(roomId) {
+    const startTime = Date.now();
+    let room = rooms.get(roomId);
+    if (!room) {
+        const router = await videoMethode.startConnection();
+        room = {
+            id: roomId,
+            router,
+            peers: new Map(),
+            createdAt: Date.now()
+        };
+        rooms.set(roomId, room);
+        performanceMetrics.totalRooms++;
+        performanceMetrics.activeRooms++;
+        const duration = Date.now() - startTime;
+        logPerformance('Room created', roomId, duration);
+    }
+    return room;
 }
 function broadcastToRoom(roomId, excludePeerId, message) {
     const room = rooms.get(roomId);
@@ -143,7 +132,7 @@ function cleanupPeer(peerId) {
     });
 }
 // ============= MAIN SERVER =============
-const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
+const runVideoServer = async () => {
     try {
         console.log('🚀 Starting optimized video server with metrics...');
         wss.on('connection', (ws, req) => {
@@ -152,7 +141,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
             performanceMetrics.totalConnections++;
             performanceMetrics.activeConnections++;
             let currentPeer = null;
-            ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
+            ws.on('message', async (message) => {
                 const messageStart = Date.now();
                 try {
                     const messageData = JSON.parse(message);
@@ -164,7 +153,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 performanceMetrics.errorCount++;
                                 return;
                             }
-                            const room = yield getOrCreateRoom(messageData.roomId);
+                            const room = await getOrCreateRoom(messageData.roomId);
                             currentPeer = {
                                 id: peerId,
                                 ws,
@@ -226,7 +215,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 performanceMetrics.errorCount++;
                                 return;
                             }
-                            yield videoMethode.getRouterRtpCapabilities(ws, room.router);
+                            await videoMethode.getRouterRtpCapabilities(ws, room.router);
                             const duration = Date.now() - messageStart;
                             logPerformance('RTP capabilities sent', peerId, duration);
                             break;
@@ -244,7 +233,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 return;
                             }
                             const transportId = nanoid(12);
-                            const transport = yield videoMethode.createTransportForService(room.router);
+                            const transport = await videoMethode.createTransportForService(room.router);
                             currentPeer.transports.set(transportId, {
                                 transport,
                                 producers: new Map(),
@@ -286,7 +275,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 return;
                             }
                             try {
-                                yield transportData.transport.connect({
+                                await transportData.transport.connect({
                                     dtlsParameters: messageData.dtlsParameters
                                 });
                                 transportData.connectedAt = Date.now();
@@ -323,7 +312,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                 return;
                             }
                             try {
-                                const producer = yield transportData.transport.produce({
+                                const producer = await transportData.transport.produce({
                                     kind: messageData.kind,
                                     rtpParameters: messageData.rtpParameters,
                                     appData: {
@@ -391,7 +380,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                                     return;
                                 }
                                 // Create consumer with optimized settings
-                                const consumer = yield transportData.transport.consume({
+                                const consumer = await transportData.transport.consume({
                                     producerId: messageData.producerId,
                                     rtpCapabilities: messageData.rtpCapabilities,
                                     paused: false, // Start immediately for faster rendering
@@ -513,7 +502,7 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
                         error: `Error: ${error instanceof Error ? error.message : String(error)}`
                     }));
                 }
-            }));
+            });
             ws.on('close', () => {
                 const connectionDuration = Date.now() - connectionStart;
                 logPerformance('Connection closed', peerId, connectionDuration);
@@ -544,8 +533,8 @@ const runVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
         console.error("❌ Failed to start video server:", error);
         throw new UniError(`Failed to start video server: ${error}`);
     }
-});
-const closeVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
+};
+const closeVideoServer = async () => {
     try {
         console.log("🛑 Closing video server...");
         peers.forEach((peer) => {
@@ -560,5 +549,5 @@ const closeVideoServer = () => __awaiter(void 0, void 0, void 0, function* () {
         console.error("❌ Error closing video server:", error);
         throw error;
     }
-});
+};
 export { runVideoServer, closeVideoServer };

@@ -44,6 +44,7 @@ RUN pwd
 # Set the working directory
 WORKDIR /app
 ENV PRISMA_ENGINES_OPENSSL_VERSION=openssl-1.1.x
+ENV LD_LIBRARY_PATH=/usr/local/openssl-1.1/lib:/usr/lib
 
 # Copy application dependencies
 COPY package*.json ./

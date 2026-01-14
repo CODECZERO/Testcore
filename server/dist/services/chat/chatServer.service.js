@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { WebSocketServer } from "ws";
 import { sendMessage, receiveMessage, closeSocket } from "./chatMethodes.services.js";
 import AsyncHandler from "../../util/ayscHandler.js";
@@ -20,15 +11,15 @@ const actions = {
     'DELETE_MESSAGE': sendMessage,
     'MODIFI_MESSAGE': sendMessage,
 };
-const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, function* () {
-    wss.on('connection', (ws, req) => __awaiter(void 0, void 0, void 0, function* () {
+const runWebSocket = AsyncHandler(async () => {
+    wss.on('connection', async (ws, req) => {
         try {
             // const token = await tokenExtractr(req);
             // if (!token) {
             //   ws.close(4000, "Invalid request, User does not have access to this group");
             //   return;
             // }
-            ws.on('message', (message) => __awaiter(void 0, void 0, void 0, function* () {
+            ws.on('message', async (message) => {
                 try {
                     const MessageData = JSON.parse(message);
                     if (!(MessageData && MessageData.MessageId && MessageData.roomName && MessageData.content && MessageData.typeOfMessage && MessageData.userId)) {
@@ -48,14 +39,14 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
                         ws.close(4000, "Invalid message type");
                         return;
                     }
-                    yield action(MessageData, ws);
-                    yield receiveMessage(ws);
+                    await action(MessageData, ws);
+                    await receiveMessage(ws);
                 }
                 catch (error) {
                     console.error("Error processing message:", error);
                     ws.close(4000, "Error processing message");
                 }
-            }));
+            });
             ws.on('close', () => {
                 clients.delete(ws);
                 if (ws.roomName && rooms[ws.roomName]) {
@@ -71,9 +62,9 @@ const runWebSocket = AsyncHandler(() => __awaiter(void 0, void 0, void 0, functi
             console.error("Error establishing WebSocket connection:", error);
             ws.close(4000, "Error establishing connection");
         }
-    }));
-}));
-const closeChatSocket = () => __awaiter(void 0, void 0, void 0, function* () {
+    });
+});
+const closeChatSocket = async () => {
     try {
         wss.close();
         console.log("WebSocket server closed");
@@ -82,5 +73,5 @@ const closeChatSocket = () => __awaiter(void 0, void 0, void 0, function* () {
         console.error("Error closing WebSocket server:", error);
         return error;
     }
-});
+};
 export { runWebSocket, clients, rooms, closeChatSocket };

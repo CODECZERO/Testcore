@@ -27,11 +27,12 @@ const searchMongodb = async (tokenID: string): Promise<ExamDocument | null> => {
     }
 };
 
-const closeDb = async (client:any) => {//this function close mongodb database connection
+const closeDb = async (client: typeof mongoose | null) => {//this function close mongodb database connection
     try {
-        await client.close();
-        console.log("Disconnected from MongoDB");
-        process.exit(0);
+        if (client) {
+            await mongoose.disconnect();
+            console.log("Disconnected from MongoDB");
+        }
     } catch (error) {
         console.log(`something went wrong while closeing mongodb connection ${error}`);
     }

@@ -46,12 +46,12 @@ const cacheSearch = async (tokenID: string) => {//this function to search tokenI
     }
 }
 
-const cacheSearchForChatRoom = async (roomName:string) => {//this function takes room name from user and search it on redis 
+const cacheSearchForChatRoom = async (roomName: string) => {//this function takes room name from user and search it on redis 
     try {
         //this function spilt the college name and branch name
         if (!roomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = await client.hGet(roomName,roomName);//if the  name is provied then search theme in redis 
+        const roomSearch = await client.hGet(roomName, roomName);//if the  name is provied then search theme in redis 
         //cache , the cache uses Hashe datatype
         //the output will be like this 
         /*
@@ -76,7 +76,7 @@ const cacheUpdateForChatRoom = async (roomName: string, roomID: string) => {//th
 
         if (!roomName) throw new ApiError(500, "Invalid room name format");//if it wasn't able to split theme throw erro
         //value are at 0th index
-        const roomSearch = await client.hSet(roomName,roomName,roomID);
+        const roomSearch = await client.hSet(roomName, roomName, roomID);
         //the data will store like this 
         /*
             "roomName":{
@@ -125,9 +125,12 @@ const removeVideoServerTranspor = async (Id: string) => {//remove video server d
 
 const closeRedis = async () => {//this function close redis connection
     try {
-        client.disconnect();
+        if (client && client.isReady) {
+            await client.disconnect();
+        }
     } catch (error) {
-        throw new ApiError(500, `something went while closeing redis connection`);
+        console.log(`Error while closing redis connection: ${error}`);
+        // Don't throw here during shutdown - just log the error
     }
 }
 export {

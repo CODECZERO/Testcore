@@ -1,12 +1,3 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import axios from "axios";
 import mediasoup from "mediasoup";
 import { UniError } from "../../util/UniErrorHandler.js";
@@ -63,9 +54,9 @@ const mediaCodecs = [
 // Cache for public IP
 let cachedPublicIp = null;
 // ============= CREATE WORKER =============
-const createWorkerForService = () => __awaiter(void 0, void 0, void 0, function* () {
+const createWorkerForService = async () => {
     try {
-        const worker = yield mediasoup.createWorker({
+        const worker = await mediasoup.createWorker({
             logLevel: 'warn',
             rtcMinPort: 10000,
             rtcMaxPort: 15000,
@@ -86,14 +77,14 @@ const createWorkerForService = () => __awaiter(void 0, void 0, void 0, function*
     catch (error) {
         throw new UniError(`Failed to create worker: ${error}`);
     }
-});
+};
 // ============= CREATE ROUTER =============
-const createRouterForService = (worker) => __awaiter(void 0, void 0, void 0, function* () {
+const createRouterForService = async (worker) => {
     try {
         if (!worker) {
             throw new UniError("Worker not provided");
         }
-        const router = yield worker.createRouter({
+        const router = await worker.createRouter({
             mediaCodecs,
             // Optimize router settings
             appData: {
@@ -107,9 +98,9 @@ const createRouterForService = (worker) => __awaiter(void 0, void 0, void 0, fun
     catch (error) {
         throw new UniError(`Failed to create router: ${error}`);
     }
-});
+};
 // ============= CREATE TRANSPORT =============
-const createTransportForService = (router) => __awaiter(void 0, void 0, void 0, function* () {
+const createTransportForService = async (router) => {
     try {
         if (!router) {
             throw new UniError("Router not provided");
@@ -121,7 +112,7 @@ const createTransportForService = (router) => __awaiter(void 0, void 0, void 0, 
         }
         else {
             try {
-                const response = yield axios.get('https://api.ipify.org?format=json', {
+                const response = await axios.get('https://api.ipify.org?format=json', {
                     timeout: 3000 // Reduced timeout for faster failure
                 });
                 publicIp = response.data.ip;
@@ -135,7 +126,7 @@ const createTransportForService = (router) => __awaiter(void 0, void 0, void 0, 
             }
         }
         // Optimized transport configuration for better performance
-        const transport = yield router.createWebRtcTransport({
+        const transport = await router.createWebRtcTransport({
             listenIps: [
                 {
                     ip: '0.0.0.0',
@@ -183,5 +174,5 @@ const createTransportForService = (router) => __awaiter(void 0, void 0, void 0, 
     catch (error) {
         throw new UniError(`Failed to create transport: ${error}`);
     }
-});
+};
 export { createWorkerForService, createRouterForService, createTransportForService, mediaCodecs };
