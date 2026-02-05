@@ -11,7 +11,13 @@ const REDIS_PORT = process.env.REDIS_PORT || 6379;
 let client: RedisClientType;
 const connectReids = async () => {//connecting redis
     try {
-        client = createClient({ url: process.env.REDISURL });
+        const url = process.env.REDISURL || `redis://${REDIS_HOST}:${REDIS_PORT}`;
+        console.log(`Redis Connection URL: ${url.replace(/:\/\/.*@/, '://***@')}`);
+
+        client = createClient({
+            url,
+            pingInterval: 1000
+        });
         client.on('error', (err) => console.log('Redis Client Error', err));
         await client.connect();
         console.log('Redis connected successfully');
